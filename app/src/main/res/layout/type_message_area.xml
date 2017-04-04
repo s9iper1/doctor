@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:gravity="bottom"
+    android:padding="10dp">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="31dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/camera"
+        android:paddingRight="4dp"/>
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/custom_edit_text_background"
+        android:textColorHint="#bcc0c8"
+        android:textColor="#bcc0c8"
+        android:hint="Write a message"
+        android:padding="10dp"
+        android:layout_margin="1dp"/>
+
+    <ImageView
+        android:layout_width="37dp"
+        android:layout_height="26dp"
+        android:paddingBottom="1dp"
+        android:layout_marginBottom="10dp"
+        android:src="@mipmap/send" />
+
+
+</LinearLayout>
