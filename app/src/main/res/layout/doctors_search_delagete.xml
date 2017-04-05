@@ -25,20 +25,20 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:weightSum="9">
+        android:background="@android:color/white"
+        android:weightSum="10">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <RelativeLayout
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2">
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/round_relative_layout">
+            android:maxHeight="150dp"
+            android:maxWidth="150dp"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:background="@drawable/round_relative_layout">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_image_view_search"
@@ -55,8 +55,8 @@
 
                 <ImageView
                     android:id="@+id/status"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="10dp"
@@ -64,13 +64,11 @@
                     android:src="@mipmap/ic_offline_indicator" />
             </RelativeLayout>
 
-        </LinearLayout>
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:orientation="vertical">
 
             <TextView
@@ -78,12 +76,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Name"
+                android:layout_margin="1dp"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/specialist"
                 android:textSize="12sp"
+                android:layout_margin="1dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SpecialistIn" />
@@ -98,13 +98,12 @@
 
             <RatingBar
                 android:id="@+id/rating_bar"
-                style="?android:attr/ratingBarStyleSmall"
+                android:layout_margin="1dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:isIndicator="false"
+                android:layout_height="30dp"
                 android:numStars="5"
-                android:paddingBottom="10dp"
-                android:rating="3.5" />
+                style="@style/customRatingBar"
+                android:rating="3" />
 
         </LinearLayout>
 
@@ -112,24 +111,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_margin="2dp"
-                android:background="@null"
-                android:src="@mipmap/ic_chat" />
+                android:layout_gravity="left"
+                android:maxHeight="30dp"
+                android:maxWidth="30dp"
+                android:background="@mipmap/ic_chat" />
 
             <ImageButton
                 android:id="@+id/call"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:maxHeight="30dp"
+                android:maxWidth="30dp"
+                android:layout_gravity="right"
+                android:layout_height="30dp"
                 android:layout_margin="2dp"
-                android:background="@null"
-                android:src="@mipmap/ic_call" />
+                android:background="@mipmap/ic_call" />
 
         </LinearLayout>
 
@@ -138,7 +141,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="2dp"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:orientation="horizontal">
 
             <TextView
