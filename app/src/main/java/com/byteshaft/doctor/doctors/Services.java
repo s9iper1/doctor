@@ -34,10 +34,6 @@ import com.byteshaft.doctor.R;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-/**
- * Created by s9iper1 on 3/15/17.
- */
-
 public class Services extends Fragment {
 
     private LinearLayout searchContainer;
@@ -122,12 +118,13 @@ public class Services extends Fragment {
         // Setup the clear button
         Resources r = getResources();
         int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, r.getDisplayMetrics());
-        LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"service bla bla ", "120.00", "0"});
+        data.add(new String[]{"service bla ", "120.00", "0"});
         data.add(new String[]{"service abc ", "125.00", "1"});
         data.add(new String[]{"service abc ", "125.00", "2"});
         data.add(new String[]{"service abc ", "125.00", "1"});
