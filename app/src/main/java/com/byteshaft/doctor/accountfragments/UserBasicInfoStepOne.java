@@ -203,10 +203,9 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
             case R.id.next_button:
                 if (validateEditText() && mGenderButtonString != null && !mGenderButtonString.isEmpty()) {
                     if (mLocationString == null) {
-                        mLocationString = getLocationFromAddress(AppGlobals.getContext(),
-                                mAddressString).toString();
-                        Log.i("TAG", "lat lng " + mLocationString);
-                        Log.i("TAG", "lat lng " +  mAddressString);
+
+                        LatLng location = getLocationFromAddress(AppGlobals.getContext(), mAddressString);
+                        mLocationString = String.format("%s,%s", location.latitude, location.longitude);
                     }
                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, mDocIDString);
                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, mFirstNameString);

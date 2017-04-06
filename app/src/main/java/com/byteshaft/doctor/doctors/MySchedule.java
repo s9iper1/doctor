@@ -49,11 +49,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by s9iper1 on 3/23/17.
- */
-
-public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener, View.OnClickListener {
+public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnErrorListener, View.OnClickListener {
 
     private View mBaseView;
     private ListView mListView;
