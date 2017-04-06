@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -40,14 +43,18 @@ import com.byteshaft.doctor.patients.PatientDetails;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -222,8 +229,12 @@ public class MyPatients extends Fragment {
             final com.byteshaft.doctor.gettersetter.MyPatients myPatients = myPatientsList.get(position);
             viewHolder.name.setText(myPatients.getPatientsName());
             String years = Helpers.calculateAge(myPatients.getPatientAge());
-            viewHolder.patientAge.setText(" " + "-" + " " + "(" +  years +"a)");
-            viewHolder.distance.setText(myPatients.getPatientLocation());
+            viewHolder.patientAge.setText("-" + " " + "(" +  years +"a)");
+            String[] startLocation = myPatients.getPatientLocation().split(",");
+            String[] endLocation = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION).split(",");
+            viewHolder.distance.setText(" " + String.valueOf(calculationByDistance(new LatLng(Double.parseDouble(startLocation[0]),
+                    Double.parseDouble(startLocation[1])), new LatLng(Double.parseDouble(endLocation[0]),
+                    Double.parseDouble(endLocation[1])))) + " " + "km");
             Helpers.getBitMap(myPatients.getPatientImage(), viewHolder.circleImageView);
             if (!myPatients.getChatStatus()) {
                 viewHolder.status.setImageResource(R.mipmap.ic_offline_indicator);
@@ -255,10 +266,30 @@ public class MyPatients extends Fragment {
             return convertView;
         }
 
+
         @Override
         public int getCount() {
             return myPatientsList.size();
         }
+    }
+
+
+
+    public String calculationByDistance(LatLng startP, LatLng endP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = startP.latitude;
+        double lat2 = endP.latitude;
+        double lon1 = startP.longitude;
+        double lon2 = endP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        return String.format("%.2f", valueResult);
     }
 
     private void getPatientsDetails() {
@@ -279,7 +310,7 @@ public class MyPatients extends Fragment {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         com.byteshaft.doctor.gettersetter.MyPatients myPatients = new com.byteshaft.doctor.gettersetter.MyPatients();
                                         myPatients.setPatientId(jsonObject.getInt("id"));
-                                        myPatients.setPatientsName(jsonObject.getString("first_name") + "" + jsonObject.getString("last_name"));
+                                        myPatients.setPatientsName(jsonObject.getString("first_name") + " " + jsonObject.getString("last_name"));
                                         myPatients.setPatientAge(jsonObject.getString("dob"));
                                         myPatients.setPatientPhoneNumber(jsonObject.getString("phone_number_primary"));
                                         myPatients.setPatientLocation(jsonObject.getString("location"));

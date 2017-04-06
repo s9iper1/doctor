@@ -60,7 +60,7 @@
     <string name="close">Close</string>
     <string name="permission_denied">Permission denied !</string>
     <string name="date_of_birth">Date of birth</string>
-    <string name="acquiring_location">Acquiring location</string>
+    <string name="acquiring_location">Acquiring location please wait..</string>
     <string name="email">Email</string>
     <string name="resend">Resend</string>
     <string name="activate">Activate</string>
