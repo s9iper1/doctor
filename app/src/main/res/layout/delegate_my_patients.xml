@@ -20,8 +20,7 @@
 
             <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/round_relative_layout">
+                android:layout_height="wrap_content">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_image_view_search"
@@ -33,7 +32,7 @@
                     android:minWidth="100dp"
                     android:src="@mipmap/image_placeholder"
                     app:civ_border_color="#FFF"
-                    app:civ_border_width="4dp"
+                    app:civ_border_width="2dp"
                     app:civ_fill_color="@android:color/white" />
 
                 <ImageView
@@ -74,7 +73,7 @@
 
                 <TextView
                     android:id="@+id/patient_age"
-                    android:text=" - (27a)"
+                    android:text="-(27a)"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -100,23 +99,23 @@
 
             <ImageButton
                 android:id="@+id/chat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_margin="2dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:background="@null"
-                android:src="@mipmap/ic_chat" />
+                android:layout_gravity="left"
+                android:maxHeight="30dp"
+                android:maxWidth="30dp"
+                android:background="@mipmap/ic_chat" />
 
             <ImageButton
                 android:id="@+id/call"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:maxHeight="30dp"
+                android:maxWidth="30dp"
+                android:layout_gravity="right"
+                android:layout_height="30dp"
                 android:layout_margin="2dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:background="@null"
-                android:src="@mipmap/ic_call" />
+                android:background="@mipmap/ic_call" />
 
         </LinearLayout>
 

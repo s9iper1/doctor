@@ -203,6 +203,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
             case R.id.next_button:
                 if (validateEditText() && mGenderButtonString != null && !mGenderButtonString.isEmpty()) {
                     if (mLocationString == null) {
+
                         LatLng location = getLocationFromAddress(AppGlobals.getContext(), mAddressString);
                         mLocationString = String.format("%s,%s", location.latitude, location.longitude);
                     }
@@ -310,6 +311,32 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         }
     }
 
+    public LatLng getLocationFromAddress(Context context, String strAddress) {
+
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        LatLng p1 = null;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+            Address location = address.get(0);
+            location.getLatitude();
+            location.getLongitude();
+
+            p1 = new LatLng(location.getLatitude(), location.getLongitude());
+
+        } catch (IOException ex) {
+
+            ex.printStackTrace();
+        }
+
+        return p1;
+    }
+
     private boolean validateEditText() {
         boolean valid = true;
         mDocIDString = mDocID.getText().toString();
@@ -384,31 +411,6 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         }
     }
 
-    public LatLng getLocationFromAddress(Context context, String strAddress) {
-
-        Geocoder coder = new Geocoder(context);
-        List<Address> address;
-        LatLng p1 = null;
-
-        try {
-            // May throw an IOException
-            address = coder.getFromLocationName(strAddress, 5);
-            if (address == null) {
-                return null;
-            }
-            Address location = address.get(0);
-            location.getLatitude();
-            location.getLongitude();
-
-            p1 = new LatLng(location.getLatitude(), location.getLongitude());
-
-        } catch (IOException ex) {
-
-            ex.printStackTrace();
-        }
-
-        return p1;
-    }
 
     public void buildGoogleApiClient() {
         if (mGoogleApiClient == null) {
