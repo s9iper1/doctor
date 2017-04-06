@@ -24,20 +24,33 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.gettersetter.Agenda;
 import com.byteshaft.doctor.patients.DoctorsAppointment;
+import com.byteshaft.doctor.utils.AppGlobals;
+import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
+import static com.byteshaft.doctor.R.id.state;
+
 ;
 
-public class Appointments extends Fragment {
+public class Appointments extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View mBaseView;
-    SwipeMenuListView mListView;
+    private SwipeMenuListView mListView;
+    private HttpRequest request;
+    private ArrayList<Agenda> agendaArrayList;
+    private Adapter arrayAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,6 +66,8 @@ public class Appointments extends Fragment {
         TextView dateTextview = (TextView) calendarView.findViewById(R.id.calendar_date_display);
         Log.i("TAG", dateTextview.getText().toString());
         dateTextview.setTextColor(getResources().getColor(R.color.header_background));
+        agendaArrayList = new ArrayList<>();
+        getAgendaList();
 
         // assign event handler
         calendarView.setEventHandler(new com.byteshaft.doctor.uihelpers.CalendarView.EventHandler() {
@@ -74,7 +89,7 @@ public class Appointments extends Fragment {
                         getContext());
                 // set item background
                 close.setBackground(new ColorDrawable(getResources().getColor(
-                        R.color.close_background)));
+                        R.color.reject_background)));
                 // set item width
                 close.setWidth(dpToPx(50));
                 // set item title
@@ -101,11 +116,11 @@ public class Appointments extends Fragment {
         mListView.setMenuCreator(creator);
         mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
         ArrayList<String[]> arrayList = new ArrayList<>();
-        arrayList.add(new String[]{"Bilal" , "24", "ENT checkup"});
-        arrayList.add(new String[]{"omer" , "25", "ENT checkup"});
-        arrayList.add(new String[]{"shahid" , "26", "ENT checkup"});
-        arrayList.add(new String[]{"hussi" , "24", "ENT checkup"});
-        mListView.setAdapter(new Adapter(getContext(), arrayList));
+        arrayList.add(new String[]{"Bilal", "24", "ENT checkup"});
+        arrayList.add(new String[]{"omer", "25", "ENT checkup"});
+        arrayList.add(new String[]{"shahid", "26", "ENT checkup"});
+        arrayList.add(new String[]{"hussi", "24", "ENT checkup"});
+//        mListView.setAdapter(new Adapter(getContext(), arrayList));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -113,6 +128,16 @@ public class Appointments extends Fragment {
             }
         });
         return mBaseView;
+    }
+
+    private void getAgendaList() {
+        request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%sdoctor/agenda", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 
     @Override
@@ -124,13 +149,14 @@ public class Appointments extends Fragment {
                 switch (index) {
                     // close
                     case 0:
-                        Log.i("TAG", "0");
+                        Log.i("TAG", "Rejected");
                         return true;
                     // tick
                     case 1:
-                        Log.i("TAG", "1");
+                        Log.i("TAG", "Accepted");
                         return true;
-                    default: return false;
+                    default:
+                        return false;
                 }
             }
         });
@@ -141,12 +167,49 @@ public class Appointments extends Fragment {
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
-    class Adapter extends ArrayAdapter {
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("agenda List ", request.getResponseText());
+                        try {
+                            JSONObject jsonObject = new JSONObject(request.getResponseText());
+                            JSONArray jsonArray = jsonObject.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject agendaObject = jsonArray.getJSONObject(i);
+                                Agenda agenda = new Agenda();
+                                agenda.setCreatedAt(agendaObject.getString("created_at"));
+                                agenda.setDate(agendaObject.getString("date"));
+                                agenda.setAgendaState(agendaObject.getString("state"));
+                                agenda.setReaseon(agendaObject.getString("reason"));
+                                agenda.setDoctorId(agendaObject.getInt("doctor"));
+                                agenda.setAgendaId(agendaObject.getInt("id"));
+                                agenda.setStartTIme(agendaObject.getString("start_time"));
+                                agendaArrayList.add(agenda);
+                                arrayAdapter = new Adapter(getActivity(), agendaArrayList);
+                                mListView.setAdapter(arrayAdapter);
+                                Log.i("TagONE ", agendaObject.toString());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                }
+        }
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+    }
+
+    private class Adapter extends ArrayAdapter {
 
         private ViewHolder viewHolder;
-        private ArrayList<String[]> data;
+        private ArrayList<Agenda> data;
 
-        public Adapter(@NonNull Context context, ArrayList<String[]> data) {
+        public Adapter(Context context, ArrayList<Agenda> data) {
             super(context, R.layout.delegate_appointments);
             this.data = data;
         }
@@ -163,14 +226,15 @@ public class Appointments extends Fragment {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_appointments, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.nameAge = (TextView) convertView.findViewById(R.id.name_age);
-                viewHolder.appointmentState = (View) convertView.findViewById(R.id.state);
+                viewHolder.appointmentTime = (TextView) convertView.findViewById(R.id.appointment_time);
+                viewHolder.appointmentState = (View) convertView.findViewById(state);
                 viewHolder.service = (TextView) convertView.findViewById(R.id.service);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            viewHolder.nameAge.setText(data.get(position)[0] +" - ("+ data.get(position)[1]+")");
-            viewHolder.service.setText(data.get(position)[2]);
+            Agenda agenda = agendaArrayList.get(position);
+            viewHolder.appointmentTime.setText(agenda.getStartTIme());
 
             return convertView;
         }
