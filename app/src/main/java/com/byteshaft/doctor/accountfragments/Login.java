@@ -212,6 +212,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     String phoneOne = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
                                     String phoneTwo = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
                                     String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+                                    String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
                                     if (AppGlobals.isDoctor()) {
                                         JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
@@ -242,6 +243,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY, phoneTwo);
                                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, docID);
                                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
+                                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
                                     AppGlobals.gotInfo(true);
                                     startActivity(new Intent(getActivity().getApplicationContext(), MainActivity.class));
                                 } catch (JSONException e) {
