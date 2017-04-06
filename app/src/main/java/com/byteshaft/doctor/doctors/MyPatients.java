@@ -7,8 +7,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -49,16 +46,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.view.View.GONE;
+import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
 
 /**
  * Created by s9iper1 on 3/9/17.
@@ -197,7 +192,7 @@ public class MyPatients extends Fragment {
         }
     }
 
-    class CustomAdapter extends ArrayAdapter<ArrayList<com.byteshaft.doctor.gettersetter.MyPatients>> {
+    private class CustomAdapter extends ArrayAdapter<ArrayList<com.byteshaft.doctor.gettersetter.MyPatients>> {
 
         private ArrayList<com.byteshaft.doctor.gettersetter.MyPatients> myPatientsList;
         private ViewHolder viewHolder;
@@ -271,25 +266,6 @@ public class MyPatients extends Fragment {
         public int getCount() {
             return myPatientsList.size();
         }
-    }
-
-
-
-    public String calculationByDistance(LatLng startP, LatLng endP) {
-        int Radius = 6371;// radius of earth in Km
-        double lat1 = startP.latitude;
-        double lat2 = endP.latitude;
-        double lon1 = startP.longitude;
-        double lon2 = endP.longitude;
-        double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1))
-                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
-                * Math.sin(dLon / 2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-        double valueResult = Radius * c;
-        return String.format("%.2f", valueResult);
     }
 
     private void getPatientsDetails() {

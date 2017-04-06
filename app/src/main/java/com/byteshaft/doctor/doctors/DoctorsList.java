@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -47,6 +46,7 @@ import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.FilterDialog;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +60,7 @@ import java.util.HashMap;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.view.View.GONE;
+import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
 
 /**
  * Created by s9iper1 on 2/22/17.
@@ -182,7 +183,26 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                startActivity(new Intent(getActivity(), DoctorDetailsActivity.class));
+                DoctorDetails doctorDetails = doctors.get(i);
+                Intent intent = new Intent(getActivity(), DoctorDetailsActivity.class);
+                intent.putExtra("start_time", "09:30 am");
+                StringBuilder stringBuilder = new StringBuilder();
+                if (doctorDetails.getGender().equals("M")) {
+                    stringBuilder.append("Dr.");
+                } else {
+                    stringBuilder.append("Dra.");
+                }
+                stringBuilder.append(doctorDetails.getFirstName());
+                stringBuilder.append(" ");
+                stringBuilder.append(doctorDetails.getLastName());
+                intent.putExtra("name", stringBuilder.toString());
+                intent.putExtra("specialist", doctorDetails.getSpeciality());
+                intent.putExtra("stars", doctorDetails.getReviewStars());
+//                intent.putExtra("favourite", doctorDetails.getSpeciality());
+                intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
+                intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
+                intent.putExtra("photo", doctorDetails.getPhotoUrl());
+                startActivity(intent);
             }
         });
         return mBaseView;
@@ -243,7 +263,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                            for (int i = 0;i < jsonArray.length(); i++) {
                                JSONObject mainJsonObject = jsonArray.getJSONObject(i);
                                String date = mainJsonObject.getString("date");
-                               JSONArray doctorList = jsonArray.getJSONArray(i);
+                               JSONArray doctorList = mainJsonObject.getJSONArray("doctors");
                                for (int j = 0; j< doctorList.length(); j++) {
                                    JSONObject doctorDetail = doctorList.getJSONObject(j);
                                    DoctorDetails doctorDetails = new DoctorDetails();
@@ -256,6 +276,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                    doctorDetails.setGender(doctorDetail.getString("gender"));
                                    doctorDetails.setLocation(doctorDetail.getString("location"));
 //                                   doctorDetails.setStartTime(doctorDetail.getString("start_time"));
+//                                   doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favt"));
                                    doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
                                    if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
                                        doctorDetails.setPhoneNumberSecondary(doctorDetail.getString("phone_number_secondary"));
@@ -263,6 +284,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                    doctorDetails.setReviewStars(doctorDetail.getInt("review_stars"));
                                    doctorDetails.setUserId(doctorDetail.getInt("user"));
                                    doctors.add(doctorDetails);
+                                   customAdapter.notifyDataSetChanged();
                                }
                            }
                        } catch (JSONException e) {
@@ -313,7 +335,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            DoctorDetails singleDoctor = doctorsList.get(position);
+            final DoctorDetails singleDoctor = doctorsList.get(position);
+            Helpers.getBitMap(singleDoctor.getPhotoUrl(), viewHolder.circleImageView);
 
             if (addedDates.contains(singleDoctor.getDate()) &&
                     showingPosition.get(singleDoctor.getDate()) != position) {
@@ -340,9 +363,13 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             stringBuilder.append(singleDoctor.getLastName());
             viewHolder.name.setText(stringBuilder.toString());
             viewHolder.specialist.setText(singleDoctor.getSpeciality());
-            viewHolder.distance.setText(" " + singleDoctor.get(position)[2] + " km");
-            viewHolder.review.setRating(Float.parseFloat(singleDoctor.get(position)[3]));
-            viewHolder.availableTime.setText(String.valueOf(singleDoctor.get(position)[4] + " am"));
+            String[] startLocation = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION).split(",");
+            String[] endLocation = singleDoctor.getLocation().split(",");
+            viewHolder.distance.setText(" " + calculationByDistance(new LatLng(Double.parseDouble(startLocation[0]),
+                    Double.parseDouble(startLocation[1])), new LatLng(Double.parseDouble(endLocation[0]),
+                    Double.parseDouble(endLocation[1]))) + " km");
+            viewHolder.review.setRating(singleDoctor.getReviewStars());
+            viewHolder.availableTime.setText(String.valueOf(" am"));
             viewHolder.call.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -352,7 +379,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                         requestPermissions(new String[]{Manifest.permission.CALL_PHONE},
                                 AppGlobals.CALL_PERMISSION);
                     } else {
-                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
+                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + singleDoctor.getPrimaryPhoneNumber()));
                         startActivity(intent);
                     }
                 }
@@ -381,7 +408,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             case AppGlobals.CALL_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
+
                     if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
@@ -392,7 +419,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                         // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
-                    startActivity(intent);
+                    Helpers.showSnackBar(getView(), R.string.permission_granted);
+
                 } else {
                     Helpers.showSnackBar(getView(), R.string.permission_denied);
                 }

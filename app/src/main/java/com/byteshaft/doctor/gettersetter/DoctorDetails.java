@@ -22,6 +22,16 @@ public class DoctorDetails {
     private float reviewStars;
     private String gender;
 
+    public boolean isFavouriteDoctor() {
+        return favouriteDoctor;
+    }
+
+    public void setFavouriteDoctor(boolean favouriteDoctor) {
+        this.favouriteDoctor = favouriteDoctor;
+    }
+
+    private boolean favouriteDoctor;
+
     public String getGender() {
         return gender;
     }
