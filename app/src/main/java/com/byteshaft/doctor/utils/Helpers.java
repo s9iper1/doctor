@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.LocationManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -27,7 +25,6 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
@@ -206,6 +203,13 @@ public class Helpers {
         return df.format(c.getTime());
     }
 
+    public static String getDateNextSevenDays() {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_YEAR, 7);
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        return df.format(c.getTime());
+    }
+
     public static String calculateAge(String dateOfBirth) {
         String[] dob = dateOfBirth.split("/");
         Log.i("AGE", dob[0] + dob[1] + dob[2]);
@@ -216,6 +220,23 @@ public class Helpers {
         int year = Integer.parseInt(dob[2]);
         String years = Helpers.getAge(year, month, date);
         return years;
+    }
+
+    public static String calculationByDistance(LatLng startP, LatLng endP) {
+        int Radius = 6371;// radius of earth in Km
+        double lat1 = startP.latitude;
+        double lat2 = endP.latitude;
+        double lon1 = startP.longitude;
+        double lon2 = endP.longitude;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1))
+                * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2)
+                * Math.sin(dLon / 2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        double valueResult = Radius * c;
+        return String.format("%.2f", valueResult);
     }
 
 }

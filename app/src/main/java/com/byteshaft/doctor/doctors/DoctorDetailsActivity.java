@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextClock;
 import android.widget.TextView;
@@ -25,6 +26,8 @@ import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.patients.DoctorBookingActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -36,10 +39,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ImageButton chatButton;
     private Button bookingButton;
     private Button showallReviewButton;
-
     private TextClock textClock;
-
+    private ImageView status;
     private ReviewAdapter adapter;
+    private String number;
+    private CircleImageView circleImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +51,27 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_details);
+
+        String startTime = getIntent().getStringExtra("start_time");
+        String name = getIntent().getStringExtra("name");
+        String specialist = getIntent().getStringExtra("specialist");
+        int stars = getIntent().getIntExtra("stars", 0);
+        boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        number = getIntent().getStringExtra("number");
+        String photo = getIntent().getStringExtra("photo");
+        boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+
+
         doctorName = (TextView) findViewById(R.id.doctor_name);
+        doctorName.setText(name);
         doctorSpeciality = (TextView) findViewById(R.id.doctor_sp);
+        doctorSpeciality.setText(specialist);
+        circleImageView = (CircleImageView) findViewById(R.id.profile_image_view);
         ratingBar = (RatingBar) findViewById(R.id.user_ratings);
+        ratingBar.setRating(stars);
         callButton = (ImageButton) findViewById(R.id.call_button);
         chatButton = (ImageButton) findViewById(R.id.message_button);
+        status = (ImageView) findViewById(R.id.status);
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
         bookingButton = (Button) findViewById(R.id.button_book);
@@ -63,6 +83,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 startActivity(new Intent(getApplicationContext(), DoctorBookingActivity.class));
             }
         });
+        if (!availableForChat) {
+            status.setImageResource(R.mipmap.ic_offline_indicator);
+        } else {
+            status.setImageResource(R.mipmap.ic_online_indicator);
+        }
+        Helpers.getBitMap(photo, circleImageView);
     }
 
     @Override
@@ -85,7 +111,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE},
                             AppGlobals.CALL_PERMISSION);
                 } else {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number));
                     startActivity(intent);
                 }
                 break;
@@ -105,7 +131,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             case AppGlobals.CALL_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
@@ -116,7 +141,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                         // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
-                    startActivity(intent);
+                    Helpers.showSnackBar(findViewById(android.R.id.content), R.string.permission_granted);
                 } else {
                     Helpers.showSnackBar(findViewById(android.R.id.content), R.string.permission_denied);
                 }
