@@ -10,12 +10,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,13 +40,20 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.gettersetter.DoctorDetails;
 import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.patients.DoctorsLocator;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.FilterDialog;
 import com.byteshaft.doctor.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -56,19 +65,22 @@ import static android.view.View.GONE;
  * Created by s9iper1 on 2/22/17.
  */
 
-public class DoctorsList extends Fragment {
+public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private ListView mListView;
-    private HashMap<Integer, String[]> doctorsList;
     private ArrayList<String> addedDates;
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
     private HashMap<String, Integer> showingPosition;
     private EditText toolbarSearchView;
+    private HttpRequest request;
+    private ArrayList<DoctorDetails> doctors;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        doctors = new ArrayList<>();
+        getDoctorList();
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
         searchContainer = new LinearLayout(getActivity());
@@ -149,17 +161,10 @@ public class DoctorsList extends Fragment {
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
-        doctorsList = new HashMap<>();
         addedDates = new ArrayList<>();
         showingPosition = new HashMap<>();
-        doctorsList.put(0, new String[]{"Bilal", "Dermatologist", "2", "2.5", "9:30", "12-February-2017", "0"});
-        doctorsList.put(1, new String[]{"Husnain", "Dermatologist", "2", "3.5", "7:30", "12-February-2017" , "1"});
-        doctorsList.put(2, new String[]{"shahid", "Dermatologist", "3", "4.5", "5:30", "12-February-2017", "1"});
-        doctorsList.put(3, new String[]{"Omer", "Dermatologist", "4", "1.5", "6:30", "13-February-2017", "0"});
-        doctorsList.put(4, new String[]{"Mohsin", "Dermatologist", "6", "3.2", "7:30", "13-February-2017", "1"});
-        doctorsList.put(5, new String[]{"Imran Hakeem", "Dermatologist", "8", "2.3", "5:30", "13-February-2017", "1"});
         customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                R.layout.doctors_search_delagete, doctorsList);
+                R.layout.doctors_search_delagete, doctors);
         mListView.setAdapter(customAdapter);
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -183,6 +188,16 @@ public class DoctorsList extends Fragment {
         return mBaseView;
     }
 
+    private void getDoctorList() {
+        request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%spublic/filter-doctors?start_date=%s&end_date=%s",
+                AppGlobals.BASE_URL, Helpers.getDate(), Helpers.getDateNextSevenDays()));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
 
 
     @Override
@@ -210,17 +225,66 @@ public class DoctorsList extends Fragment {
             case R.id.action_location:
                 startActivity(new Intent(AppGlobals.getContext(), DoctorsLocator.class));
                 return true;
-            default:return false;
+            default:
+                return false;
         }
     }
 
-    class CustomAdapter extends ArrayAdapter<HashMap<Integer, String[]>> {
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                   case HttpURLConnection.HTTP_OK:
+                       Log.i("TAG", "data " + request.getResponseText());
+                       try {
+                           JSONObject jsonObject = new JSONObject(request.getResponseText());
+                           JSONArray jsonArray = jsonObject.getJSONArray("results");
+                           for (int i = 0;i < jsonArray.length(); i++) {
+                               JSONObject mainJsonObject = jsonArray.getJSONObject(i);
+                               String date = mainJsonObject.getString("date");
+                               JSONArray doctorList = jsonArray.getJSONArray(i);
+                               for (int j = 0; j< doctorList.length(); j++) {
+                                   JSONObject doctorDetail = doctorList.getJSONObject(j);
+                                   DoctorDetails doctorDetails = new DoctorDetails();
+                                   doctorDetails.setDate(date);
+                                   JSONObject speciality = doctorDetail.getJSONObject("speciality");
+                                   doctorDetails.setSpeciality(speciality.getString("name"));
+                                   doctorDetails.setFirstName(doctorDetail.getString("first_name"));
+                                   doctorDetails.setLastName(doctorDetail.getString("last_name"));
+                                   doctorDetails.setPhotoUrl(doctorDetail.getString("photo"));
+                                   doctorDetails.setGender(doctorDetail.getString("gender"));
+                                   doctorDetails.setLocation(doctorDetail.getString("location"));
+//                                   doctorDetails.setStartTime(doctorDetail.getString("start_time"));
+                                   doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
+                                   if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
+                                       doctorDetails.setPhoneNumberSecondary(doctorDetail.getString("phone_number_secondary"));
+                                   }
+                                   doctorDetails.setReviewStars(doctorDetail.getInt("review_stars"));
+                                   doctorDetails.setUserId(doctorDetail.getInt("user"));
+                                   doctors.add(doctorDetails);
+                               }
+                           }
+                       } catch (JSONException e) {
+                           e.printStackTrace();
+                       }
+                       break;
+                }
+        }
+    }
 
-        private HashMap<Integer, String[]> doctorsList;
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+    }
+
+    private class CustomAdapter extends ArrayAdapter<ArrayList<DoctorDetails>> {
+
+        private ArrayList<DoctorDetails> doctorsList;
         private ViewHolder viewHolder;
 
-        public CustomAdapter(Context context, int resource, HashMap<Integer,
-                String[]> doctorsList) {
+        public CustomAdapter(Context context, int resource, ArrayList<DoctorDetails>
+                doctorsList) {
             super(context, resource);
             this.doctorsList = doctorsList;
         }
@@ -249,25 +313,36 @@ public class DoctorsList extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            if (addedDates.contains(doctorsList.get(position)[5]) &&
-                    showingPosition.get(doctorsList.get(position)[5]) != position) {
+            DoctorDetails singleDoctor = doctorsList.get(position);
+
+            if (addedDates.contains(singleDoctor.getDate()) &&
+                    showingPosition.get(singleDoctor.getDate()) != position) {
                 viewHolder.dateLayout.setVisibility(GONE);
             } else {
                 viewHolder.dateLayout.setVisibility(View.VISIBLE);
-                viewHolder.date.setText(doctorsList.get(position)[5].replaceAll("-" , " "));
-                addedDates.add(doctorsList.get(position)[5]);
-                showingPosition.put(doctorsList.get(position)[5], position);
+                viewHolder.date.setText(singleDoctor.getDate().replaceAll("-", " "));
+                addedDates.add(singleDoctor.getDate());
+                showingPosition.put(singleDoctor.getDate(), position);
             }
-            if (Integer.valueOf(doctorsList.get(position)[6]) == 0) {
+            if (!singleDoctor.isAvailableToChat()) {
                 viewHolder.status.setImageResource(R.mipmap.ic_offline_indicator);
             } else {
                 viewHolder.status.setImageResource(R.mipmap.ic_online_indicator);
             }
-            viewHolder.name.setText(doctorsList.get(position)[0]);
-            viewHolder.specialist.setText(doctorsList.get(position)[1]);
-            viewHolder.distance.setText(" "+doctorsList.get(position)[2]+" km");
-            viewHolder.review.setRating(Float.parseFloat(doctorsList.get(position)[3]));
-            viewHolder.availableTime.setText(String.valueOf(doctorsList.get(position)[4]+ " am"));
+            StringBuilder stringBuilder = new StringBuilder();
+            if (singleDoctor.getGender().equals("M")) {
+                stringBuilder.append("Dr.");
+            } else {
+                stringBuilder.append("Dra.");
+            }
+            stringBuilder.append(singleDoctor.getFirstName());
+            stringBuilder.append(" ");
+            stringBuilder.append(singleDoctor.getLastName());
+            viewHolder.name.setText(stringBuilder.toString());
+            viewHolder.specialist.setText(singleDoctor.getSpeciality());
+            viewHolder.distance.setText(" " + singleDoctor.get(position)[2] + " km");
+            viewHolder.review.setRating(Float.parseFloat(singleDoctor.get(position)[3]));
+            viewHolder.availableTime.setText(String.valueOf(singleDoctor.get(position)[4] + " am"));
             viewHolder.call.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -291,6 +366,7 @@ public class DoctorsList extends Fragment {
             });
             return convertView;
         }
+
 
         @Override
         public int getCount() {

@@ -202,6 +202,13 @@ public class Helpers {
         return df.format(c.getTime());
     }
 
+    public static String getDateNextSevenDays() {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_YEAR, 7);
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        return df.format(c.getTime());
+    }
+
     public static String calculateAge(String dateOfBirth) {
         String[] dob = dateOfBirth.split("/");
         Log.i("AGE", dob[0] + dob[1] + dob[2]);
