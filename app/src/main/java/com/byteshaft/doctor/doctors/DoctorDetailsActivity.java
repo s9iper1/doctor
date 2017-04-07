@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
@@ -39,7 +38,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ImageButton chatButton;
     private Button bookingButton;
     private Button showallReviewButton;
-    private TextClock textClock;
+    private TextView textClock;
     private ImageView status;
     private ReviewAdapter adapter;
     private String number;
@@ -76,7 +75,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         chatButton.setOnClickListener(this);
         bookingButton = (Button) findViewById(R.id.button_book);
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
-        textClock = (TextClock) findViewById(R.id.clock);
+        textClock = (TextView) findViewById(R.id.clock);
         bookingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

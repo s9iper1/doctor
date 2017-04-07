@@ -105,6 +105,12 @@ public class Helpers {
                 .show();
     }
 
+    public static void showSnackBar(View view, String text) {
+        Snackbar.make(view, text, Snackbar.LENGTH_SHORT)
+                .setActionTextColor(AppGlobals.getContext().getResources().getColor(android.R.color.holo_red_light))
+                .show();
+    }
+
     public static boolean locationEnabled() {
         LocationManager lm = (LocationManager) AppGlobals.getContext()
                 .getSystemService(Context.LOCATION_SERVICE);

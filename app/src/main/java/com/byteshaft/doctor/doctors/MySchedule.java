@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
@@ -47,6 +46,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChangeListener,
@@ -54,7 +54,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
     private View mBaseView;
     private ListView mListView;
-    private ArrayList<JSONObject> scheduleList;
+    private HashMap<String,ArrayList<JSONObject>> scheduleList;
     private LinearLayout searchContainer;
     private String currentDate;
     private ArrayList<String> initialTimeSLots;
@@ -66,23 +66,38 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.my_schedule, container, false);
+        mListView = (ListView) mBaseView.findViewById(R.id.schedule_list);
         com.byteshaft.doctor.uihelpers.CalendarView cv = ((com.byteshaft.doctor.uihelpers.CalendarView)
                 mBaseView.findViewById(R.id.calendar_view));
-
+        currentDate = Helpers.getDate();
         // assign event handler
         cv.setEventHandler(new com.byteshaft.doctor.uihelpers.CalendarView.EventHandler() {
             @Override
             public void onDayPress(Date date) {
                 // show returned day
                 DateFormat df = SimpleDateFormat.getDateInstance();
-                Toast.makeText(getActivity(), df.format(date), Toast.LENGTH_SHORT).show();
+                String resultDate = df.format(date);
+                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date formattedDate = null;
+                try {
+                    formattedDate = formatterFrom.parse(resultDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getActivity(), dateFormat.format(formattedDate) , Toast.LENGTH_SHORT).show();
+                currentDate = dateFormat.format(formattedDate);
+                Log.i("TAG", "current date  " + currentDate);
+                getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
+                        .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
+                        ))));
             }
         });
         setHasOptionsMenu(true);
-        currentDate = Helpers.getDate();
-        initialTimeSLots = new ArrayList<>();
-        scheduleList = new ArrayList<>();
-        getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(45));
+        scheduleList = new HashMap<>();
+        getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
+                .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
+        ))));
         save = (AppCompatButton) mBaseView.findViewById(R.id.save_button);
         save.setOnClickListener(this);
         searchContainer = new LinearLayout(getActivity());
@@ -91,7 +106,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         containerParams.gravity = Gravity.CENTER_VERTICAL;
         containerParams.setMargins(20, 20, 10, 20);
-        getSchedule(Helpers.getDate());
+        getSchedule(currentDate);
         searchContainer.setLayoutParams(containerParams);
         // Setup search view
         final EditText toolbarSearchView = new EditText(getActivity());
@@ -171,9 +186,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         String time2 = "22:31:00";
 
         String format = "dd/MM/yyyy hh:mm";
-
-        Log.i("TAG", "" + targetDate);
-        Log.i("TAG", "" + targetDate);
+        initialTimeSLots = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat(format);
 
@@ -185,9 +198,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        System.out.println("Date Start: " + dateObj1);
-        System.out.println("Date End: " + dateObj2);
-
         long dif = dateObj1.getTime();
         while (dif < dateObj2.getTime()) {
             Date slot = new Date(dif);
@@ -196,7 +206,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             initialTimeSLots.add(date);
             dif += duration;
         }
-
+        ArrayList<JSONObject> arrayList = new ArrayList<>();
         for (int i = 0; i < initialTimeSLots.size(); i++) {
             StringBuilder time = new StringBuilder();
             if (i + 1 < initialTimeSLots.size()) {
@@ -218,14 +228,18 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     e.printStackTrace();
                 }
                 if (!bothTimes[0].trim().isEmpty()) {
-                    scheduleList.add(jsonObject);
+                    arrayList.add(jsonObject);
                 }
             }
         }
-        Log.i("TAG", String.valueOf(scheduleList));
-        mListView = (ListView) mBaseView.findViewById(R.id.schedule_list);
-        scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
-        mListView.setAdapter(scheduleAdapter);
+        scheduleList.put(currentDate, arrayList);
+        if (scheduleAdapter ==  null){
+            scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
+            mListView.setAdapter(scheduleAdapter);
+        } else {
+            scheduleAdapter.notifyDataSetChanged();
+        }
+        getSchedule(currentDate);
     }
 
     @Override
@@ -250,9 +264,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         switch (view.getId()) {
             case R.id.save_button:
                 if (jsonArray.length() > 0) {
-                    sendSchedule("PUT");
+//                    updateSchedule();
                 } else {
-                    sendSchedule("POST");
+                    sendSchedule();
                 }
                 break;
         }
@@ -260,10 +274,10 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
     private class ScheduleAdapter extends ArrayAdapter<String> {
 
-        private ArrayList<JSONObject> scheduleList;
+        private HashMap<String, ArrayList<JSONObject>> scheduleList;
         private ViewHolder viewHolder;
 
-        public ScheduleAdapter(@NonNull Context context, ArrayList<JSONObject> scheduleList) {
+        public ScheduleAdapter(Context context, HashMap<String, ArrayList<JSONObject>> scheduleList) {
             super(context, R.layout.delegate_doctor_schedule);
             this.scheduleList = scheduleList;
         }
@@ -282,42 +296,41 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            final ArrayList<JSONObject> data = scheduleList.get(currentDate);
+            final JSONObject jsonObject = data.get(position);
             viewHolder.state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    Log.i("TAG", " boolean " + b);
-                    JSONObject jsonObject = scheduleList.get(position);
+
                     int pos = (int) viewHolder.state.getTag();
                     View checkBoxView = mListView.getChildAt(pos);
                     if (checkBoxView != null) {
                         CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
-                        Log.i("TAG", " checked" + b);
-                        Log.i("TAG", " id" + String.valueOf(cbx.getId() == R.id.check_box_appointment));
                         if (b) {
                             try {
                                 jsonObject.put("state", 1);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            scheduleList.remove(position);
-                            scheduleList.add(position, jsonObject);
+                            data.remove(position);
+                            data.add(position, jsonObject);
                         } else {
                             try {
                                 jsonObject.put("state", 0);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            scheduleList.remove(position);
-                            scheduleList.add(position, jsonObject);
+                            data.remove(position);
+                            data.add(position, jsonObject);
                         }
                     }
 
                 }
             });
             try {
-                viewHolder.startTime.setText(scheduleList.get(position).getString("start_time"));
-                viewHolder.endTime.setText(scheduleList.get(position).getString("end_time"));
-                if (scheduleList.get(position).getInt("state") == 0) {
+                viewHolder.startTime.setText(jsonObject.getString("start_time"));
+                viewHolder.endTime.setText(jsonObject.getString("end_time"));
+                if (jsonObject.getInt("state") == 0) {
                     viewHolder.state.setChecked(false);
                 } else {
                     viewHolder.state.setChecked(true);
@@ -330,7 +343,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
         @Override
         public int getCount() {
-            return scheduleList.size();
+            return scheduleList.get(currentDate).size();
         }
     }
 
@@ -352,18 +365,48 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         request.send();
     }
 
-    private void sendSchedule(String method) {
+    private void updateSchedule() {
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open(method, String.format("%sdoctor/schedule", AppGlobals.BASE_URL));
+        request.open("PATCH", String.format("%sdoctor/schedule", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("date", Helpers.getDate());
             JSONArray jsonArray = new JSONArray();
-            for (JSONObject singleJson : scheduleList) {
+            ArrayList<JSONObject> jsonObjectJSONArray = scheduleList.get(currentDate);
+            for (JSONObject singleJson : jsonObjectJSONArray) {
+                if (singleJson.getInt("state") == 1) {
+                    JSONObject time = new JSONObject();
+                    time.put("start_time", singleJson.get("start_time"));
+                    time.put("end_time", singleJson.get("end_time"));
+                    jsonArray.put(time);
+                }
+            }
+            if (jsonArray.length() > 0) {
+                jsonObject.put("items", jsonArray);
+                request.send(jsonObject.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendSchedule() {
+        request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("POST", String.format("%sdoctor/schedule", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("date", currentDate);
+            JSONArray jsonArray = new JSONArray();
+            ArrayList<JSONObject> jsonObjectJSONArray = scheduleList.get(currentDate);
+            for (JSONObject singleJson : jsonObjectJSONArray) {
                 if (singleJson.getInt("state") == 1) {
                     JSONObject time = new JSONObject();
                     time.put("start_time", singleJson.get("start_time"));
@@ -386,8 +429,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", request.getResponseText());
-                        Log.i("TAG", "" + scheduleList);
                         ArrayList<String> arrayList = new ArrayList<>();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
@@ -397,24 +438,25 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                                 String startTime = timeSlot.getString("start_time");
                                 arrayList.add(startTime.trim());
                             }
-                            for (int j = 0; j < scheduleList.size(); j++) {
-                                Log.i("TAG", "schedule " + scheduleList.get(j).getString("start_time"));
-                                Log.i("TAG", "schedule " + arrayList);
-                                if (arrayList.contains(scheduleList.get(j).getString("start_time").trim())) {
-                                    Log.i("TAG", "Condition match");
-                                    JSONObject slot = scheduleList.get(j);
+                            Log.i("Server", jsonArray.toString());
+                            ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
+                            for (int j = 0; j < jsonObjects.size(); j++) {
+                                if (arrayList.contains(jsonObjects.get(j).getString("start_time").trim())) {
+                                    JSONObject slot = jsonObjects.get(j);
                                     slot.put("state", 1);
-                                    scheduleList.remove(j);
-                                    scheduleList.add(j, slot);
-                                    scheduleAdapter.notifyDataSetChanged();
+                                    jsonObjects.remove(j);
+                                    jsonObjects.add(j, slot);
                                 }
                             }
+                            scheduleList.put(currentDate, jsonObjects);
+                            scheduleAdapter.notifyDataSetChanged();
+                            Log.i("Server", scheduleList.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         break;
                     case HttpURLConnection.HTTP_CREATED:
-                        Log.i("TAG", request.getResponseText());
+
                         break;
                 }
         }
