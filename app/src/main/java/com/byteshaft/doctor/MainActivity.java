@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private SwitchCompat patientOnlineSwitch;
     private CircleImageView profilePicture;
     private HttpRequest request;
+    private boolean isError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,14 +137,17 @@ public class MainActivity extends AppCompatActivity
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     switch (compoundButton.getId()) {
                         case R.id.doc_nav_online_switch:
-                            if (b) {
-                                doctorOnlineSwitch.setText(R.string.online);
+                            if (isError) {
+                                isError = false;
                             } else {
-                                doctorOnlineSwitch.setText(R.string.offline);
+                                if (b) {
+                                    doctorOnlineSwitch.setText(R.string.online);
+                                } else {
+                                    doctorOnlineSwitch.setText(R.string.offline);
+                                }
+                                changeStatus(b);
+                                doctorOnlineSwitch.setEnabled(false);
                             }
-                            changeStatus(b);
-                            AppGlobals.saveChatStatus(b);
-                            doctorOnlineSwitch.setEnabled(false);
                             break;
                     }
                 }
@@ -186,14 +190,17 @@ public class MainActivity extends AppCompatActivity
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     switch (compoundButton.getId()) {
                         case R.id.patient_nav_online_switch:
-                            if (b) {
-                                patientOnlineSwitch.setText(R.string.online);
+                            if (isError) {
+                                isError = false;
                             } else {
-                                patientOnlineSwitch.setText(R.string.offline);
+                                if (b) {
+                                    patientOnlineSwitch.setText(R.string.online);
+                                } else {
+                                    patientOnlineSwitch.setText(R.string.offline);
+                                }
+                                changeStatus(b);
+                                patientOnlineSwitch.setEnabled(false);
                             }
-                            changeStatus(b);
-                            AppGlobals.saveChatStatus(b);
-                            patientOnlineSwitch.setEnabled(false);
                             break;
                     }
                 }
@@ -360,8 +367,11 @@ public class MainActivity extends AppCompatActivity
                     case HttpURLConnection.HTTP_OK:
                         if (!AppGlobals.isDoctor()) {
                             patientOnlineSwitch.setEnabled(true);
+                            AppGlobals.saveChatStatus(patientOnlineSwitch.isChecked());
+
                         } else {
                             doctorOnlineSwitch.setEnabled(true);
+                            AppGlobals.saveChatStatus(doctorOnlineSwitch.isChecked());
                         }
                 }
         }
@@ -369,6 +379,38 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        isError = true;
+        Helpers.showSnackBar(findViewById(android.R.id.content), R.string.check_internet);
+        if (!AppGlobals.isDoctor()) {
+            new android.os.Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    patientOnlineSwitch.setEnabled(true);
+                }
+            }, 500);
+            if (patientOnlineSwitch.isChecked()) {
+                patientOnlineSwitch.setChecked(false);
+                patientOnlineSwitch.setText(R.string.offline);
+            } else {
+                patientOnlineSwitch.setChecked(true);
+                patientOnlineSwitch.setText(R.string.online);
+            }
+        } else {
+            new android.os.Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doctorOnlineSwitch.setEnabled(true);
+                }
+            }, 500);
+            if (doctorOnlineSwitch.isChecked()) {
+                doctorOnlineSwitch.setChecked(false);
+                patientOnlineSwitch.setText(R.string.offline);
+            } else {
+                doctorOnlineSwitch.setChecked(true);
+                patientOnlineSwitch.setText(R.string.online);
+            }
+
+        }
 
     }
 }

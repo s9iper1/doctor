@@ -95,7 +95,7 @@
     <string name="emergency_contact">Emergency Contact</string>
     <string name="i_accept_the_terms_and_conditions">I accept the terms and conditions</string>
     <string name="login_faild">Login Failed!</string>
-    <string name="check_internet">please check your internet connection</string>
+    <string name="check_internet">Please check your internet connection</string>
     <string name="email_not_exist">Email does not exist on server</string>
     <string name="check_password">Please enter correct password</string>
     <string name="activate_your_account">Please activate your account !</string>
