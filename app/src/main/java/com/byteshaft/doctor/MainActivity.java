@@ -404,10 +404,10 @@ public class MainActivity extends AppCompatActivity
             }, 500);
             if (doctorOnlineSwitch.isChecked()) {
                 doctorOnlineSwitch.setChecked(false);
-                patientOnlineSwitch.setText(R.string.offline);
+                doctorOnlineSwitch.setText(R.string.offline);
             } else {
                 doctorOnlineSwitch.setChecked(true);
-                patientOnlineSwitch.setText(R.string.online);
+                doctorOnlineSwitch.setText(R.string.online);
             }
 
         }
