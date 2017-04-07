@@ -17,7 +17,7 @@
         <item name="colorControlActivated">@color/activated_rating_bar</item>
     </style>
 
-    <style name="customRatingBar"
+    <style name="customRatingBar">
         parent="android:style/Widget.Material.RatingBar.Small">
     </style>
 

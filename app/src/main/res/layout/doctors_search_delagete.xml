@@ -100,7 +100,7 @@
                 android:id="@+id/rating_bar"
                 android:layout_margin="1dp"
                 android:layout_width="wrap_content"
-                android:layout_height="20dp"
+                android:layout_height="30dp"
                 android:numStars="5"
                 style="@style/customRatingBar"
                 android:rating="3" />
