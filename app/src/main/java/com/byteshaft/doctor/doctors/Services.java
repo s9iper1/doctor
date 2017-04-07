@@ -124,12 +124,12 @@ public class Services extends Fragment {
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
         ArrayList<String[]> data = new ArrayList<>();
-        data.add(new String[]{"service bla ", "120.00", "0"});
-        data.add(new String[]{"service abc ", "125.00", "1"});
-        data.add(new String[]{"service abc ", "125.00", "2"});
-        data.add(new String[]{"service abc ", "125.00", "1"});
-        data.add(new String[]{"service bcd ", "130.00", "2"});
-        data.add(new String[]{"service efg ", "150.00", "0"});
+        data.add(new String[]{"reason bla ", "120.00", "0"});
+        data.add(new String[]{"reason abc ", "125.00", "1"});
+        data.add(new String[]{"reason abc ", "125.00", "2"});
+        data.add(new String[]{"reason abc ", "125.00", "1"});
+        data.add(new String[]{"reason bcd ", "130.00", "2"});
+        data.add(new String[]{"reason efg ", "150.00", "0"});
         serviceList.setAdapter(new ServiceAdapter(getActivity().getApplicationContext(), data));
         return mBaseView;
     }
