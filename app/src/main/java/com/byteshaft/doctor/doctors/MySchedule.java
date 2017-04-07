@@ -1,31 +1,19 @@
 package com.byteshaft.doctor.doctors;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -56,7 +43,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     private View mBaseView;
     private ListView mListView;
     private HashMap<String,ArrayList<JSONObject>> scheduleList;
-    private LinearLayout searchContainer;
+//    private LinearLayout searchContainer;
     private String currentDate;
     private ArrayList<String> initialTimeSLots;
     private HttpRequest request;
@@ -101,84 +88,84 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         ))));
         save = (AppCompatButton) mBaseView.findViewById(R.id.save_button);
         save.setOnClickListener(this);
-        searchContainer = new LinearLayout(getActivity());
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
-                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        containerParams.gravity = Gravity.CENTER_VERTICAL;
-        containerParams.setMargins(20, 20, 10, 20);
-        getSchedule(currentDate);
-        searchContainer.setLayoutParams(containerParams);
-        // Setup search view
-        final EditText toolbarSearchView = new EditText(getActivity());
-        toolbarSearchView.setBackgroundColor(getResources().getColor(R.color.search_background));
-        // Set width / height / gravity
-        int[] textSizeAttr = new int[]{android.R.attr.actionBarSize};
-        int indexOfAttrTextSize = 0;
-        TypedArray a = getActivity().obtainStyledAttributes(new TypedValue().data, textSizeAttr);
-        int actionBarHeight = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
-        a.recycle();
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, actionBarHeight);
-        params.gravity = Gravity.CENTER_VERTICAL;
-        params.setMargins(5, 5, 5, 5);
-        params.weight = 1;
-        toolbarSearchView.setLayoutParams(params);
-        // Setup display
-        toolbarSearchView.setPadding(2, 0, 0, 0);
-        toolbarSearchView.setTextColor(Color.WHITE);
-        toolbarSearchView.setGravity(Gravity.CENTER_VERTICAL);
-        toolbarSearchView.setSingleLine(true);
-        toolbarSearchView.setImeActionLabel("Search", EditorInfo.IME_ACTION_UNSPECIFIED);
-        try {
-            Field f = TextView.class.getDeclaredField("mCursorDrawableRes");
-            f.setAccessible(true);
-            f.set(toolbarSearchView, R.drawable.cursor_color);
-        } catch (Exception ignored) {
-
-        }
-        // Search text changed listener
-        toolbarSearchView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        toolbarSearchView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (!b) {
-
-                } else {
-
-                }
-            }
-        });
-        toolbarSearchView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                toolbarSearchView.setFocusable(true);
-                toolbarSearchView.setFocusableInTouchMode(true);
-                return false;
-            }
-        });
-        toolbarSearchView.setFocusableInTouchMode(false);
-        toolbarSearchView.setFocusable(false);
-        (searchContainer).addView(toolbarSearchView);
+//        searchContainer = new LinearLayout(getActivity());
+//        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+//        Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
+//                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//        containerParams.gravity = Gravity.CENTER_VERTICAL;
+//        containerParams.setMargins(20, 20, 10, 20);
+//        getSchedule(currentDate);
+//        searchContainer.setLayoutParams(containerParams);
+//        // Setup search view
+//        final EditText toolbarSearchView = new EditText(getActivity());
+//        toolbarSearchView.setBackgroundColor(getResources().getColor(R.color.search_background));
+//        // Set width / height / gravity
+//        int[] textSizeAttr = new int[]{android.R.attr.actionBarSize};
+//        int indexOfAttrTextSize = 0;
+//        TypedArray a = getActivity().obtainStyledAttributes(new TypedValue().data, textSizeAttr);
+//        int actionBarHeight = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
+//        a.recycle();
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, actionBarHeight);
+//        params.gravity = Gravity.CENTER_VERTICAL;
+//        params.setMargins(5, 5, 5, 5);
+//        params.weight = 1;
+//        toolbarSearchView.setLayoutParams(params);
+//        // Setup display
+//        toolbarSearchView.setPadding(2, 0, 0, 0);
+//        toolbarSearchView.setTextColor(Color.WHITE);
+//        toolbarSearchView.setGravity(Gravity.CENTER_VERTICAL);
+//        toolbarSearchView.setSingleLine(true);
+//        toolbarSearchView.setImeActionLabel("Search", EditorInfo.IME_ACTION_UNSPECIFIED);
+//        try {
+//            Field f = TextView.class.getDeclaredField("mCursorDrawableRes");
+//            f.setAccessible(true);
+//            f.set(toolbarSearchView, R.drawable.cursor_color);
+//        } catch (Exception ignored) {
+//
+//        }
+//        // Search text changed listener
+//        toolbarSearchView.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
+//        toolbarSearchView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean b) {
+//                if (!b) {
+//
+//                } else {
+//
+//                }
+//            }
+//        });
+//        toolbarSearchView.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                toolbarSearchView.setFocusable(true);
+//                toolbarSearchView.setFocusableInTouchMode(true);
+//                return false;
+//            }
+//        });
+//        toolbarSearchView.setFocusableInTouchMode(false);
+//        toolbarSearchView.setFocusable(false);
+//        (searchContainer).addView(toolbarSearchView);
 
         // Setup the clear button
-        Resources r = getResources();
-        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, r.getDisplayMetrics());
-        LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        clearParams.gravity = Gravity.CENTER;
-        // Add search view to toolbar and hide it
-        toolbar.addView(searchContainer);
+//        Resources r = getResources();
+//        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, r.getDisplayMetrics());
+//        LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        clearParams.gravity = Gravity.CENTER;
+//        // Add search view to toolbar and hide it
+//        toolbar.addView(searchContainer);
         return mBaseView;
     }
 
@@ -457,7 +444,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         }
                         break;
                     case HttpURLConnection.HTTP_CREATED:
-
+                        Helpers.showSnackBar(getView(), R.string.success);
                         break;
                 }
         }
