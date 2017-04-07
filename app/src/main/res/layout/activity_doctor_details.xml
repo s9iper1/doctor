@@ -83,13 +83,13 @@
 
         <android.support.v7.widget.AppCompatRatingBar
             android:id="@+id/user_ratings"
-            style="@style/Base.Widget.AppCompat.RatingBar.Small"
+            style="@style/Rating_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/doctor_sp"
             android:layout_centerHorizontal="true"
             android:numStars="5"
-            android:rating="5.0" />
+            android:rating="3" />
 
         <ImageButton
             android:id="@+id/button"

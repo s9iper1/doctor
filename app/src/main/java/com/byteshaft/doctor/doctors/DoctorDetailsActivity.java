@@ -28,6 +28,8 @@ import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import java.net.HttpURLConnection;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
@@ -55,16 +57,15 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_details);
 
-        String startTime = getIntent().getStringExtra("start_time");
-        String name = getIntent().getStringExtra("name");
-        String specialist = getIntent().getStringExtra("specialist");
-        int stars = getIntent().getIntExtra("stars", 0);
-        boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        final String startTime = getIntent().getStringExtra("start_time");
+        final String name = getIntent().getStringExtra("name");
+        final String specialist = getIntent().getStringExtra("specialist");
+        final int stars = getIntent().getIntExtra("stars", 0);
+        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
-        String photo = getIntent().getStringExtra("photo");
-        boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        final String photo = getIntent().getStringExtra("photo");
+        final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
-
 
         doctorName = (TextView) findViewById(R.id.doctor_name);
         doctorName.setText(name);
@@ -81,10 +82,21 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         bookingButton = (Button) findViewById(R.id.button_book);
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
         textClock = (TextView) findViewById(R.id.clock);
+        textClock.setText(startTime);
         bookingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), DoctorBookingActivity.class));
+                Intent intent = new Intent(getApplicationContext(), DoctorBookingActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("specialist", specialist);
+                intent.putExtra("stars", stars);
+                intent.putExtra("favourite", favourite);
+                intent.putExtra("number", number);
+                intent.putExtra("available_to_chat", availableForChat);
+                intent.putExtra("user", id);
+                intent.putExtra("photo", photo);
+                intent.putExtra("start_time", startTime);
+                startActivity(intent);
             }
         });
         if (!availableForChat) {
@@ -168,6 +180,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                }
+        }
 
     }
 
