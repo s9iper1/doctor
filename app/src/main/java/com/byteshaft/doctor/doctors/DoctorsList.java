@@ -77,6 +77,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private EditText toolbarSearchView;
     private HttpRequest request;
     private ArrayList<DoctorDetails> doctors;
+    private TextView noDoctor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -84,6 +85,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         getDoctorList();
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
+        noDoctor = (TextView) mBaseView.findViewById(R.id.no_doctor);
         searchContainer = new LinearLayout(getActivity());
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
@@ -285,6 +287,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                    doctorDetails.setUserId(doctorDetail.getInt("user"));
                                    doctors.add(doctorDetails);
                                    customAdapter.notifyDataSetChanged();
+                               }
+                               if (doctors.size() < 1) {
+                                   mListView.setVisibility(GONE);
+                                   noDoctor.setVisibility(View.VISIBLE);
+                                   Helpers.showSnackBar(getView(), R.string.no_doctor_available_snack_bar);
                                }
                            }
                        } catch (JSONException e) {
