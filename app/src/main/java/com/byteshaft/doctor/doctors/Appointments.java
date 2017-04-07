@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -43,8 +42,6 @@ import java.util.Date;
 import java.util.HashSet;
 
 import static com.byteshaft.doctor.R.id.state;
-
-;
 
 public class Appointments extends Fragment implements
         HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
@@ -91,7 +88,6 @@ public class Appointments extends Fragment implements
                 agendaArrayList.clear();
                 String agendaDate = dateFormat.format(formattedDate);
                 getAgendaList(agendaDate);
-                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
             }
         });
 
