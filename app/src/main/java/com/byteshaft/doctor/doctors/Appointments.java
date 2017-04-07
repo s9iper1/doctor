@@ -27,6 +27,7 @@ import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.gettersetter.Agenda;
 import com.byteshaft.doctor.patients.DoctorsAppointment;
 import com.byteshaft.doctor.utils.AppGlobals;
+import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
 import org.json.JSONArray;
@@ -35,6 +36,7 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,7 +46,8 @@ import static com.byteshaft.doctor.R.id.state;
 
 ;
 
-public class Appointments extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class Appointments extends Fragment implements
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private SwipeMenuListView mListView;
@@ -67,16 +70,28 @@ public class Appointments extends Fragment implements HttpRequest.OnReadyStateCh
         Log.i("TAG", dateTextview.getText().toString());
         dateTextview.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();
-        getAgendaList();
+        Helpers.showProgressDialog(getActivity(), "Please wait...");
+        getAgendaList(Helpers.getDate());
 
         // assign event handler
         calendarView.setEventHandler(new com.byteshaft.doctor.uihelpers.CalendarView.EventHandler() {
             @Override
             public void onDayPress(Date date) {
-                Log.i("TAG", "click");
-                // show returned day
                 DateFormat df = SimpleDateFormat.getDateInstance();
-                Toast.makeText(getActivity(), df.format(date), Toast.LENGTH_SHORT).show();
+                String resultDate = df.format(date);
+                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date formattedDate = null;
+                try {
+                    formattedDate = formatterFrom.parse(resultDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Helpers.showProgressDialog(getActivity(), "Please wait...");
+                agendaArrayList.clear();
+                String agendaDate = dateFormat.format(formattedDate);
+                getAgendaList(agendaDate);
+                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -130,11 +145,11 @@ public class Appointments extends Fragment implements HttpRequest.OnReadyStateCh
         return mBaseView;
     }
 
-    private void getAgendaList() {
+    private void getAgendaList(String date) {
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%sdoctor/agenda", AppGlobals.BASE_URL));
+        request.open("GET", String.format("%sdoctor/agenda?date=%s", AppGlobals.BASE_URL, date));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
@@ -171,6 +186,7 @@ public class Appointments extends Fragment implements HttpRequest.OnReadyStateCh
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("agenda List ", request.getResponseText());
@@ -188,8 +204,12 @@ public class Appointments extends Fragment implements HttpRequest.OnReadyStateCh
                                 agenda.setAgendaId(agendaObject.getInt("id"));
                                 agenda.setStartTIme(agendaObject.getString("start_time"));
                                 agendaArrayList.add(agenda);
-                                arrayAdapter = new Adapter(getActivity(), agendaArrayList);
-                                mListView.setAdapter(arrayAdapter);
+                                if (arrayAdapter == null) {
+                                    arrayAdapter = new Adapter(getActivity(), agendaArrayList);
+                                    mListView.setAdapter(arrayAdapter);
+                                } else {
+                                    arrayAdapter.notifyDataSetChanged();
+                                }
                                 Log.i("TagONE ", agendaObject.toString());
                             }
                         } catch (JSONException e) {
@@ -227,14 +247,25 @@ public class Appointments extends Fragment implements HttpRequest.OnReadyStateCh
                 viewHolder = new ViewHolder();
                 viewHolder.nameAge = (TextView) convertView.findViewById(R.id.name_age);
                 viewHolder.appointmentTime = (TextView) convertView.findViewById(R.id.appointment_time);
-                viewHolder.appointmentState = (View) convertView.findViewById(state);
+                viewHolder.appointmentState = convertView.findViewById(state);
                 viewHolder.service = (TextView) convertView.findViewById(R.id.service);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             Agenda agenda = agendaArrayList.get(position);
-            viewHolder.appointmentTime.setText(agenda.getStartTIme());
+            SimpleDateFormat formatter_from = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+            try {
+                Date date = formatter_from.parse(agenda.getStartTIme());
+                viewHolder.appointmentTime.setText(dateFormat.format(date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String state = agenda.getAgendaState();
+            if (state.contains("pending")) {
+                viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.pending_background_color));
+            }
 
             return convertView;
         }
