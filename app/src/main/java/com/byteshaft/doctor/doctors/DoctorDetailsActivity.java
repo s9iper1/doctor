@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,11 @@ import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.patients.DoctorBookingActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener {
+public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private TextView doctorName;
     private TextView doctorSpeciality;
@@ -43,6 +45,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ReviewAdapter adapter;
     private String number;
     private CircleImageView circleImageView;
+    private HttpRequest request;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         number = getIntent().getStringExtra("number");
         String photo = getIntent().getStringExtra("photo");
         boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        id = getIntent().getIntExtra("user", -1);
 
 
         doctorName = (TextView) findViewById(R.id.doctor_name);
@@ -88,6 +93,19 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             status.setImageResource(R.mipmap.ic_online_indicator);
         }
         Helpers.getBitMap(photo, circleImageView);
+        getReviews();
+    }
+
+    private void getReviews() {
+        request = new HttpRequest(this);
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%spublic/doctor/%s/review",
+                AppGlobals.BASE_URL, id));
+        Log.i("TAG", "id "  + id);
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 
     @Override
@@ -146,6 +164,16 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
     }
 
     private class ReviewAdapter extends ArrayAdapter {

@@ -115,6 +115,7 @@
     <string name="permission_granted">Permission Granted</string>
     <string name="no_doctor_available">No Doctor Available</string>
     <string name="no_doctor_available_snack_bar">No doctor available in next 7 days</string>
+    <string name="success">Schedule Created Successfully</string>
 
 </resources>
 
