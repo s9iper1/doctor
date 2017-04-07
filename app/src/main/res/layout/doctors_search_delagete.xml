@@ -102,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:numStars="5"
-                style="@style/customRatingBar"
+                style="@style/RatingBar"
                 android:rating="3" />
 
         </LinearLayout>

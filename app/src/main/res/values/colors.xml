@@ -34,4 +34,6 @@
     <color name="finished_progress_color">#e54949</color>
     <color name="normal_rating_bar">#D3D6DB</color>
     <color name="activated_rating_bar">#7E848C</color>
+    <color name="normal_rating_bar_internal">#7E848C</color>
+    <color name="activated_rating_bar_internal">#D3D6DB</color>
 </resources>
