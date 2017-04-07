@@ -244,12 +244,13 @@ public class Appointments extends Fragment implements
                 viewHolder.nameAge = (TextView) convertView.findViewById(R.id.name_age);
                 viewHolder.appointmentTime = (TextView) convertView.findViewById(R.id.appointment_time);
                 viewHolder.appointmentState = convertView.findViewById(state);
-                viewHolder.service = (TextView) convertView.findViewById(R.id.service);
+                viewHolder.reason = (TextView) convertView.findViewById(R.id.service);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             Agenda agenda = agendaArrayList.get(position);
+            viewHolder.reason.setText(agenda.getReaseon());
             SimpleDateFormat formatter_from = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
             try {
@@ -261,6 +262,10 @@ public class Appointments extends Fragment implements
             String state = agenda.getAgendaState();
             if (state.contains("pending")) {
                 viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.pending_background_color));
+            } else if (state.contains("attended")) {
+                viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.attended_background_color));
+            } else if (state.contains("rejected")) {
+                viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.reject_background));
             }
 
             return convertView;
@@ -272,7 +277,7 @@ public class Appointments extends Fragment implements
         TextView appointmentTime;
         View appointmentState;
         TextView nameAge;
-        TextView service;
+        TextView reason;
         ImageView chatStatus;
     }
 }
