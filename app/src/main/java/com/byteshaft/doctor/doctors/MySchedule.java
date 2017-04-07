@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+
 public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnErrorListener, View.OnClickListener {
 
