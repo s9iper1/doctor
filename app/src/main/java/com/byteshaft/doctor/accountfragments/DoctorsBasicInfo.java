@@ -429,7 +429,8 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
 
     private void getCities(int id) {
         HttpRequest getCitiesRequest = new HttpRequest(getActivity().getApplicationContext());
-        getCitiesRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+        getCitiesRequest.setOnReadyStateChangeListener(
+                new HttpRequest.OnReadyStateChangeListener() {
             @Override
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
