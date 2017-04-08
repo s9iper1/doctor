@@ -64,7 +64,7 @@ public class AccountManagerActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         Fragment fragment = getSupportFragmentManager()
-                .findFragmentByTag("com.byteshaft.patient.accountfragments.AccountActivationCode");
+                .findFragmentByTag("com.byteshaft.doctor.accountfragments.AccountActivationCode");
         if (fragment instanceof AccountActivationCode) {
             Log.i("TAG", "fragment " + fragment.isVisible());
 
@@ -74,9 +74,9 @@ public class AccountManagerActivity extends AppCompatActivity {
                 getFragmentManager().popBackStack();
                 Log.i("TAG", "count again" + getSupportFragmentManager().getBackStackEntryCount());
                 Fragment accountActivation = getSupportFragmentManager()
-                        .findFragmentByTag("com.byteshaft.patient.accountfragments.UserBasicInfoStepOne");
+                        .findFragmentByTag("com.byteshaft.doctor.accountfragments.UserBasicInfoStepOne");
                 Fragment closeLogin = getSupportFragmentManager()
-                        .findFragmentByTag("com.byteshaft.patient.accountfragments.Login");
+                        .findFragmentByTag("com.byteshaft.doctor.accountfragments.Login");
                 if (getSupportFragmentManager().getBackStackEntryCount() == 1 && accountActivation != null &&
                         accountActivation.isVisible()) {
                     super.onBackPressed();
