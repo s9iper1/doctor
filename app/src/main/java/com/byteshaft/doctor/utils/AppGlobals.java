@@ -78,6 +78,7 @@ public class AppGlobals extends Application {
     public static final String KEY_CITY = "city";
     public static final String KEY_USER = "user";
     public static final String KEY_GOT_INFO = "got_info";
+    public static final String KEY_FAVOURITE_STATE = "favourite";
 
     public static final String KEY_TOKEN = "token";
     public static final String USER_ACTIVATION_KEY = "activation_key";
@@ -172,6 +173,17 @@ public class AppGlobals extends Application {
     public static boolean isOnline() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(KEY_CHAT_STATUS, false);
+    }
+
+
+    public static void saveFavourite(String drId, boolean isFavourite) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean(drId ,isFavourite).apply();
+    }
+
+    public static boolean isFavourite(String id) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getBoolean(id , false);
     }
 
     public static SharedPreferences getPreferenceManager() {
