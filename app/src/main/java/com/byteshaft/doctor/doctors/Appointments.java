@@ -123,15 +123,9 @@ public class Appointments extends Fragment implements
             }
         };
 
-// set creator
+        // set creator
         mListView.setMenuCreator(creator);
         mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-        ArrayList<String[]> arrayList = new ArrayList<>();
-        arrayList.add(new String[]{"Bilal", "24", "ENT checkup"});
-        arrayList.add(new String[]{"omer", "25", "ENT checkup"});
-        arrayList.add(new String[]{"shahid", "26", "ENT checkup"});
-        arrayList.add(new String[]{"hussi", "24", "ENT checkup"});
-//        mListView.setAdapter(new Adapter(getContext(), arrayList));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
