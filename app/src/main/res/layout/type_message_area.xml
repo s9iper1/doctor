@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    android:id="@+id/ll"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,14 +9,26 @@
     android:gravity="bottom"
     android:padding="10dp">
 
-    <ImageView
-        android:layout_width="32dp"
-        android:layout_height="31dp"
+    <!--<ImageView-->
+        <!--android:id="@+id/camera_button"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:src="@mipmap/camera"-->
+        <!--android:layout_marginBottom="10dp"-->
+        <!--android:paddingRight="4dp"/>-->
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/camera_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginBottom="10dp"
-        android:src="@drawable/camera"
-        android:paddingRight="4dp"/>
+        android:layout_marginRight="2dp"
+        android:background="@mipmap/camera" />
+
+
 
     <EditText
+        android:id="@+id/write_message_edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -26,9 +40,11 @@
         android:layout_margin="1dp"/>
 
     <ImageView
-        android:layout_width="37dp"
-        android:layout_height="26dp"
+        android:id="@+id/send_button"
+        android:layout_width="35dp"
+        android:layout_height="30dp"
         android:paddingBottom="1dp"
+        android:clickable="true"
         android:layout_marginBottom="10dp"
         android:src="@mipmap/send" />
 

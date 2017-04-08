@@ -41,12 +41,18 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true">
+
     <ImageButton
         android:id="@+id/dustbin_messages"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
         android:src="@mipmap/dustbin_delete"
         android:background="@null"
+        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    </LinearLayout>
 </RelativeLayout>
