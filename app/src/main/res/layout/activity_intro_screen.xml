@@ -4,7 +4,7 @@
     android:id="@+id/activity_intro_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.byteshaft.patient.introscreen.IntroScreen">
+    tools:context="com.byteshaft.doctor.introscreen.IntroScreen">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
