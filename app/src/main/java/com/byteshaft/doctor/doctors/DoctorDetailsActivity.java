@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +26,13 @@ import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.patients.DoctorBookingActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
+
+import java.net.HttpURLConnection;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener {
+public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private TextView doctorName;
     private TextView doctorSpeciality;
@@ -45,6 +49,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private String number;
     private CircleImageView circleImageView;
     private boolean isFavourite;
+    private HttpRequest request;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +59,15 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_details);
 
-        String startTime = getIntent().getStringExtra("start_time");
-        String name = getIntent().getStringExtra("name");
-        String specialist = getIntent().getStringExtra("specialist");
-        int stars = getIntent().getIntExtra("stars", 0);
-        boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        final String startTime = getIntent().getStringExtra("start_time");
+        final String name = getIntent().getStringExtra("name");
+        final String specialist = getIntent().getStringExtra("specialist");
+        final int stars = getIntent().getIntExtra("stars", 0);
+        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
-        String photo = getIntent().getStringExtra("photo");
-        boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
-
+        final String photo = getIntent().getStringExtra("photo");
+        final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        id = getIntent().getIntExtra("user", -1);
 
         doctorName = (TextView) findViewById(R.id.doctor_name);
         doctorName.setText(name);
@@ -80,10 +86,21 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         bookingButton = (Button) findViewById(R.id.button_book);
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
         textClock = (TextView) findViewById(R.id.clock);
+        textClock.setText(startTime);
         bookingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), DoctorBookingActivity.class));
+                Intent intent = new Intent(getApplicationContext(), DoctorBookingActivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("specialist", specialist);
+                intent.putExtra("stars", stars);
+                intent.putExtra("favourite", favourite);
+                intent.putExtra("number", number);
+                intent.putExtra("available_to_chat", availableForChat);
+                intent.putExtra("user", id);
+                intent.putExtra("photo", photo);
+                intent.putExtra("start_time", startTime);
+                startActivity(intent);
             }
         });
         if (!availableForChat) {
@@ -92,6 +109,19 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             status.setImageResource(R.mipmap.ic_online_indicator);
         }
         Helpers.getBitMap(photo, circleImageView);
+        getReviews();
+    }
+
+    private void getReviews() {
+        request = new HttpRequest(this);
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%spublic/doctor/%s/review",
+                AppGlobals.BASE_URL, id));
+        Log.i("TAG", "id "  + id);
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 
     @Override
@@ -157,6 +187,22 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                }
+        }
+
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
     }
 
     private class ReviewAdapter extends ArrayAdapter {

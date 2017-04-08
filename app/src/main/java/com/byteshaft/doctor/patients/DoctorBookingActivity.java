@@ -20,8 +20,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RatingBar;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +29,13 @@ import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,17 +43,21 @@ import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener {
+public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private TextView mDoctorName;
     private TextView mDoctorSpeciality;
-    private TextClock mtime;
+    private TextView mtime;
     private CircleImageView mDoctorImage;
     private RatingBar mDoctorRating;
     private ImageButton mCallButton;
     private ImageButton mChatButton;
     private ImageButton mFavButton;
     private GridView timeTableGrid;
+    private ImageView status;
+    private String number;
+    private int id;
+    private HttpRequest request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,17 +83,41 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
             }
         });
-//        mDoctorName = (TextView) findViewById(R.id.doctor_name_booking);
-//        mDoctorSpeciality = (TextView) findViewById(R.id.doctor_sp_booking);
-//        mDoctorRating = (RatingBar) findViewById(R.id.doctor_rating_booking);
-//        mtime = (TextClock) findViewById(R.id.clock);
-//        mDoctorImage = (CircleImageView) findViewById(R.id.doctor_image_booking);
+        mDoctorName = (TextView) findViewById(R.id.doctor_name);
+        mDoctorSpeciality = (TextView) findViewById(R.id.doctor_sp);
+        mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
+        mtime = (TextView) findViewById(R.id.clock);
+        mDoctorImage = (CircleImageView) findViewById(R.id.profile_image_view_search);
         mCallButton = (ImageButton) findViewById(R.id.call_button);
         mChatButton = (ImageButton) findViewById(R.id.message_button);
-//        mFavButton = (ImageButton) findViewById(R.id.button_fav_booking);
+        mFavButton = (ImageButton) findViewById(R.id.favt_button);
+        status = (ImageView) findViewById(R.id.status);
         mCallButton.setOnClickListener(this);
         mChatButton.setOnClickListener(this);
-//        mFavButton.setOnClickListener(this);
+        mFavButton.setOnClickListener(this);
+        getSchedule();
+        final String startTime = getIntent().getStringExtra("start_time");
+        final String name = getIntent().getStringExtra("name");
+        final String specialist = getIntent().getStringExtra("specialist");
+        final int stars = getIntent().getIntExtra("stars", 0);
+        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        number = getIntent().getStringExtra("number");
+        final String photo = getIntent().getStringExtra("photo");
+        final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        id = getIntent().getIntExtra("user", -1);
+        if (!availableForChat) {
+            status.setImageResource(R.mipmap.ic_offline_indicator);
+        } else {
+            status.setImageResource(R.mipmap.ic_online_indicator);
+        }
+
+        mDoctorName.setText(name);
+        mDoctorSpeciality.setText(specialist);
+        mDoctorRating.setRating(stars);
+        mtime.setText(startTime);
+        Helpers.getBitMap(photo, mDoctorImage);
+//        mFavButton
+
         JSONArray jsonArray = new JSONArray();
         try {
 
@@ -140,6 +170,18 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+    private void getSchedule() {
+        request = new HttpRequest(this);
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%spublic/doctor/%s/schedule?date=07/04/2017",
+                AppGlobals.BASE_URL, id));
+        Log.i("TAG", "id "  + id);
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -150,7 +192,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE},
                             AppGlobals.CALL_PERMISSION);
                 } else {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number));
                     startActivity(intent);
                 }
                 break;
@@ -185,6 +227,24 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "response " + request.getResponseText());
+                        break;
+                }
+        }
+
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
     }
 
     private class TimeTableAdapter extends ArrayAdapter<JSONArray> {

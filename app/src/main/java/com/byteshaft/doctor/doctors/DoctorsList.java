@@ -203,6 +203,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 //                intent.putExtra("favourite", doctorDetails.getSpeciality());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
+                intent.putExtra("user", doctorDetails.getId());
                 intent.putExtra("photo", doctorDetails.getPhotoUrl());
                 startActivity(intent);
             }
@@ -376,7 +377,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                     Double.parseDouble(startLocation[1])), new LatLng(Double.parseDouble(endLocation[0]),
                     Double.parseDouble(endLocation[1]))) + " km");
             viewHolder.review.setRating(singleDoctor.getReviewStars());
-            viewHolder.availableTime.setText(String.valueOf(" am"));
+            viewHolder.availableTime.setText(String.valueOf("9:00 am"));
             viewHolder.call.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
