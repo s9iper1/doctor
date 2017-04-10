@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity
             if (AppGlobals.isLogin() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
                 String url = String.format("%s" + AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
+                Log.i("TAG", "url " + url);
                 getBitMap(url, profilePicture);
             }
         }

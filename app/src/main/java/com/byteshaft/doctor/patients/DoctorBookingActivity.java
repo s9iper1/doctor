@@ -11,12 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,7 +46,7 @@ import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener, AdapterView.OnItemClickListener {
 
     private TextView mDoctorName;
     private TextView mDoctorSpeciality;
@@ -62,6 +63,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private HttpRequest request;
     private ArrayList<AppointmentDetail> timeSlots;
     private TimeTableAdapter timeTableAdapter;
+    private String currentDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +72,11 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_booking);
         timeTableGrid = (GridView) findViewById(R.id.time_table);
+        timeTableGrid.setOnItemClickListener(this);
         timeSlots = new ArrayList<>();
         HashSet<Date> events = new HashSet<>();
         events.add(new Date());
+        currentDate = Helpers.getDate();
         com.byteshaft.doctor.uihelpers.CalendarView cv = ((com.byteshaft.doctor.uihelpers.CalendarView)
                 findViewById(R.id.calendar_view));
         cv.updateCalendar(events);
@@ -81,10 +85,20 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         cv.setEventHandler(new com.byteshaft.doctor.uihelpers.CalendarView.EventHandler() {
             @Override
             public void onDayPress(Date date) {
-                Log.i("TAG", "click");
-                // show returned day
                 DateFormat df = SimpleDateFormat.getDateInstance();
-                Toast.makeText(DoctorBookingActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                String resultDate = df.format(date);
+                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date formattedDate = null;
+                try {
+                    formattedDate = formatterFrom.parse(resultDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(DoctorBookingActivity.this, dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+                currentDate = dateFormat.format(formattedDate);
+                Log.i("TAG", "current date  " + currentDate);
+                getSchedule(currentDate);
 
             }
         });
@@ -92,7 +106,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mDoctorSpeciality = (TextView) findViewById(R.id.doctor_sp);
         mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
         mtime = (TextView) findViewById(R.id.clock);
-        mDoctorImage = (CircleImageView) findViewById(R.id.profile_image_view_search);
+        mDoctorImage = (CircleImageView) findViewById(R.id.profile_image_view);
         mCallButton = (ImageButton) findViewById(R.id.call_button);
         mChatButton = (ImageButton) findViewById(R.id.message_button);
         mFavButton = (ImageButton) findViewById(R.id.favt_button);
@@ -119,10 +133,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mDoctorRating.setRating(stars);
         mtime.setText(startTime);
         Helpers.getBitMap(photo, mDoctorImage);
-        getSchedule(Helpers.getDate());
-//        mFavButton
-        timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
-        timeTableGrid.setAdapter(timeTableAdapter);
+        getSchedule(currentDate);
     }
 
     @Override
@@ -212,6 +223,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
+                        timeSlots = new ArrayList<>();
+                        timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
+                        timeTableGrid.setAdapter(timeTableAdapter);
                         try {
                             JSONArray jsonArray = new JSONArray(request.getResponseText());
                             for (int i = 0; i < jsonArray.length(); i++) {
@@ -238,6 +252,19 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        AppointmentDetail appointmentDetail = timeSlots.get(i);
+        TextView textView = (TextView) view;
+        Log.i("TAG", timeSlots.get(i).getStartTime());
+        if (appointmentDetail.getState().equals("pending")) {
+            textView.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
+            startActivity(new Intent(getApplicationContext(), CreateAppointmentActivity.class));
+        } else {
+            Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);
+        }
+    }
+
     private class TimeTableAdapter extends ArrayAdapter<ArrayList<AppointmentDetail>> {
 
         private ArrayList<AppointmentDetail> timeTable;
@@ -255,7 +282,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.delegate_time_table, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.time = (AppCompatButton) convertView.findViewById(R.id.time);
+                viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -263,23 +290,10 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             final AppointmentDetail appointmentDetail = timeTable.get(position);
 
             viewHolder.time.setText(appointmentDetail.getStartTime());
-            viewHolder.time.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!appointmentDetail.getState().equals("pending")) {
-                        viewHolder.time.setBackgroundColor(getResources().getColor(R.color.appointment_bg));
-                        viewHolder.time.setPressed(true);
-                        startActivity(new Intent(getApplicationContext(), CreateAppointmentActivity.class));
-                    } else {
-                        Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);
-                    }
-
-                }
-            });
             if (appointmentDetail.getState().equals("pending")) {
-                viewHolder.time.setPressed(false);
+                viewHolder.time.setBackground(getResources().getDrawable(R.drawable.rounded_button));
             } else {
-                viewHolder.time.setPressed(true);
+                viewHolder.time.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             }
 
 
@@ -293,6 +307,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     }
 
     private class ViewHolder {
-        AppCompatButton time;
+        TextView time;
     }
 }
