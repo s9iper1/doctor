@@ -9,6 +9,15 @@ public class Review {
     private int reviewId;
     private String reviewText;
     private float reviewStars;
+    private String reviewTime;
+
+    public String getReviewTime() {
+        return reviewTime;
+    }
+
+    public void setReviewTime(String reviewTime) {
+        this.reviewTime = reviewTime;
+    }
 
     public int getReviewId() {
         return reviewId;

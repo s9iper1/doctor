@@ -35,7 +35,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -213,6 +217,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+    public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
@@ -231,6 +240,14 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 review.setReviewId(jsonObject.getInt("id"));
                                 review.setReviewText(jsonObject.getString("message"));
                                 review.setReviewStars(jsonObject.getInt("stars"));
+                                String currentTime = jsonObject.getString("created_at");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                try {
+                                    Log.i("TAG", "" +getDateDiff(dateFormat.parse(currentTime), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
+                                             TimeUnit.MINUTES));
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
                                 arrayList.add(review);
                                 reviewAdapter.notifyDataSetChanged();
                             }
@@ -272,7 +289,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             }
             Review review = arrayList.get(position);
             viewHolder.userRating.setRating(review.getReviewStars());
-            viewHolder.userComment.setText(review.getReviewText());
+            String output = review.getReviewText().substring(0, 1).toUpperCase() +
+                    review.getReviewText().substring(1);
+            viewHolder.userComment.setText(output);
+            viewHolder.userComment.setTypeface(AppGlobals.robotoItalic);
+            viewHolder.time.setTypeface(AppGlobals.robotoItalic);
+            viewHolder.userName.setTypeface(AppGlobals.robotoItalic);
 
             return convertView;
         }

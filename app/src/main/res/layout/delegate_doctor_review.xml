@@ -30,6 +30,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:textSize="14sp"
                     android:layout_toEndOf="@+id/user_ratings"
                     android:layout_toRightOf="@+id/user_ratings"
                     android:text="username" />
@@ -38,8 +39,7 @@
                     android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:text="10 hours ago" />
+                    android:layout_alignParentRight="true" />
 
             </RelativeLayout>
 
@@ -47,6 +47,7 @@
                 android:id="@+id/tv_review"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="5dp"
                 android:layout_below="@+id/rating_layout"
                 android:layout_marginTop="6dp"
                 android:text="@string/review" />

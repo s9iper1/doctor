@@ -260,4 +260,10 @@ public class Helpers {
         return formattedDate;
     }
 
+    public static String getCurrentTimeAndDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(c.getTime());
+    }
+
 }
