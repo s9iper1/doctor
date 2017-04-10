@@ -25,9 +25,11 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -243,6 +245,19 @@ public class Helpers {
         double c = 2 * Math.asin(Math.sqrt(a));
         double valueResult = Radius * c;
         return String.format("%.2f", valueResult);
+    }
+
+    public static String getFormattedTime(String startTime) {
+        SimpleDateFormat formatterFrom = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aa");
+        Date rawDate = null;
+        try {
+            rawDate = formatterFrom.parse(startTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String formattedDate = dateFormat.format(rawDate);
+        return formattedDate;
     }
 
 }

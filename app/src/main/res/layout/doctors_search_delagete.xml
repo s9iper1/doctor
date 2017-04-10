@@ -150,10 +150,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:textSize="13sp"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/open_details"
                 android:drawableTop="@mipmap/ic_schedule"
-                android:text="18:00" />
+                />
 
             <ImageButton
                 android:id="@+id/open_details"

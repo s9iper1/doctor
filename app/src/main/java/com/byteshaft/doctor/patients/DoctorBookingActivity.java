@@ -243,7 +243,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                                 AppointmentDetail appointmentDetail = new AppointmentDetail();
                                 appointmentDetail.setDoctorId(jsonObject.getInt("doctor"));
                                 appointmentDetail.setAppointmentId(jsonObject.getInt("id"));
-                                appointmentDetail.setStartTime(jsonObject.getString("start_time"));
+                                appointmentDetail.setStartTime(Helpers.getFormattedTime(jsonObject.getString("start_time")));
                                 appointmentDetail.setState(jsonObject.getString("state"));
                                 timeSlots.add(appointmentDetail);
                                 timeTableAdapter.notifyDataSetChanged();

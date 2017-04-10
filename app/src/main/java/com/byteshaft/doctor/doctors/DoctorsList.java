@@ -61,6 +61,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.view.View.GONE;
 import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
+import static com.byteshaft.doctor.utils.Helpers.getFormattedTime;
 
 /**
  * Created by s9iper1 on 2/22/17.
@@ -281,7 +282,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                    doctorDetails.setGender(doctorDetail.getString("gender"));
                                    doctorDetails.setLocation(doctorDetail.getString("location"));
                                    doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favorite"));
-                                   doctorDetails.setStartTime(doctorDetail.getString("start_time"));
+                                   doctorDetails.setStartTime(getFormattedTime(doctorDetail.getString("start_time")));
                                    doctorDetails.setBlocked(doctorDetail.getBoolean("am_i_blocked"));
                                    doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
                                    if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
@@ -381,7 +382,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                     Double.parseDouble(startLocation[1])), new LatLng(Double.parseDouble(endLocation[0]),
                     Double.parseDouble(endLocation[1]))) + " km");
             viewHolder.review.setRating(singleDoctor.getReviewStars());
-            viewHolder.availableTime.setText(String.valueOf("9:00 am"));
+            viewHolder.availableTime.setText(singleDoctor.getStartTime());
             viewHolder.call.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
