@@ -106,7 +106,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mDoctorSpeciality = (TextView) findViewById(R.id.doctor_sp);
         mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
         mtime = (TextView) findViewById(R.id.clock);
-        mDoctorImage = (CircleImageView) findViewById(R.id.profile_image_view);
+        mDoctorImage = (CircleImageView) findViewById(R.id.profile_image_view_search);
         mCallButton = (ImageButton) findViewById(R.id.call_button);
         mChatButton = (ImageButton) findViewById(R.id.message_button);
         mFavButton = (ImageButton) findViewById(R.id.favt_button);
