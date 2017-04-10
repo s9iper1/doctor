@@ -82,6 +82,7 @@ public class Dashboard extends Fragment {
         doctorName.setTypeface(AppGlobals.typefaceNormal);
         doctorEmail.setTypeface(AppGlobals.typefaceNormal);
         doctorSp.setTypeface(AppGlobals.typefaceNormal);
+
         doctorName.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME)
                 + " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
         doctorEmail.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMAIL));

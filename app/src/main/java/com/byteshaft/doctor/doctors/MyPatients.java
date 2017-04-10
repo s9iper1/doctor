@@ -217,6 +217,11 @@ public class MyPatients extends Fragment {
                 viewHolder.call = (ImageButton) convertView.findViewById(R.id.call);
                 viewHolder.openDetailButton = (ImageButton) convertView.findViewById(R.id.open_details);
                 viewHolder.status = (ImageView) convertView.findViewById(R.id.status);
+
+                viewHolder.name.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.patientAge.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.distance.setTypeface(AppGlobals.typefaceNormal);
+
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

@@ -83,6 +83,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         chatButton = (ImageButton) findViewById(R.id.message_button);
         heartButton = (ImageButton) findViewById(R.id.heart_button);
         status = (ImageView) findViewById(R.id.status);
+
+        // setting typeface
+        doctorName.setTypeface(AppGlobals.typefaceNormal);
+        doctorSpeciality.setTypeface(AppGlobals.typefaceNormal);
+        textClock.setTypeface(AppGlobals.typefaceNormal);
+
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
         if (isBlocked) {
@@ -236,6 +242,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 viewHolder.userComment = (TextView) convertView.findViewById(R.id.tv_review);
                 viewHolder.userRating = (RatingBar) convertView.findViewById(R.id.user_ratings);
+
+                viewHolder.userName.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.time.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.userComment.setTypeface(AppGlobals.typefaceNormal);
+
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

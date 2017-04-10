@@ -651,6 +651,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_spinner, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.spinnerText = (TextView) convertView.findViewById(R.id.spinner_text);
+                viewHolder.spinnerText.setTypeface(AppGlobals.typefaceNormal);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
