@@ -39,7 +39,7 @@
             android:id="@+id/name_age"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bilal Khan (24)"
+            android:singleLine="true"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -48,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="2dp"
+            android:singleLine="true"
             android:text="Service Description"
             android:textSize="12sp" />
     </LinearLayout>
@@ -65,7 +66,7 @@
             android:layout_height="wrap_content">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profile_image_view_search"
+                android:id="@+id/patient_appointment_image_view"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@mipmap/image_placeholder"
@@ -74,14 +75,14 @@
                 app:civ_fill_color="@android:color/white" />
 
             <ImageView
-                android:id="@+id/status"
+                android:id="@+id/available_for_chat_status"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="2dp"
-                android:src="@mipmap/ic_offline_indicator" />
+                android:layout_marginTop="2dp" />
+
         </RelativeLayout>
 
     </LinearLayout>

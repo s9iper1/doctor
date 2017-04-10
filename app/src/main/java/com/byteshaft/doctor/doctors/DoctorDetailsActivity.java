@@ -40,6 +40,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
     private ImageButton callButton;
     private ImageButton chatButton;
+    private ImageButton heartButton;
     private Button bookingButton;
     private Button showallReviewButton;
     private TextView textClock;
@@ -47,6 +48,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ReviewAdapter adapter;
     private String number;
     private CircleImageView circleImageView;
+    private boolean isFavourite;
     private HttpRequest request;
     private int id;
 
@@ -76,9 +78,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         ratingBar.setRating(stars);
         callButton = (ImageButton) findViewById(R.id.call_button);
         chatButton = (ImageButton) findViewById(R.id.message_button);
+        heartButton = (ImageButton) findViewById(R.id.heart_button);
         status = (ImageView) findViewById(R.id.status);
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
+        heartButton.setOnClickListener(this);
         bookingButton = (Button) findViewById(R.id.button_book);
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
         textClock = (TextView) findViewById(R.id.clock);
@@ -151,8 +155,15 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 startActivity(new Intent(getApplicationContext(),
                         ConversationActivity.class));
                 break;
-
-
+            case R.id.heart_button:
+                if (isFavourite) {
+                    heartButton.setBackgroundResource(R.mipmap.heart);
+                    isFavourite = true;
+                } else {
+                    heartButton.setBackgroundResource(R.mipmap.ic_heart_fill);
+                    isFavourite = false;
+                }
+                break;
         }
     }
 

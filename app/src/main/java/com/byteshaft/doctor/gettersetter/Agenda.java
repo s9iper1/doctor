@@ -10,6 +10,54 @@ public class Agenda {
     String reaseon;
     String agendaState;
 
+    String firstName;
+    String lastName;
+    String photoUrl;
+
+    public boolean isAvailAbleForChat() {
+        return availAbleForChat;
+    }
+
+    public void setAvailAbleForChat(boolean availAbleForChat) {
+        this.availAbleForChat = availAbleForChat;
+    }
+
+    boolean availAbleForChat;
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    String dateOfBirth;
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
     public String getCreatedAt() {
         return createdAt;
     }

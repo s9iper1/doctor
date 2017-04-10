@@ -81,9 +81,9 @@
             android:text="Dermatology"
             android:textColor="@android:color/darker_gray" />
 
-        <android.support.v7.widget.AppCompatRatingBar
+        <RatingBar
             android:id="@+id/user_ratings"
-            style="@style/Rating_bar"
+            style="@style/Widget.AppCompat.RatingBar.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/doctor_sp"
@@ -92,9 +92,11 @@
             android:rating="3" />
 
         <ImageButton
-            android:id="@+id/button"
+            android:id="@+id/heart_button"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:onClick="onToggleStar"
+            android:clickable="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/doctor_name"
@@ -135,6 +137,7 @@
 
 
         <RelativeLayout
+            android:layout_marginTop="5dp"
             android:id="@+id/com_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
