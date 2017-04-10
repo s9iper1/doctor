@@ -374,7 +374,11 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mRequest.setTimeout(200000);
         mRequest.setOnReadyStateChangeListener(this);
         mRequest.setOnFileUploadProgressListener(this);
-        mRequest.open("POST", String.format("%suser/profile", AppGlobals.BASE_URL));
+        String method = "POST";
+        if (AppGlobals.isInfoAvailable()) {
+            method = "PATCH";
+        }
+        mRequest.open(method, String.format("%suser/profile", AppGlobals.BASE_URL));
         mRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         mRequest.send(data);
@@ -463,6 +467,68 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        break;
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "res" + request.getResponseText());
+                        Toast.makeText(getActivity(), "Profile Updated Successfully", Toast.LENGTH_SHORT).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(request.getResponseText());
+                            System.out.println(jsonObject + "working ");
+
+                            String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
+                            String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
+                            String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
+                            String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
+                            String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+
+                            String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
+                            String dateOfBirth = jsonObject.getString(AppGlobals.KEY_DATE_OF_BIRTH);
+                            String phoneNumberPrimary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
+                            String phoneNumberSecondary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
+
+                            String insuranceCarrier = jsonObject.getString(AppGlobals.KEY_INSURANCE_CARRIER);
+                            String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
+                            String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
+
+                            String chatStatus = jsonObject.getString(AppGlobals.KEY_CHAT_STATUS);
+                            String state = jsonObject.getString(AppGlobals.KEY_STATE);
+                            String city = jsonObject.getString(AppGlobals.KEY_CITY);
+                            String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
+                            String showNews = jsonObject.getString(AppGlobals.KEY_SHOW_NEWS);
+
+                            String showNotification = jsonObject.getString(AppGlobals.KEY_SHOW_NOTIFICATION);
+                            String emergencyContact = jsonObject.getString(AppGlobals.KEY_EMERGENCY_CONTACT);
+
+                            //saving values
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_USER_ID, userId);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, firstName);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, lastName);
+
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_GENDER, gender);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, dateOfBirth);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY, phoneNumberPrimary);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY, phoneNumberSecondary);
+
+//                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC_ID, affiliateClinic);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_INSURANCE_CARRIER, insuranceCarrier);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CHAT_STATUS, chatStatus);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_STATE, state);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CITY, city);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, docId);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NEWS, showNews);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NOTIFICATION, showNotification);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT, emergencyContact);
+                            Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
+                            AppGlobals.gotInfo(true);
+                            startActivity(new Intent(getActivity(), MainActivity.class));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
 
                 }
         }

@@ -36,15 +36,15 @@
                     android:layout_width="80dp"
                     android:layout_height="wrap_content"
                     android:maxHeight="150dp"
-                    android:layout_centerHorizontal="true"
                     android:maxWidth="150dp"
                     android:minHeight="100dp"
-                    android:minWidth="100dp">
+                    android:minWidth="100dp"
+                    android:layout_centerHorizontal="true">
 
                     <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/profile_image_view_search"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:id="@+id/profile_image_view"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
                         android:maxHeight="200dp"
                         android:maxWidth="200dp"
                         android:minHeight="100dp"
@@ -180,10 +180,12 @@
         android:id="@+id/time_table"
         android:layout_below="@+id/header_layout"
         android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:verticalSpacing="1dp"
-        android:horizontalSpacing="0dp"
+        android:verticalSpacing="2dp"
+        android:horizontalSpacing="2dp"
         android:numColumns="4" />
 
 </RelativeLayout>
