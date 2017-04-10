@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.gettersetter.AffiliateClinic;
+import com.byteshaft.doctor.utils.AppGlobals;
 
 import java.util.ArrayList;
 
@@ -35,6 +36,7 @@ public class AffiliateClinicAdapter extends BaseAdapter {
             convertView = activity.getLayoutInflater().inflate(R.layout.delegate_spinner, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.spinnerText = (TextView) convertView.findViewById(R.id.spinner_text);
+            viewHolder.spinnerText.setTypeface(AppGlobals.typefaceNormal);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

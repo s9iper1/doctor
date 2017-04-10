@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.utils.AppGlobals;
 
 public class PatientsRecentHistory extends AppCompatActivity {
 
@@ -26,6 +27,13 @@ public class PatientsRecentHistory extends AppCompatActivity {
         patientEmail = (TextView) findViewById(R.id.patient_email);
         patientAge = (TextView) findViewById(R.id.patient_age);
         patientImage = (ImageView) findViewById(R.id.patient_image);
+
+        // typeface
+
+        patientName.setTypeface(AppGlobals.typefaceNormal);
+        patientEmail.setTypeface(AppGlobals.typefaceNormal);
+        patientAge.setTypeface(AppGlobals.typefaceNormal);
+
         list = (RecyclerView) findViewById(R.id.patient_history_list);
     }
 }

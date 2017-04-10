@@ -78,10 +78,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.i("Token ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        Log.i("Test Affiliate", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC));
-        Log.i("Test Subscription", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE));
-        Log.i("Test Speciality", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY));
 
         if (AppGlobals.isDoctor()) {
             View headerView;
@@ -185,6 +181,12 @@ public class MainActivity extends AppCompatActivity
             String years = Helpers.calculateAge(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH));
             patientAge.setText(years + " years");
             patientEmail.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMAIL));
+            // setting typeface
+            patientName.setTypeface(AppGlobals.typefaceNormal);
+            patientEmail.setTypeface(AppGlobals.typefaceNormal);
+            patientAge.setTypeface(AppGlobals.typefaceNormal);
+            patientOnlineSwitch.setTypeface(AppGlobals.typefaceNormal);
+
             patientOnlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

@@ -59,6 +59,8 @@ public class IntroScreen extends AppCompatActivity {
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
         btnSkip = (Button) findViewById(R.id.btn_skip);
         btnNext = (Button) findViewById(R.id.btn_next);
+        btnNext.setTypeface(AppGlobals.typefaceNormal);
+        btnSkip.setTypeface(AppGlobals.typefaceNormal);
 
         // layouts of all welcome sliders
         // add few more layouts if you want

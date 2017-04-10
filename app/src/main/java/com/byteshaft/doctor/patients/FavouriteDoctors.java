@@ -32,6 +32,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.FilterDialog;
 import com.byteshaft.doctor.utils.Helpers;
 
@@ -200,6 +201,11 @@ public class FavouriteDoctors extends Fragment {
                 viewHolder.distance = (TextView) convertView.findViewById(R.id.distance);
                 viewHolder.review = (RatingBar) convertView.findViewById(R.id.ratingBar);
                 viewHolder.timingList = (RecyclerView) convertView.findViewById(R.id.timing_list);
+
+                viewHolder.name.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.specialist.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.distance.setTypeface(AppGlobals.typefaceNormal);
+
                 LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
                 viewHolder.timingList.setLayoutManager(layoutManager);
                 convertView.setTag(viewHolder);

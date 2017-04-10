@@ -78,6 +78,10 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mSaveButton = (Button) findViewById(R.id.button_save);
         favouriteButton = (ImageButton) findViewById(R.id.btn_fav);
 
+        mNameTextView.setTypeface(AppGlobals.typefaceNormal);
+        mSpecialityTextView.setTypeface(AppGlobals.typefaceNormal);
+        mDoctorStartTime.setTypeface(AppGlobals.typefaceNormal);
+
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
         mSaveButton.setOnClickListener(this);

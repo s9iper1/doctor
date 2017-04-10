@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.utils.AppGlobals;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,6 +64,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         backPress = (ImageButton) findViewById(R.id.back_press);
         backPress.setOnClickListener(this);
 
+        mDateEditText.setTypeface(AppGlobals.typefaceNormal);
+        mTimeEditText.setTypeface(AppGlobals.typefaceNormal);
+        mReturnDateEditText.setTypeface(AppGlobals.typefaceNormal);
+        mEexplanationEditText.setTypeface(AppGlobals.typefaceNormal);
+        mConclusionsEditText.setTypeface(AppGlobals.typefaceNormal);
 
         mDateEditText.setOnClickListener(this);
         mTimeEditText.setOnClickListener(this);

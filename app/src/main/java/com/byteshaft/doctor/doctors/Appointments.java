@@ -264,6 +264,11 @@ public class Appointments extends Fragment implements
                 viewHolder.chatStatus = (ImageView) convertView.findViewById(
                         R.id.available_for_chat_status);
                 convertView.setTag(viewHolder);
+
+                viewHolder.nameAge.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.appointmentTime.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.reason.setTypeface(AppGlobals.typefaceNormal);
+
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
