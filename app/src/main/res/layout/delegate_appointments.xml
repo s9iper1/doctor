@@ -74,14 +74,14 @@
                 app:civ_fill_color="@android:color/white" />
 
             <ImageView
-                android:id="@+id/status"
+                android:id="@+id/available_for_chat_status"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="10dp"
-                android:layout_marginTop="2dp"
-                android:src="@mipmap/ic_offline_indicator" />
+                android:layout_marginTop="2dp" />
+
         </RelativeLayout>
 
     </LinearLayout>
