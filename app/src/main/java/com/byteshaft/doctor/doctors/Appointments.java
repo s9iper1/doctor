@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static com.byteshaft.doctor.R.id.state;
 
 public class Appointments extends Fragment implements
@@ -252,12 +254,17 @@ public class Appointments extends Fragment implements
                 viewHolder.appointmentTime = (TextView) convertView.findViewById(R.id.appointment_time);
                 viewHolder.appointmentState = convertView.findViewById(state);
                 viewHolder.reason = (TextView) convertView.findViewById(R.id.service);
+                viewHolder.patientImage = (CircleImageView) convertView.findViewById(R.id.patient_appointment_image_view);
                 viewHolder.chatStatus = (ImageView) convertView.findViewById(R.id.available_for_chat_status);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            // setting values
             Agenda agenda = agendaArrayList.get(position);
+            System.out.println("Photo Url: " + agenda.getPhotoUrl());
+            Helpers.getBitMap(agenda.getPhotoUrl(), viewHolder.patientImage);
+
             if (agenda.isAvailAbleForChat()) {
                 viewHolder.chatStatus.setImageDrawable(
                         getResources().getDrawable(R.mipmap.ic_online_indicator));
@@ -266,8 +273,8 @@ public class Appointments extends Fragment implements
                         getResources().getDrawable(R.mipmap.ic_offline_indicator));
             }
             String age = Helpers.calculateAge(agenda.getDateOfBirth());
-            viewHolder.nameAge.setText(agenda.getFirstName()
-                    + " " + agenda.getLastName() + " (" + age + "a)");
+            String name = agenda.getFirstName() + " " + agenda.getLastName();
+            viewHolder.nameAge.setText(name + " (" + age + "a)");
             viewHolder.reason.setText(agenda.getReaseon());
             SimpleDateFormat formatter_from = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
@@ -296,5 +303,6 @@ public class Appointments extends Fragment implements
         TextView nameAge;
         TextView reason;
         ImageView chatStatus;
+        CircleImageView patientImage;
     }
 }
