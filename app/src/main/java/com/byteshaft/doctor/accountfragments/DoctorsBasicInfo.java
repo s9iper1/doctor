@@ -155,6 +155,9 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         mNotificationCheckBox.setOnCheckedChangeListener(this);
         mNewsCheckBox.setOnCheckedChangeListener(this);
         mTermsConditionCheckBox.setOnCheckedChangeListener(this);
+        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+            mTermsConditionCheckBox.setVisibility(View.GONE);
+        }
         mSaveButton.setOnClickListener(this);
         return mBaseView;
     }

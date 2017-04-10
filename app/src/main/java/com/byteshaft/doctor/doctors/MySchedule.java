@@ -3,6 +3,7 @@ package com.byteshaft.doctor.doctors;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,6 +56,8 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.my_schedule, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.schedule_list);
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setTitle(getResources().getString(R.string.my_schedule));
         com.byteshaft.doctor.uihelpers.CalendarView cv = ((com.byteshaft.doctor.uihelpers.CalendarView)
                 mBaseView.findViewById(R.id.calendar_view));
         currentDate = Helpers.getDate();
@@ -233,7 +236,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.search_menu, menu);
+//        inflater.inflate(R.menu.search_menu, menu);
     }
 
     @Override
@@ -251,8 +254,8 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_button:
-                if (jsonArray.length() > 0) {
-//                    updateSchedule();
+                if (jsonArray != null && jsonArray.length() > 0) {
+                    updateSchedule();
                 } else {
                     sendSchedule();
                 }

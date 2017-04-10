@@ -211,6 +211,12 @@ public class Helpers {
         return df.format(c.getTime());
     }
 
+    public static String getTime() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm aa");
+        return df.format(c.getTime());
+    }
+
     public static String getDateNextSevenDays() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DAY_OF_YEAR, 7);
@@ -258,6 +264,12 @@ public class Helpers {
         }
         String formattedDate = dateFormat.format(rawDate);
         return formattedDate;
+    }
+
+    public static String getCurrentTimeAndDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(c.getTime());
     }
 
 }

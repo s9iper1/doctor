@@ -18,17 +18,28 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.gettersetter.Review;
 import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.patients.DoctorBookingActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -53,6 +64,9 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private int id;
     private boolean isBlocked;
     private String startTime;
+    private ArrayList<Review> arrayList;
+    private ListView reviewList;
+    private ReviewAdapter reviewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +74,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_details);
+        reviewList = (ListView) findViewById(R.id.review_list);
         startTime = getIntent().getStringExtra("start_time");
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
@@ -87,7 +102,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         // setting typeface
         doctorName.setTypeface(AppGlobals.typefaceNormal);
         doctorSpeciality.setTypeface(AppGlobals.typefaceNormal);
-        textClock.setTypeface(AppGlobals.typefaceNormal);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
@@ -102,6 +116,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
         textClock = (TextView) findViewById(R.id.clock);
         textClock.setText(startTime);
+        textClock.setTypeface(AppGlobals.typefaceNormal);
         bookingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -208,15 +223,45 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+    public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "review "+ request.getResponseText());
+                        arrayList = new ArrayList<>();
+                        reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
+                        reviewList.setAdapter(reviewAdapter);
+                        try {
+                            JSONArray jsonArray = new JSONArray(request.getResponseText());
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                Review review = new Review();
+                                review.setReviewId(jsonObject.getInt("id"));
+                                review.setReviewText(jsonObject.getString("message"));
+                                review.setReviewStars(jsonObject.getInt("stars"));
+                                String currentTime = jsonObject.getString("created_at");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                try {
+                                    review.setReviewTime(getDateDiff(dateFormat.parse(currentTime), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
+                                            TimeUnit.MILLISECONDS));
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                arrayList.add(review);
+                                reviewAdapter.notifyDataSetChanged();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                 }
         }
-
     }
 
     @Override
@@ -227,16 +272,18 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private class ReviewAdapter extends ArrayAdapter {
 
         private ViewHolder viewHolder;
+        private ArrayList<Review> arrayList;
 
-        public ReviewAdapter(Context context, int resource) {
-            super(context, resource);
+        public ReviewAdapter(Context context, ArrayList<Review> arrayList) {
+            super(context, R.layout.delegate_dashboard);
+            this.arrayList = arrayList;
         }
 
         @NonNull
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.delegate_dashboard, parent, false);
+                convertView = getLayoutInflater().inflate(R.layout.delegate_doctor_review, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.userName = (TextView) convertView.findViewById(R.id.by_username);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
@@ -251,7 +298,35 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            Review review = arrayList.get(position);
+            viewHolder.userRating.setRating(review.getReviewStars());
+            String output = review.getReviewText().substring(0, 1).toUpperCase() +
+                    review.getReviewText().substring(1);
+            viewHolder.userComment.setText(output);
+            viewHolder.time.setText(timeConvert(review.getReviewTime()));
+
             return convertView;
+        }
+
+        public String timeConvert(long time) {
+            long x = time / 1000;
+            long seconds  = x % 60;
+            x /= 60;
+            long minutes = x % 60;
+            x /= 60;
+           long hours = x % 24;
+            x /= 24;
+            long days  = x;
+            if (days > 0)
+            return days +" days ago";
+            else if (days == 0 && hours > 0) return hours +" hours ago";
+            else if (days == 0 && hours == 0 && minutes > 0) return hours +" minutes ago";
+            else  return seconds +" seconds ago";
+        }
+
+        @Override
+        public int getCount() {
+            return arrayList.size();
         }
     }
 
