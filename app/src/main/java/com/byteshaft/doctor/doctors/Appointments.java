@@ -185,7 +185,20 @@ public class Appointments extends Fragment implements
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject agendaObject = jsonArray.getJSONObject(i);
+                                JSONObject patientDetailsObject = agendaObject.getJSONObject("patient");
+
+                                /// getting patient details
+                                Log.i("PatientDetaisl", patientDetailsObject.toString());
+
                                 Agenda agenda = new Agenda();
+                                agenda.setFirstName(patientDetailsObject.getString("first_name"));
+                                agenda.setLastName(patientDetailsObject.getString("last_name"));
+                                agenda.setDateOfBirth(patientDetailsObject.getString("dob"));
+                                agenda.setPhotoUrl(patientDetailsObject.getString("photo").replace(
+                                        "http://localhost", AppGlobals.SERVER_IP));
+                                agenda.setAvailAbleForChat(patientDetailsObject.getBoolean("available_to_chat"));
+                                //// -------- /////////
+
                                 agenda.setCreatedAt(agendaObject.getString("created_at"));
                                 agenda.setDate(agendaObject.getString("date"));
                                 agenda.setAgendaState(agendaObject.getString("state"));
@@ -239,11 +252,22 @@ public class Appointments extends Fragment implements
                 viewHolder.appointmentTime = (TextView) convertView.findViewById(R.id.appointment_time);
                 viewHolder.appointmentState = convertView.findViewById(state);
                 viewHolder.reason = (TextView) convertView.findViewById(R.id.service);
+                viewHolder.chatStatus = (ImageView) convertView.findViewById(R.id.available_for_chat_status);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             Agenda agenda = agendaArrayList.get(position);
+            if (agenda.isAvailAbleForChat()) {
+                viewHolder.chatStatus.setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_online_indicator));
+            } else {
+                viewHolder.chatStatus.setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_offline_indicator));
+            }
+            String age = Helpers.calculateAge(agenda.getDateOfBirth());
+            viewHolder.nameAge.setText(agenda.getFirstName()
+                    + " " + agenda.getLastName() + " (" + age + "a)");
             viewHolder.reason.setText(agenda.getReaseon());
             SimpleDateFormat formatter_from = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
@@ -267,7 +291,6 @@ public class Appointments extends Fragment implements
     }
 
     class ViewHolder {
-        View state;
         TextView appointmentTime;
         View appointmentState;
         TextView nameAge;
