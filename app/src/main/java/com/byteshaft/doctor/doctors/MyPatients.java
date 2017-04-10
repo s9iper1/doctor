@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -72,6 +73,8 @@ public class MyPatients extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.my_patients, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.patients_list);
+        ((AppCompatActivity) getActivity()).getSupportActionBar()
+                .setTitle(getResources().getString(R.string.my_patient));
         getPatientsDetails();
         searchContainer = new LinearLayout(getActivity());
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
