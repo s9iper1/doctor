@@ -11,7 +11,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp">
 
             <RelativeLayout
                 android:id="@+id/rating_layout"
@@ -37,6 +38,8 @@
 
                 <TextView
                     android:id="@+id/time"
+                    android:padding="2dp"
+                    android:layout_margin="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true" />

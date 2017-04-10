@@ -102,7 +102,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         // setting typeface
         doctorName.setTypeface(AppGlobals.typefaceNormal);
         doctorSpeciality.setTypeface(AppGlobals.typefaceNormal);
-        textClock.setTypeface(AppGlobals.typefaceNormal);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
@@ -117,6 +116,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
         textClock = (TextView) findViewById(R.id.clock);
         textClock.setText(startTime);
+        textClock.setTypeface(AppGlobals.typefaceNormal);
         bookingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -249,8 +249,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 String currentTime = jsonObject.getString("created_at");
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                                 try {
-                                    Log.i("TAG", "" +getDateDiff(dateFormat.parse(currentTime), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
-                                             TimeUnit.MINUTES));
+                                    review.setReviewTime(getDateDiff(dateFormat.parse(currentTime), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
+                                            TimeUnit.MILLISECONDS));
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
@@ -303,11 +303,25 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             String output = review.getReviewText().substring(0, 1).toUpperCase() +
                     review.getReviewText().substring(1);
             viewHolder.userComment.setText(output);
-            viewHolder.userComment.setTypeface(AppGlobals.robotoItalic);
-            viewHolder.time.setTypeface(AppGlobals.robotoItalic);
-            viewHolder.userName.setTypeface(AppGlobals.robotoItalic);
+            viewHolder.time.setText(timeConvert(review.getReviewTime()));
 
             return convertView;
+        }
+
+        public String timeConvert(long time) {
+            long x = time / 1000;
+            long seconds  = x % 60;
+            x /= 60;
+            long minutes = x % 60;
+            x /= 60;
+           long hours = x % 24;
+            x /= 24;
+            long days  = x;
+            if (days > 0)
+            return days +" days ago";
+            else if (days == 0 && hours > 0) return hours +" hours ago";
+            else if (days == 0 && hours == 0 && minutes > 0) return hours +" minutes ago";
+            else  return seconds +" seconds ago";
         }
 
         @Override

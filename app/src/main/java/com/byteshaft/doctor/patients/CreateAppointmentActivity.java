@@ -58,6 +58,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private boolean favourite;
     private boolean blocked;
     private ImageButton favouriteButton;
+    private TextView dateText;
+    private TextView timeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_create_appoint);
-
+        dateText = (TextView) findViewById(R.id.date_text);
+        timeText = (TextView) findViewById(R.id.time_text);
         callButton = (ImageButton) findViewById(R.id.btn_call);
         chatButton = (ImageButton) findViewById(R.id.btn_chat);
         mDoctorImage = (CircleImageView) findViewById(R.id.doctor_image);
@@ -77,7 +80,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
         mSaveButton = (Button) findViewById(R.id.button_save);
         favouriteButton = (ImageButton) findViewById(R.id.btn_fav);
-
         mNameTextView.setTypeface(AppGlobals.typefaceNormal);
         mSpecialityTextView.setTypeface(AppGlobals.typefaceNormal);
         mDoctorStartTime.setTypeface(AppGlobals.typefaceNormal);
@@ -85,6 +87,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
         mSaveButton.setOnClickListener(this);
+
+        dateText.setText(Helpers.getDate());
+        timeText.setText(Helpers.getTime());
 
         serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
         List<String> serviceList = new ArrayList<>();

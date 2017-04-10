@@ -9,13 +9,13 @@ public class Review {
     private int reviewId;
     private String reviewText;
     private float reviewStars;
-    private String reviewTime;
+    private long reviewTime;
 
-    public String getReviewTime() {
-        return reviewTime;
+    public long getReviewTime() {
+        return  reviewTime;
     }
 
-    public void setReviewTime(String reviewTime) {
+    public void setReviewTime(long reviewTime) {
         this.reviewTime = reviewTime;
     }
 
