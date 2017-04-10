@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,6 +39,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CreateAppointmentActivity extends AppCompatActivity implements View.OnClickListener,
         HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
+
+    private Button mSaveButton;
     private Spinner serviceListSpinner;
     private ImageButton callButton;
     private ImageButton chatButton;
@@ -48,7 +51,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private TextView mSpecialityTextView;
     private TextView mDoctorStartTime;
     private RatingBar mDoctorRating;
-    private int mDoctorsId;
+    private int appointmentId;
 
     private HttpRequest request;
 
@@ -67,10 +70,12 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mDoctorStartTime = (TextView) findViewById(R.id.starts_time);
         mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
         mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
-
+        mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
+        mSaveButton = (Button) findViewById(R.id.button_save);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
+        mSaveButton.setOnClickListener(this);
 
         serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
         List<String> serviceList = new ArrayList<>();
@@ -91,7 +96,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         mPhoneNumber = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
-        mDoctorsId = getIntent().getIntExtra("user", -1);
+        appointmentId = getIntent().getIntExtra("appointment_id", -1);
 
         mDoctorStartTime.setText(startTime);
         mNameTextView.setText(name);
@@ -131,7 +136,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                         ConversationActivity.class));
                 break;
             case R.id.button_save:
+                System.out.println("working"  + "click");
                 String appointmentReasonString = mAppointmentEditText.getText().toString();
+                System.out.println(appointmentReasonString  + "abcd");
                 patientsAppointment(appointmentReasonString, new int[10]);
         }
     }
@@ -166,9 +173,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%spublic/doctor/appointment/%s/request",
-                AppGlobals.BASE_URL, mDoctorsId));
-        Log.i("TAG", "id " + mDoctorsId);
+        request.open("POST", String.format("%spublic/appointment/%s/request",
+                AppGlobals.BASE_URL, appointmentId));
+        Log.i("TAG", "id " + appointmentId);
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send(getAppointmentData(appointmentReason, services_id));
