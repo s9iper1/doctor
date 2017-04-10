@@ -14,25 +14,18 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.PhoneStateListener;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.byteshaft.doctor.R;
-import com.byteshaft.doctor.accountfragments.UserBasicInfoStepOne;
-import com.byteshaft.doctor.introscreen.IntroScreen;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.doctor.utils.RotateUtil;
@@ -77,7 +70,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         sendButton = (ImageView) view.findViewById(R.id.send_button);
         cameraButton = (CircleImageView) view.findViewById(R.id.camera_button);
         writeMessageEditText = (EditText) view.findViewById(R.id.write_message_edit_text);
-
+        writeMessageEditText.setTypeface(AppGlobals.typefaceNormal);
         deleteButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         cameraButton.setOnClickListener(this);

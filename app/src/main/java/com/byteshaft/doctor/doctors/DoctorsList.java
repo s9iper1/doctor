@@ -260,50 +260,50 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         switch (readyState) {
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
-                   case HttpURLConnection.HTTP_OK:
-                       Log.i("TAG", "data " + request.getResponseText());
-                       try {
-                           JSONObject jsonObject = new JSONObject(request.getResponseText());
-                           JSONArray jsonArray = jsonObject.getJSONArray("results");
-                           for (int i = 0;i < jsonArray.length(); i++) {
-                               JSONObject mainJsonObject = jsonArray.getJSONObject(i);
-                               String date = mainJsonObject.getString("date");
-                               JSONArray doctorList = mainJsonObject.getJSONArray("doctors");
-                               for (int j = 0; j< doctorList.length(); j++) {
-                                   JSONObject doctorDetail = doctorList.getJSONObject(j);
-                                   DoctorDetails doctorDetails = new DoctorDetails();
-                                   doctorDetails.setDate(date);
-                                   JSONObject speciality = doctorDetail.getJSONObject("speciality");
-                                   doctorDetails.setSpeciality(speciality.getString("name"));
-                                   doctorDetails.setFirstName(doctorDetail.getString("first_name"));
-                                   doctorDetails.setLastName(doctorDetail.getString("last_name"));
-                                   doctorDetails.setPhotoUrl(doctorDetail.getString("photo")
-                                           .replace("http://localhost", AppGlobals.SERVER_IP));
-                                   doctorDetails.setGender(doctorDetail.getString("gender"));
-                                   doctorDetails.setLocation(doctorDetail.getString("location"));
-                                   doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favorite"));
-                                   doctorDetails.setStartTime(getFormattedTime(doctorDetail.getString("start_time")));
-                                   doctorDetails.setBlocked(doctorDetail.getBoolean("am_i_blocked"));
-                                   doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
-                                   if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
-                                       doctorDetails.setPhoneNumberSecondary(doctorDetail.getString("phone_number_secondary"));
-                                   }
-                                   doctorDetails.setReviewStars(doctorDetail.getInt("review_stars"));
-                                   doctorDetails.setUserId(doctorDetail.getInt("id"));
-                                   doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
-                                   doctors.add(doctorDetails);
-                                   customAdapter.notifyDataSetChanged();
-                               }
-                               if (doctors.size() < 1) {
-                                   mListView.setVisibility(GONE);
-                                   noDoctor.setVisibility(View.VISIBLE);
-                                   Helpers.showSnackBar(getView(), R.string.no_doctor_available_snack_bar);
-                               }
-                           }
-                       } catch (JSONException e) {
-                           e.printStackTrace();
-                       }
-                       break;
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "data " + request.getResponseText());
+                        try {
+                            JSONObject jsonObject = new JSONObject(request.getResponseText());
+                            JSONArray jsonArray = jsonObject.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject mainJsonObject = jsonArray.getJSONObject(i);
+                                String date = mainJsonObject.getString("date");
+                                JSONArray doctorList = mainJsonObject.getJSONArray("doctors");
+                                for (int j = 0; j < doctorList.length(); j++) {
+                                    JSONObject doctorDetail = doctorList.getJSONObject(j);
+                                    DoctorDetails doctorDetails = new DoctorDetails();
+                                    doctorDetails.setDate(date);
+                                    JSONObject speciality = doctorDetail.getJSONObject("speciality");
+                                    doctorDetails.setSpeciality(speciality.getString("name"));
+                                    doctorDetails.setFirstName(doctorDetail.getString("first_name"));
+                                    doctorDetails.setLastName(doctorDetail.getString("last_name"));
+                                    doctorDetails.setPhotoUrl(doctorDetail.getString("photo")
+                                            .replace("http://localhost", AppGlobals.SERVER_IP));
+                                    doctorDetails.setGender(doctorDetail.getString("gender"));
+                                    doctorDetails.setLocation(doctorDetail.getString("location"));
+                                    doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favorite"));
+                                    doctorDetails.setStartTime(getFormattedTime(doctorDetail.getString("start_time")));
+                                    doctorDetails.setBlocked(doctorDetail.getBoolean("am_i_blocked"));
+                                    doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
+                                    if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
+                                        doctorDetails.setPhoneNumberSecondary(doctorDetail.getString("phone_number_secondary"));
+                                    }
+                                    doctorDetails.setReviewStars(doctorDetail.getInt("review_stars"));
+                                    doctorDetails.setUserId(doctorDetail.getInt("id"));
+                                    doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
+                                    doctors.add(doctorDetails);
+                                    customAdapter.notifyDataSetChanged();
+                                }
+                                if (doctors.size() < 1) {
+                                    mListView.setVisibility(GONE);
+                                    noDoctor.setVisibility(View.VISIBLE);
+                                    Helpers.showSnackBar(getView(), R.string.no_doctor_available_snack_bar);
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
                 }
         }
     }
@@ -343,6 +343,14 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 viewHolder.dateLayout = (LinearLayout) convertView.findViewById(R.id.date_layout);
                 viewHolder.date = (TextView) convertView.findViewById(R.id.date);
                 viewHolder.status = (ImageView) convertView.findViewById(R.id.status);
+
+                // setting typeface
+                viewHolder.name.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.specialist.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.distance.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.availableTime.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.date.setTypeface(AppGlobals.typefaceNormal);
+                
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

@@ -88,6 +88,11 @@ public class MainMessages extends Fragment {
                 viewHolder.date = (TextView) convertView.findViewById(R.id.date);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 viewHolder.navigateButton = (ImageButton) convertView.findViewById(R.id.navigate_button);
+
+                viewHolder.drName.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.date.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.time.setTypeface(AppGlobals.typefaceNormal);
+
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

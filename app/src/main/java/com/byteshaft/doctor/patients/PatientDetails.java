@@ -44,6 +44,12 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         patientAge = (TextView) findViewById(R.id.patient_age_);
         callButton = (ImageButton) findViewById(R.id.call_button_);
         chatButton = (ImageButton) findViewById(R.id.chat_button_);
+
+        // typeface
+        patientName.setTypeface(AppGlobals.typefaceNormal);
+        patientAge.setTypeface(AppGlobals.typefaceNormal);
+        appointmentButton.setTypeface(AppGlobals.typefaceNormal);
+
         appointmentButton = (Button) findViewById(R.id.button_appointment);
         appointmentButton.setOnClickListener(this);
         docId = (EditText) findViewById(R.id.doc_id);
