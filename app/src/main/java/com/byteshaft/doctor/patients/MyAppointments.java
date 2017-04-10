@@ -53,6 +53,7 @@ public class MyAppointments extends Fragment {
     private TextView patientEmail;
     private TextView patientAge;
     private CircleImageView profilePicture;
+    private Toolbar toolbar;
 
 
     @Override
@@ -60,7 +61,7 @@ public class MyAppointments extends Fragment {
         mBaseView = inflater.inflate(R.layout.patient_my_appointment, container, false);
         setHasOptionsMenu(true);
         searchContainer = new LinearLayout(getActivity());
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         containerParams.gravity = Gravity.CENTER_VERTICAL;
@@ -170,6 +171,12 @@ public class MyAppointments extends Fragment {
         String years = Helpers.calculateAge(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH));
         patientAge.setText(years + " years");
         return mBaseView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        toolbar.removeView(searchContainer);
     }
 
     @Override

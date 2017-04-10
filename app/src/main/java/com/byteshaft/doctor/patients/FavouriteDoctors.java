@@ -54,13 +54,14 @@ public class FavouriteDoctors extends Fragment {
     private ArrayList<String> addedDates;
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
+    private Toolbar toolbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.favourite_doctors, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.favt_doctors_list);
         searchContainer = new LinearLayout(getActivity());
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         containerParams.gravity = Gravity.CENTER_VERTICAL;
@@ -153,6 +154,11 @@ public class FavouriteDoctors extends Fragment {
         return mBaseView;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        toolbar.removeView(searchContainer);
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

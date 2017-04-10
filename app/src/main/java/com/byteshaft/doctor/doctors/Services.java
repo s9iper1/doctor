@@ -39,6 +39,7 @@ public class Services extends Fragment {
     private LinearLayout searchContainer;
     private ListView serviceList;
     private View mBaseView;
+    private Toolbar toolbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class Services extends Fragment {
         setHasOptionsMenu(true);
         serviceList = (ListView) mBaseView.findViewById(R.id.service_list);
         searchContainer = new LinearLayout(getActivity());
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         containerParams.gravity = Gravity.CENTER_VERTICAL;
@@ -132,6 +133,12 @@ public class Services extends Fragment {
         data.add(new String[]{"reason efg ", "150.00", "0"});
         serviceList.setAdapter(new ServiceAdapter(getActivity().getApplicationContext(), data));
         return mBaseView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        toolbar.removeView(searchContainer);
     }
 
     @Override

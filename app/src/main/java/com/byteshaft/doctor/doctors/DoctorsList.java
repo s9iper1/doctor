@@ -79,6 +79,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private HttpRequest request;
     private ArrayList<DoctorDetails> doctors;
     private TextView noDoctor;
+    private Toolbar toolbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,7 +89,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
         noDoctor = (TextView) mBaseView.findViewById(R.id.no_doctor);
         searchContainer = new LinearLayout(getActivity());
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         containerParams.gravity = Gravity.CENTER_VERTICAL;
@@ -228,7 +229,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     @Override
     public void onPause() {
         super.onPause();
-        searchContainer.setVisibility(GONE);
+        toolbar.removeView(searchContainer);
 
     }
 

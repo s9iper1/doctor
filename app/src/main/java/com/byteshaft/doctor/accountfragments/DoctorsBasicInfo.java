@@ -105,8 +105,13 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.fragment_doctor_basic_info, container, false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar()
-                .setTitle(getResources().getString(R.string.sign_up));
+        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar()
+                    .setTitle(getResources().getString(R.string.update_profile));
+        } else {
+            ((AppCompatActivity) getActivity()).getSupportActionBar()
+                    .setTitle(getResources().getString(R.string.sign_up));
+        }
         setHasOptionsMenu(true);
         getStates();
         getSpecialities();
