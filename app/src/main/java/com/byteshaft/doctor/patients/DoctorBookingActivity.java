@@ -58,7 +58,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private ImageButton mFavButton;
     private GridView timeTableGrid;
     private ImageView status;
-    private String number;
     private int id;
     private HttpRequest request;
     private ArrayList<AppointmentDetail> timeSlots;
@@ -67,6 +66,13 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private boolean favourite;
     private boolean isBlocked;
     private String startTime;
+
+    private String phonenumber;
+    private String drName;
+    private String drSpecialist;
+    private float drStars;
+    private String drPhoto;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,12 +125,14 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mFavButton.setOnClickListener(this);
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
-        final String name = getIntent().getStringExtra("name");
-        final String specialist = getIntent().getStringExtra("specialist");
-        final float stars = getIntent().getFloatExtra("stars", 0);
         favourite = getIntent().getBooleanExtra("favourite", false);
-        number = getIntent().getStringExtra("number");
-        final String photo = getIntent().getStringExtra("photo");
+        final String startTime = getIntent().getStringExtra("start_time");
+        drName = getIntent().getStringExtra("name");
+        drSpecialist = getIntent().getStringExtra("specialist");
+        drStars = getIntent().getFloatExtra("stars", 0);
+        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        phonenumber = getIntent().getStringExtra("number");
+         drPhoto = getIntent().getStringExtra("photo");
         final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
         if (!availableForChat) {
@@ -138,11 +146,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         if (favourite) {
             mFavButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
-        mDoctorName.setText(name);
-        mDoctorSpeciality.setText(specialist);
-        mDoctorRating.setRating(stars);
+
+        mDoctorName.setText(drName);
+        mDoctorSpeciality.setText(drSpecialist);
+        mDoctorRating.setRating(drStars);
         mtime.setText(startTime);
-        Helpers.getBitMap(photo, mDoctorImage);
+        Helpers.getBitMap(drPhoto, mDoctorImage);
         getSchedule(currentDate);
     }
 
@@ -189,7 +198,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE},
                             AppGlobals.CALL_PERMISSION);
                 } else {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phonenumber));
                     startActivity(intent);
                 }
                 break;
@@ -269,7 +278,17 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         Log.i("TAG", timeSlots.get(i).getStartTime());
         if (appointmentDetail.getState().equals("pending")) {
             textView.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
-            startActivity(new Intent(getApplicationContext(), CreateAppointmentActivity.class));
+            Intent intent = new Intent(this, CreateAppointmentActivity.class);
+            intent.putExtra("appointment_id", appointmentDetail.getAppointmentId());
+            intent.putExtra("start_time", appointmentDetail.getStartTime());
+            intent.putExtra("name", drName);
+            intent.putExtra("favourite", favourite);
+            intent.putExtra("block", isBlocked);
+            intent.putExtra("photo", drPhoto);
+            intent.putExtra("number", phonenumber);
+            intent.putExtra("stars", drStars);
+            intent.putExtra("specialist", drSpecialist);
+            startActivity(intent);
         } else {
             Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);
         }
