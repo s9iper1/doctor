@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static com.byteshaft.doctor.R.id.state;
 
 public class Appointments extends Fragment implements
@@ -60,8 +62,9 @@ public class Appointments extends Fragment implements
         mListView = (SwipeMenuListView) mBaseView.findViewById(R.id.listView);
         HashSet<Date> events = new HashSet<>();
         events.add(new Date());
-        com.byteshaft.doctor.uihelpers.CalendarView calendarView = ((com.byteshaft.doctor.uihelpers.CalendarView)
-                mBaseView.findViewById(R.id.calendar_view));
+        com.byteshaft.doctor.uihelpers.CalendarView calendarView = (
+                (com.byteshaft.doctor.uihelpers.CalendarView)
+                        mBaseView.findViewById(R.id.calendar_view));
         calendarView.updateCalendar(events);
         TextView dateTextview = (TextView) calendarView.findViewById(R.id.calendar_date_display);
         Log.i("TAG", dateTextview.getText().toString());
@@ -129,7 +132,8 @@ public class Appointments extends Fragment implements
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                startActivity(new Intent(getActivity().getApplicationContext(), DoctorsAppointment.class));
+                startActivity(new Intent(
+                        getActivity().getApplicationContext(), DoctorsAppointment.class));
             }
         });
         return mBaseView;
@@ -185,7 +189,21 @@ public class Appointments extends Fragment implements
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject agendaObject = jsonArray.getJSONObject(i);
+                                JSONObject patientDetailsObject = agendaObject.getJSONObject("patient");
+
+                                /// getting patient details
+                                Log.i("PatientDetaisl", patientDetailsObject.toString());
+
                                 Agenda agenda = new Agenda();
+                                agenda.setFirstName(patientDetailsObject.getString("first_name"));
+                                agenda.setLastName(patientDetailsObject.getString("last_name"));
+                                agenda.setDateOfBirth(patientDetailsObject.getString("dob"));
+                                agenda.setPhotoUrl(patientDetailsObject.getString("photo").replace(
+                                        "http://localhost", AppGlobals.SERVER_IP));
+                                agenda.setAvailAbleForChat(
+                                        patientDetailsObject.getBoolean("available_to_chat"));
+                                //// -------- /////////
+
                                 agenda.setCreatedAt(agendaObject.getString("created_at"));
                                 agenda.setDate(agendaObject.getString("date"));
                                 agenda.setAgendaState(agendaObject.getString("state"));
@@ -233,17 +251,37 @@ public class Appointments extends Fragment implements
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_appointments, parent, false);
+                convertView = getActivity().getLayoutInflater().inflate(
+                        R.layout.delegate_appointments, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.nameAge = (TextView) convertView.findViewById(R.id.name_age);
-                viewHolder.appointmentTime = (TextView) convertView.findViewById(R.id.appointment_time);
+                viewHolder.appointmentTime = (TextView) convertView.findViewById(
+                        R.id.appointment_time);
                 viewHolder.appointmentState = convertView.findViewById(state);
                 viewHolder.reason = (TextView) convertView.findViewById(R.id.service);
+                viewHolder.patientImage = (CircleImageView) convertView.findViewById(
+                        R.id.patient_appointment_image_view);
+                viewHolder.chatStatus = (ImageView) convertView.findViewById(
+                        R.id.available_for_chat_status);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            // setting values
             Agenda agenda = agendaArrayList.get(position);
+            System.out.println("Photo Url: " + agenda.getPhotoUrl());
+            Helpers.getBitMap(agenda.getPhotoUrl(), viewHolder.patientImage);
+
+            if (agenda.isAvailAbleForChat()) {
+                viewHolder.chatStatus.setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_online_indicator));
+            } else {
+                viewHolder.chatStatus.setImageDrawable(
+                        getResources().getDrawable(R.mipmap.ic_offline_indicator));
+            }
+            String age = Helpers.calculateAge(agenda.getDateOfBirth());
+            String name = agenda.getFirstName() + " " + agenda.getLastName();
+            viewHolder.nameAge.setText(name + " (" + age + "a)");
             viewHolder.reason.setText(agenda.getReaseon());
             SimpleDateFormat formatter_from = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
@@ -255,11 +293,14 @@ public class Appointments extends Fragment implements
             }
             String state = agenda.getAgendaState();
             if (state.contains("pending")) {
-                viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.pending_background_color));
+                viewHolder.appointmentState.setBackgroundColor(
+                        getResources().getColor(R.color.pending_background_color));
             } else if (state.contains("attended")) {
-                viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.attended_background_color));
+                viewHolder.appointmentState.setBackgroundColor(
+                        getResources().getColor(R.color.attended_background_color));
             } else if (state.contains("rejected")) {
-                viewHolder.appointmentState.setBackgroundColor(getResources().getColor(R.color.reject_background));
+                viewHolder.appointmentState.setBackgroundColor(
+                        getResources().getColor(R.color.reject_background));
             }
 
             return convertView;
@@ -267,11 +308,11 @@ public class Appointments extends Fragment implements
     }
 
     class ViewHolder {
-        View state;
         TextView appointmentTime;
         View appointmentState;
         TextView nameAge;
         TextView reason;
         ImageView chatStatus;
+        CircleImageView patientImage;
     }
 }
