@@ -11,12 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.gettersetter.AppointmentDetail;
 import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
@@ -37,13 +38,15 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener, AdapterView.OnItemClickListener {
 
     private TextView mDoctorName;
     private TextView mDoctorSpeciality;
@@ -58,6 +61,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private String number;
     private int id;
     private HttpRequest request;
+    private ArrayList<AppointmentDetail> timeSlots;
+    private TimeTableAdapter timeTableAdapter;
+    private String currentDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +72,11 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_booking);
         timeTableGrid = (GridView) findViewById(R.id.time_table);
+        timeTableGrid.setOnItemClickListener(this);
+        timeSlots = new ArrayList<>();
         HashSet<Date> events = new HashSet<>();
         events.add(new Date());
+        currentDate = Helpers.getDate();
         com.byteshaft.doctor.uihelpers.CalendarView cv = ((com.byteshaft.doctor.uihelpers.CalendarView)
                 findViewById(R.id.calendar_view));
         cv.updateCalendar(events);
@@ -76,10 +85,20 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         cv.setEventHandler(new com.byteshaft.doctor.uihelpers.CalendarView.EventHandler() {
             @Override
             public void onDayPress(Date date) {
-                Log.i("TAG", "click");
-                // show returned day
                 DateFormat df = SimpleDateFormat.getDateInstance();
-                Toast.makeText(DoctorBookingActivity.this, df.format(date), Toast.LENGTH_SHORT).show();
+                String resultDate = df.format(date);
+                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                Date formattedDate = null;
+                try {
+                    formattedDate = formatterFrom.parse(resultDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(DoctorBookingActivity.this, dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+                currentDate = dateFormat.format(formattedDate);
+                Log.i("TAG", "current date  " + currentDate);
+                getSchedule(currentDate);
 
             }
         });
@@ -95,11 +114,10 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mCallButton.setOnClickListener(this);
         mChatButton.setOnClickListener(this);
         mFavButton.setOnClickListener(this);
-        getSchedule();
         final String startTime = getIntent().getStringExtra("start_time");
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
-        final int stars = getIntent().getIntExtra("stars", 0);
+        final float stars = getIntent().getFloatExtra("stars", 0);
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
@@ -110,45 +128,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         } else {
             status.setImageResource(R.mipmap.ic_online_indicator);
         }
-
         mDoctorName.setText(name);
         mDoctorSpeciality.setText(specialist);
         mDoctorRating.setRating(stars);
         mtime.setText(startTime);
         Helpers.getBitMap(photo, mDoctorImage);
-//        mFavButton
-
-        JSONArray jsonArray = new JSONArray();
-        try {
-
-            JSONObject time = new JSONObject();
-            time.put("time", "9:00");
-            time.put("state", 0);
-            jsonArray.put(time);
-            JSONObject timeTwo = new JSONObject();
-            timeTwo.put("time", "9:30");
-            timeTwo.put("state", 1);
-            jsonArray.put(timeTwo);
-            JSONObject timeThree = new JSONObject();
-            timeThree.put("time", "10:00");
-            timeThree.put("state", 0);
-            jsonArray.put(timeThree);
-
-            JSONObject timeFour = new JSONObject();
-            timeFour.put("time", "10:30");
-            timeFour.put("state", 1);
-            jsonArray.put(timeFour);
-
-            JSONObject timeFive = new JSONObject();
-            timeFive.put("time", "11:00");
-            timeFive.put("state", 0);
-            jsonArray.put(timeFive);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.i("TAG", "array " + jsonArray);
-        timeTableGrid.setAdapter(new TimeTableAdapter(getApplicationContext(), jsonArray));
+        getSchedule(currentDate);
     }
 
     @Override
@@ -166,17 +151,19 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
 
-    private void getSchedule() {
+    private void getSchedule(String targetDate) {
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%spublic/doctor/%s/schedule?date=07/04/2017",
-                AppGlobals.BASE_URL, id));
-        Log.i("TAG", "id "  + id);
+        String url = String.format("%spublic/doctor/%s/schedule?date=%s",
+                AppGlobals.BASE_URL, id, targetDate);
+        Log.i("TAG", "url" + url);
+        request.open("GET", url);
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
@@ -236,6 +223,24 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
+                        timeSlots = new ArrayList<>();
+                        timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
+                        timeTableGrid.setAdapter(timeTableAdapter);
+                        try {
+                            JSONArray jsonArray = new JSONArray(request.getResponseText());
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                AppointmentDetail appointmentDetail = new AppointmentDetail();
+                                appointmentDetail.setDoctorId(jsonObject.getInt("doctor"));
+                                appointmentDetail.setAppointmentId(jsonObject.getInt("id"));
+                                appointmentDetail.setStartTime(jsonObject.getString("start_time"));
+                                appointmentDetail.setState(jsonObject.getString("state"));
+                                timeSlots.add(appointmentDetail);
+                                timeTableAdapter.notifyDataSetChanged();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         break;
                 }
         }
@@ -247,13 +252,26 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
     }
 
-    private class TimeTableAdapter extends ArrayAdapter<JSONArray> {
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        AppointmentDetail appointmentDetail = timeSlots.get(i);
+        TextView textView = (TextView) view;
+        Log.i("TAG", timeSlots.get(i).getStartTime());
+        if (appointmentDetail.getState().equals("pending")) {
+            textView.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
+            startActivity(new Intent(getApplicationContext(), CreateAppointmentActivity.class));
+        } else {
+            Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);
+        }
+    }
 
-        private JSONArray timeTable;
+    private class TimeTableAdapter extends ArrayAdapter<ArrayList<AppointmentDetail>> {
+
+        private ArrayList<AppointmentDetail> timeTable;
         private ViewHolder viewHolder;
 
         public TimeTableAdapter(@NonNull Context context,
-                                JSONArray timeTable) {
+                                ArrayList<AppointmentDetail> timeTable) {
             super(context, R.layout.delegate_time_table);
             this.timeTable = timeTable;
         }
@@ -264,49 +282,31 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.delegate_time_table, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.time = (AppCompatButton) convertView.findViewById(R.id.time);
+                viewHolder.time = (TextView) convertView.findViewById(R.id.time);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            try {
-            final JSONObject jsonObject = timeTable.getJSONObject(position);
-                viewHolder.time.setText(jsonObject.getString("time"));
-                viewHolder.time.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        try {
-                            if (jsonObject.getInt("state") == 0) {
-                                viewHolder.time.setBackgroundColor(getResources().getColor(R.color.appointment_bg));
-                                viewHolder.time.setPressed(true);
-                                startActivity(new Intent(getApplicationContext(), CreateAppointmentActivity.class));
-                            } else {
-                                Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                if (jsonObject.getInt("state") == 0) {
-                    viewHolder.time.setPressed(false);
-                } else {
-                    viewHolder.time.setPressed(true);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+            final AppointmentDetail appointmentDetail = timeTable.get(position);
+
+            viewHolder.time.setText(appointmentDetail.getStartTime());
+            if (appointmentDetail.getState().equals("pending")) {
+                viewHolder.time.setBackground(getResources().getDrawable(R.drawable.rounded_button));
+            } else {
+                viewHolder.time.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             }
+
 
             return convertView;
         }
 
         @Override
         public int getCount() {
-            return timeTable.length();
+            return timeTable.size();
         }
     }
 
     private class ViewHolder {
-        AppCompatButton time;
+        TextView time;
     }
 }

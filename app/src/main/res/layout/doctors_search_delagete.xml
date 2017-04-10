@@ -37,7 +37,6 @@
             <RelativeLayout
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/round_relative_layout"
                 android:gravity="center">
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -96,7 +95,6 @@
                 android:singleLine="true"
                 android:text="Distance"
                 android:textSize="12sp" />
-
             <RatingBar
                 android:id="@+id/rating_bar"
                 style="@style/Widget.AppCompat.RatingBar.Small"
