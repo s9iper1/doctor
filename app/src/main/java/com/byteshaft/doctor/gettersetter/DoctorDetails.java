@@ -22,6 +22,16 @@ public class DoctorDetails {
     private float reviewStars;
     private String gender;
 
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    private boolean isBlocked;
+
     public boolean isFavouriteDoctor() {
         return favouriteDoctor;
     }
