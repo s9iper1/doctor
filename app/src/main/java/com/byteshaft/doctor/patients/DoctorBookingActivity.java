@@ -69,6 +69,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private String drSpecialist;
     private float drStars;
     private String drPhoto;
+    private boolean availableForChat;
 
 
     @Override
@@ -127,7 +128,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         phonenumber = getIntent().getStringExtra("number");
          drPhoto = getIntent().getStringExtra("photo");
-        final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
@@ -268,10 +269,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             Intent intent = new Intent(this, CreateAppointmentActivity.class);
             intent.putExtra("appointment_id", appointmentDetail.getAppointmentId());
             intent.putExtra("start_time", appointmentDetail.getStartTime());
+            intent.putExtra("available_to_chat", availableForChat);
             intent.putExtra("name", drName);
             intent.putExtra("photo", drPhoto);
             intent.putExtra("number", phonenumber);
             intent.putExtra("stars", drStars);
+            intent.putExtra("specialist", drSpecialist);
             intent.putExtra("specialist", drSpecialist);
             startActivity(intent);
         } else {

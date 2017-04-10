@@ -52,8 +52,10 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private TextView mDoctorStartTime;
     private RatingBar mDoctorRating;
     private int appointmentId;
+    private ImageView status;
 
     private HttpRequest request;
+    private boolean availableForChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +71,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mSpecialityTextView = (TextView) findViewById(R.id.doctor_speciality);
         mDoctorStartTime = (TextView) findViewById(R.id.starts_time);
         mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
-        mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
+        status = (ImageView) findViewById(R.id.status);
         mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
         mSaveButton = (Button) findViewById(R.id.button_save);
 
@@ -97,6 +99,12 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mPhoneNumber = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
         appointmentId = getIntent().getIntExtra("appointment_id", -1);
+        availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        if (!availableForChat) {
+            status.setImageResource(R.mipmap.ic_offline_indicator);
+        } else {
+            status.setImageResource(R.mipmap.ic_online_indicator);
+        }
 
         mDoctorStartTime.setText(startTime);
         mNameTextView.setText(name);
@@ -136,10 +144,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                         ConversationActivity.class));
                 break;
             case R.id.button_save:
-                System.out.println("working"  + "click");
                 String appointmentReasonString = mAppointmentEditText.getText().toString();
-                System.out.println(appointmentReasonString  + "abcd");
-                patientsAppointment(appointmentReasonString, new int[10]);
+                System.out.println(appointmentReasonString  + "working");
+                patientsAppointment(appointmentReasonString, new int[4]);
         }
     }
 
