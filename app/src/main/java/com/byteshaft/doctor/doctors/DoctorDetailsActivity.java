@@ -51,6 +51,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private boolean isFavourite;
     private HttpRequest request;
     private int id;
+    private boolean isBlocked;
+    private String startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,13 +60,14 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_details);
-
-        final String startTime = getIntent().getStringExtra("start_time");
+        startTime = getIntent().getStringExtra("start_time");
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final float stars = getIntent().getFloatExtra("stars", 0);
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
+        isBlocked = getIntent().getBooleanExtra("block", false);
+        isFavourite = getIntent().getBooleanExtra("favourite", false);
         final String photo = getIntent().getStringExtra("photo");
         final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
@@ -82,6 +85,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         status = (ImageView) findViewById(R.id.status);
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
+        if (isBlocked) {
+            chatButton.setEnabled(false);
+        }
+        if (isFavourite) {
+            heartButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
+        }
         heartButton.setOnClickListener(this);
         bookingButton = (Button) findViewById(R.id.button_book);
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
@@ -98,8 +107,9 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 intent.putExtra("number", number);
                 intent.putExtra("available_to_chat", availableForChat);
                 intent.putExtra("user", id);
-                Log.i("TAG", "sent id" + id);
                 intent.putExtra("photo", photo);
+                intent.putExtra("favourite", isFavourite);
+                intent.putExtra("block", isBlocked);
                 intent.putExtra("start_time", startTime);
                 startActivity(intent);
             }

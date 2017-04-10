@@ -25,7 +25,7 @@
     <color name="total_appointments_today_background">#9B9B9B</color>
     <color name="tick_background">#417505</color>
     <color name="reject_background">#FF5252</color>
-    <color name="fav_doc_color">#DBDBDB</color>
+    <color name="normal_background_color">#DBDBDB</color>
     <color name="time_color">#FF5252</color>
     <color name="attended_background_color">#417505</color>
     <color name="cancel_background_color">#FF5252</color>

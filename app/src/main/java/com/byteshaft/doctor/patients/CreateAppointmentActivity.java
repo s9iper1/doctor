@@ -39,7 +39,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CreateAppointmentActivity extends AppCompatActivity implements View.OnClickListener,
         HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
-
     private Button mSaveButton;
     private Spinner serviceListSpinner;
     private ImageButton callButton;
@@ -56,6 +55,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
     private HttpRequest request;
     private boolean availableForChat;
+    private boolean favourite;
+    private boolean blocked;
+    private ImageButton favouriteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         status = (ImageView) findViewById(R.id.status);
         mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
         mSaveButton = (Button) findViewById(R.id.button_save);
+        favouriteButton = (ImageButton) findViewById(R.id.btn_fav);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
@@ -95,7 +98,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final int stars = getIntent().getIntExtra("stars", 0);
-        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        favourite = getIntent().getBooleanExtra("favourite", false);
         mPhoneNumber = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
         appointmentId = getIntent().getIntExtra("appointment_id", -1);
@@ -105,11 +108,17 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         } else {
             status.setImageResource(R.mipmap.ic_online_indicator);
         }
-
+        blocked = getIntent().getBooleanExtra("block", false);
         mDoctorStartTime.setText(startTime);
         mNameTextView.setText(name);
         mSpecialityTextView.setText(specialist);
         mDoctorRating.setRating(stars);
+        if (blocked) {
+            chatButton.setEnabled(false);
+        }
+        if (favourite) {
+            favouriteButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
+        }
         Helpers.getBitMap(photo, mDoctorImage);
 
     }

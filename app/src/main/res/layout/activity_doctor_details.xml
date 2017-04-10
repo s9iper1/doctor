@@ -100,7 +100,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/doctor_name"
-            android:background="@mipmap/ic_heart_fill"
+            android:background="@mipmap/ic_empty_heart"
             android:text="Button" />
 
         <RelativeLayout

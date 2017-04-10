@@ -63,6 +63,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private ArrayList<AppointmentDetail> timeSlots;
     private TimeTableAdapter timeTableAdapter;
     private String currentDate;
+    private boolean favourite;
+    private boolean isBlocked;
+    private String startTime;
 
     private String phonenumber;
     private String drName;
@@ -121,6 +124,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mCallButton.setOnClickListener(this);
         mChatButton.setOnClickListener(this);
         mFavButton.setOnClickListener(this);
+        startTime = getIntent().getStringExtra("start_time");
+        isBlocked = getIntent().getBooleanExtra("block", false);
+        favourite = getIntent().getBooleanExtra("favourite", false);
         final String startTime = getIntent().getStringExtra("start_time");
         drName = getIntent().getStringExtra("name");
         drSpecialist = getIntent().getStringExtra("specialist");
@@ -135,6 +141,13 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         } else {
             status.setImageResource(R.mipmap.ic_online_indicator);
         }
+        if (isBlocked) {
+            mChatButton.setEnabled(false);
+        }
+        if (favourite) {
+            mFavButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
+        }
+
         mDoctorName.setText(drName);
         mDoctorSpeciality.setText(drSpecialist);
         mDoctorRating.setRating(drStars);
@@ -240,7 +253,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                                 AppointmentDetail appointmentDetail = new AppointmentDetail();
                                 appointmentDetail.setDoctorId(jsonObject.getInt("doctor"));
                                 appointmentDetail.setAppointmentId(jsonObject.getInt("id"));
-                                appointmentDetail.setStartTime(jsonObject.getString("start_time"));
+                                appointmentDetail.setStartTime(Helpers.getFormattedTime(jsonObject.getString("start_time")));
                                 appointmentDetail.setState(jsonObject.getString("state"));
                                 timeSlots.add(appointmentDetail);
                                 timeTableAdapter.notifyDataSetChanged();
@@ -271,6 +284,8 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("start_time", appointmentDetail.getStartTime());
             intent.putExtra("available_to_chat", availableForChat);
             intent.putExtra("name", drName);
+            intent.putExtra("favourite", favourite);
+            intent.putExtra("block", isBlocked);
             intent.putExtra("photo", drPhoto);
             intent.putExtra("number", phonenumber);
             intent.putExtra("stars", drStars);

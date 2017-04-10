@@ -7,7 +7,9 @@
     <RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         tools:context="com.byteshaft.patient.patients.CreateAppointmentActivity">
 
         <RelativeLayout
@@ -79,7 +81,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignTop="@+id/doctor_name"
-                android:background="@mipmap/ic_heart_fill" />
+                android:background="@mipmap/ic_empty_heart" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -114,7 +116,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_marginTop="4dp">
+            android:layout_marginTop="10dp">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -143,14 +145,14 @@
 
 
         <RelativeLayout
-            android:id="@+id/date_"
+            android:id="@+id/date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/com_layout"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_marginTop="6dp"
-            android:background="@android:color/darker_gray"
+            android:layout_marginTop="10dp"
+            android:background="@color/normal_background_color"
             android:padding="12dp">
 
             <TextView
@@ -176,14 +178,14 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:id="@+id/time_"
+            android:id="@+id/time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/date_"
+            android:layout_below="@+id/date"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:layout_marginTop="2dp"
-            android:background="@android:color/darker_gray"
+            android:layout_marginTop="5dp"
+            android:background="@color/normal_background_color"
             android:padding="12dp">
 
             <TextView
@@ -212,7 +214,7 @@
             android:id="@+id/txt_service"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/time_"
+            android:layout_below="@+id/time"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:padding="8dp"
@@ -241,8 +243,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/board"
+            android:layout_alignRight="@+id/board"
             android:layout_below="@+id/appointment_reason_editText"
             android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
