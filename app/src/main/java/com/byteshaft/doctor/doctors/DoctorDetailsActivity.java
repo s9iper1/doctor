@@ -60,7 +60,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         final String startTime = getIntent().getStringExtra("start_time");
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
-        final int stars = getIntent().getIntExtra("stars", 0);
+        final float stars = getIntent().getFloatExtra("stars", 0);
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
@@ -94,6 +94,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 intent.putExtra("number", number);
                 intent.putExtra("available_to_chat", availableForChat);
                 intent.putExtra("user", id);
+                Log.i("TAG", "sent id" + id);
                 intent.putExtra("photo", photo);
                 intent.putExtra("start_time", startTime);
                 startActivity(intent);
@@ -112,9 +113,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
+        String url =  String.format("%spublic/doctor/%s/review",
+                AppGlobals.BASE_URL, id);
+        Log.i("TAG", "url" + url);
         request.open("GET", String.format("%spublic/doctor/%s/review",
                 AppGlobals.BASE_URL, id));
-        Log.i("TAG", "id "  + id);
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();

@@ -203,7 +203,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 //                intent.putExtra("favourite", doctorDetails.getSpeciality());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
-                intent.putExtra("user", doctorDetails.getId());
+                intent.putExtra("user", doctorDetails.getUserId());
                 intent.putExtra("photo", doctorDetails.getPhotoUrl());
                 startActivity(intent);
             }
@@ -275,17 +275,18 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                    doctorDetails.setSpeciality(speciality.getString("name"));
                                    doctorDetails.setFirstName(doctorDetail.getString("first_name"));
                                    doctorDetails.setLastName(doctorDetail.getString("last_name"));
-                                   doctorDetails.setPhotoUrl(doctorDetail.getString("photo"));
+                                   doctorDetails.setPhotoUrl(doctorDetail.getString("photo")
+                                           .replace("http://localhost", AppGlobals.SERVER_IP));
                                    doctorDetails.setGender(doctorDetail.getString("gender"));
                                    doctorDetails.setLocation(doctorDetail.getString("location"));
 //                                   doctorDetails.setStartTime(doctorDetail.getString("start_time"));
-//                                   doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favt"));
                                    doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
                                    if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
                                        doctorDetails.setPhoneNumberSecondary(doctorDetail.getString("phone_number_secondary"));
                                    }
                                    doctorDetails.setReviewStars(doctorDetail.getInt("review_stars"));
-                                   doctorDetails.setUserId(doctorDetail.getInt("user"));
+                                   doctorDetails.setUserId(doctorDetail.getInt("id"));
+                                   doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
                                    doctors.add(doctorDetails);
                                    customAdapter.notifyDataSetChanged();
                                }
