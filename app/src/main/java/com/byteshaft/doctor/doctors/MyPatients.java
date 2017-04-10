@@ -53,7 +53,6 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.view.View.GONE;
 import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
 
 /**
@@ -68,6 +67,7 @@ public class MyPatients extends Fragment {
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
     private HttpRequest request;
+    private Toolbar toolbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class MyPatients extends Fragment {
                 .setTitle(getResources().getString(R.string.my_patient));
         getPatientsDetails();
         searchContainer = new LinearLayout(getActivity());
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         containerParams.gravity = Gravity.CENTER_VERTICAL;
@@ -174,7 +174,7 @@ public class MyPatients extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        searchContainer.setVisibility(GONE);
+        toolbar.removeView(searchContainer);
 
     }
 
