@@ -64,6 +64,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private ArrayList<AppointmentDetail> timeSlots;
     private TimeTableAdapter timeTableAdapter;
     private String currentDate;
+    private boolean favourite;
+    private boolean isBlocked;
+    private String startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +117,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mCallButton.setOnClickListener(this);
         mChatButton.setOnClickListener(this);
         mFavButton.setOnClickListener(this);
-        final String startTime = getIntent().getStringExtra("start_time");
+        startTime = getIntent().getStringExtra("start_time");
+        isBlocked = getIntent().getBooleanExtra("block", false);
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final float stars = getIntent().getFloatExtra("stars", 0);
-        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
+        favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
         final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
@@ -127,6 +131,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
             status.setImageResource(R.mipmap.ic_online_indicator);
+        }
+        if (isBlocked) {
+            mChatButton.setEnabled(false);
+        }
+        if (favourite) {
+            mFavButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
         mDoctorName.setText(name);
         mDoctorSpeciality.setText(specialist);

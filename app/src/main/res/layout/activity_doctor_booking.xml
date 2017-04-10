@@ -93,7 +93,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignTop="@+id/doctor_sp"
-                android:background="@mipmap/ic_heart_fill" />
+                android:background="@mipmap/ic_empty_heart" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"

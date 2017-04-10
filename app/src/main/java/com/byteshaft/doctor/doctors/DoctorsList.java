@@ -187,7 +187,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 DoctorDetails doctorDetails = doctors.get(i);
                 Intent intent = new Intent(getActivity(), DoctorDetailsActivity.class);
-                intent.putExtra("start_time", "09:30 am");
+                intent.putExtra("start_time", doctorDetails.getStartTime());
                 StringBuilder stringBuilder = new StringBuilder();
                 if (doctorDetails.getGender().equals("M")) {
                     stringBuilder.append("Dr.");
@@ -200,7 +200,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("name", stringBuilder.toString());
                 intent.putExtra("specialist", doctorDetails.getSpeciality());
                 intent.putExtra("stars", doctorDetails.getReviewStars());
-//                intent.putExtra("favourite", doctorDetails.getSpeciality());
+                intent.putExtra("favourite", doctorDetails.isFavouriteDoctor());
+                intent.putExtra("block", doctorDetails.isBlocked());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
                 intent.putExtra("user", doctorDetails.getUserId());
@@ -279,7 +280,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                            .replace("http://localhost", AppGlobals.SERVER_IP));
                                    doctorDetails.setGender(doctorDetail.getString("gender"));
                                    doctorDetails.setLocation(doctorDetail.getString("location"));
-//                                   doctorDetails.setStartTime(doctorDetail.getString("start_time"));
+                                   doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favorite"));
+                                   doctorDetails.setStartTime(doctorDetail.getString("start_time"));
+                                   doctorDetails.setBlocked(doctorDetail.getBoolean("am_i_blocked"));
                                    doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
                                    if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
                                        doctorDetails.setPhoneNumberSecondary(doctorDetail.getString("phone_number_secondary"));
@@ -400,6 +403,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                             ConversationActivity.class));
                 }
             });
+            if (singleDoctor.isBlocked()) {
+                viewHolder.chat.setEnabled(false);
+            } else {
+                viewHolder.chat.setEnabled(true);
+            }
             return convertView;
         }
 
