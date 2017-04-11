@@ -84,6 +84,7 @@ public class AppGlobals extends Application {
     public static final String KEY_SUBSCRIPTION_SELECTED = "selected_subscription";
     public static final String KEY_CLINIC_SELECTED = "selected_clinic";
     public static final String KEY_SPECIALIST_SELECTED = "selected_specialist";
+    public static final String KEY_INSURANCE_SELECTED = "selected_insurance";
 
 
     public static final String KEY_TOKEN = "token";

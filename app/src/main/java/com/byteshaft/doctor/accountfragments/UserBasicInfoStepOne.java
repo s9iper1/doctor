@@ -223,15 +223,13 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_IMAGE_URL, imageUrl);
                     }
                     if (!AppGlobals.isDoctor()) {
-                        if (AccountManagerActivity.getInstance() != null &&
-                                MainActivity.getInstance() == null) {
+                        if (AccountManagerActivity.getInstance() != null) {
                             AccountManagerActivity.getInstance().loadFragment(new UserBasicInfoStepTwo());
                         } else {
                             MainActivity.getInstance().loadFragment(new UserBasicInfoStepTwo());
                         }
                     } else {
-                        if (AccountManagerActivity.getInstance() != null &&
-                                MainActivity.getInstance() == null) {
+                        if (AccountManagerActivity.getInstance() != null) {
                             AccountManagerActivity.getInstance().loadFragment(new DoctorsBasicInfo());
                         } else {
                             MainActivity.getInstance().loadFragment(new DoctorsBasicInfo());

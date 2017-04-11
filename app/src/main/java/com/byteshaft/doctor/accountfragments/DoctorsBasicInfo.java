@@ -576,15 +576,16 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                         AppGlobals.alertDialog(getActivity(), "Profile update Failed!", "provide a valid EmailAddress");
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
-                        AppGlobals.alertDialog(getActivity(), "Profile update Failed!", "Please enter correct password");
+                        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+                            AppGlobals.alertDialog(getActivity(), "Inactive Account", "Your account is inactive, " +
+                                    "please wait gor admin's approval. You will receive a activation Email");
+                        } else AppGlobals.alertDialog(getActivity(), "Profile update Failed", "Please enter correct password");
                         break;
 
                     case HttpURLConnection.HTTP_BAD_REQUEST:
                         Log.i("TAG", " " + request.getResponseText());
                         break;
                     case HttpURLConnection.HTTP_FORBIDDEN:
-                        AppGlobals.alertDialog(getActivity(), "Inactive Account", "Please activate your account");
-                        AccountManagerActivity.getInstance().loadFragment(new AccountActivationCode());
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Log.i("TAG", "res" + request.getResponseText());
@@ -652,6 +653,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
                             Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
                             AppGlobals.gotInfo(true);
+                            AccountManagerActivity.getInstance().finish();
                             startActivity(new Intent(getActivity(), MainActivity.class));
                         } catch (JSONException e) {
                             e.printStackTrace();
