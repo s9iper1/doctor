@@ -20,6 +20,7 @@ import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -134,6 +135,11 @@ public class CalendarView extends LinearLayout {
                 Log.i("TAG", "press");
                 Log.i("TAG", "press inside");
                 eventHandler.onDayPress((Date) adapterView.getItemAtPosition(i));
+                Date date = (Date) adapterView.getItemAtPosition(i);
+                DateFormat df = SimpleDateFormat.getDateInstance();
+                String resultDate = df.format(date);
+
+                txtDate.setText(resultDate);
                 selectedDate = (Date) adapterView.getItemAtPosition(i);
                 calendarAdapter.notifyDataSetChanged();
 
