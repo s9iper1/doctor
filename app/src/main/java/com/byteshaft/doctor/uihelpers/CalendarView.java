@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.utils.AppGlobals;
+import com.byteshaft.doctor.utils.Helpers;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class CalendarView extends LinearLayout {
     private static final int DAYS_COUNT = 7;
 
     // default date format
-    private static final String DATE_FORMAT = "MMM yyyy";
+    private static final String DATE_FORMAT = "DD MMM yyyy";
 
     // date format
     private String dateFormat;
@@ -164,7 +165,7 @@ public class CalendarView extends LinearLayout {
         grid.setAdapter(calendarAdapter);
         // update title
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        txtDate.setText(sdf.format(currentDate.getTime()));
+        txtDate.setText(Helpers.getDateForHeader());
     }
 
 
