@@ -187,6 +187,10 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        Helpers.dismissProgressDialog();
+        AppGlobals.alertDialog(getActivity(), getString(R.string.login_faild), getString(R.string.check_internet));
+
+
 
 
     }
@@ -213,14 +217,29 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     String phoneTwo = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
                                     String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
                                     String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
+                                    JSONObject cityJson = jsonObject.getJSONObject("city");
+                                    AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED,
+                                            cityJson.getInt("id"));
+
+                                    JSONObject stateJson = jsonObject.getJSONObject("state");
+                                    AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
+                                            stateJson.getInt("id"));
 
                                     if (AppGlobals.isDoctor()) {
                                         JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
+                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
+                                                specialityJsonObject.getInt("id"));
                                         String speciality = specialityJsonObject.getString("name");
+
                                         JSONObject subscriptionPlanObject = jsonObject.getJSONObject("subscription_plan");
+                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SUBSCRIPTION_SELECTED,
+                                                subscriptionPlanObject.getInt("id"));
                                         String subscriptionType = subscriptionPlanObject.getString("plan_type");
-//                                        JSONObject affiliateClinicObject = jsonObject.getJSONObject("affiliate_clinic");
-//                                        String affiliateClinic = affiliateClinicObject.getString("name");
+
+                                        JSONObject affiliateClinicObject = jsonObject.getJSONObject("affiliate_clinic");
+                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
+                                                affiliateClinicObject.getInt("id"));
+                                        String affiliateClinic = affiliateClinicObject.getString("name");
                                         String collageId = jsonObject.getString(AppGlobals.KEY_COLLEGE_ID);
                                         String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);
 
@@ -228,7 +247,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY, speciality);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_COLLEGE_ID, collageId);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE, subscriptionType);
-//                                        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
+                                        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
                                     }
                                     String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
 

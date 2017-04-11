@@ -82,6 +82,10 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
     private ArrayList<InsuranceCarriers> insuranceCarriersesList;
     private InsuranceCarriersAdapter insuranceCarriersAdapter;
 
+    private int cityPosition;
+    private int statePosition;
+    private int insuranceCarrierPosition;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.fragment_user_basic_info_step_two, container, false);
@@ -157,11 +161,16 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         InsuranceCarriers insuranceCarriers = new InsuranceCarriers();
                                         insuranceCarriers.setId(jsonObject.getInt("id"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED)
+                                                == jsonObject.getInt("id")) {
+                                            insuranceCarrierPosition = i;
+                                        }
                                         insuranceCarriers.setName(jsonObject.getString("name"));
                                         insuranceCarriersesList.add(insuranceCarriers);
                                     }
                                     insuranceCarriersAdapter = new InsuranceCarriersAdapter(getActivity(), insuranceCarriersesList);
                                     mInsuranceCarrierSpinner.setAdapter(insuranceCarriersAdapter);
+                                    mInsuranceCarrierSpinner.setSelection(insuranceCarrierPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -191,11 +200,17 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                         States states = new States();
                                         states.setCode(jsonObject.getString("code"));
                                         states.setId(jsonObject.getInt("id"));
+                                        if (jsonObject.getInt("id") ==
+                                                AppGlobals.getDoctorProfileIds(
+                                                        AppGlobals.KEY_STATE_SELECTED)) {
+                                            statePosition = i;
+                                        }
                                         states.setName(jsonObject.getString("name"));
                                         statesList.add(states);
                                     }
                                     statesAdapter = new StatesAdapter(getActivity(), statesList);
                                     mStateSpinner.setAdapter(statesAdapter);
+                                    mStateSpinner.setSelection(statePosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -228,11 +243,16 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                         cities.setCityId(jsonObject.getInt("id"));
                                         cities.setCityName(jsonObject.getString("name"));
                                         cities.setStateId(jsonObject.getInt("state"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED) ==
+                                                jsonObject.getInt("id")) {
+                                            cityPosition = i;
+                                        }
                                         cities.setStateName(jsonObject.getString("state_name"));
                                         citiesList.add(cities);
                                     }
                                     citiesAdapter = new CitiesAdapter(getActivity(), citiesList);
                                     mCitySpinner.setAdapter(citiesAdapter);
+                                    mCitySpinner.setSelection(cityPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -262,15 +282,21 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                 getCities(states.getId());
                 mStatesSpinnerValueString = String.valueOf(states.getId());
                 System.out.println(states.getId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
+                        states.getId());
                 break;
             case R.id.cities_spinner:
                 Cities city = citiesList.get(i);
                 mCitiesSpinnerValueString = String.valueOf(city.getCityId());
                 System.out.println(city.getCityId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED,
+                        city.getCityId());
                 break;
             case R.id.insurance_spinner:
                 InsuranceCarriers insuranceCarriers = insuranceCarriersesList.get(i);
                 mInsuranceCarrierSpinnerValueString = String.valueOf(insuranceCarriers.getId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
+                        insuranceCarriers.getId());
                 break;
         }
     }
@@ -470,6 +496,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
                             AppGlobals.gotInfo(true);
+                            AccountManagerActivity.getInstance().finish();
                             startActivity(new Intent(getActivity(), MainActivity.class));
                         } catch (JSONException e) {
                             e.printStackTrace();

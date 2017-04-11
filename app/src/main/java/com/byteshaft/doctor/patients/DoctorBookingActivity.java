@@ -295,7 +295,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("number", phonenumber);
             intent.putExtra("stars", drStars);
             intent.putExtra("specialist", drSpecialist);
-            intent.putExtra("specialist", drSpecialist);
             startActivity(intent);
         } else {
             Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);
@@ -328,7 +327,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
             viewHolder.time.setText(appointmentDetail.getStartTime());
             if (appointmentDetail.getState().equals("pending")) {
-                viewHolder.time.setBackground(getResources().getDrawable(R.drawable.rounded_button));
+                viewHolder.time.setBackground(getResources().getDrawable(R.drawable.normal_time_slot));
             } else {
                 viewHolder.time.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             }

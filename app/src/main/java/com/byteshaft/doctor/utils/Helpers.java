@@ -272,4 +272,10 @@ public class Helpers {
         return df.format(c.getTime());
     }
 
+    public static String getDateForHeader() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
+        return df.format(c.getTime());
+    }
+
 }
