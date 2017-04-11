@@ -27,6 +27,8 @@ import com.byteshaft.doctor.adapters.AffiliateClinicAdapter;
 import com.byteshaft.doctor.adapters.CitiesAdapter;
 import com.byteshaft.doctor.adapters.StatesAdapter;
 import com.byteshaft.doctor.adapters.SubscriptionTypeAdapter;
+import com.byteshaft.doctor.doctors.Dashboard;
+import com.byteshaft.doctor.doctors.DoctorsList;
 import com.byteshaft.doctor.gettersetter.AffiliateClinic;
 import com.byteshaft.doctor.gettersetter.Cities;
 import com.byteshaft.doctor.gettersetter.Specialities;
@@ -101,6 +103,12 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
 
     private ArrayList<SubscriptionType> subscriptionTypesList;
     private SubscriptionTypeAdapter subscriptionTypeAdapter;
+
+    private int cityPosition;
+    private int statePosition;
+    private int subscriptionPosition;
+    private int affiliateClinicPosition;
+    private int specialistPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -186,28 +194,38 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 getCities(states.getId());
                 mStatesSpinnerValueString = String.valueOf(states.getId());
                 System.out.println(states.getId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
+                        states.getId());
                 break;
             case R.id.cities_spinner:
                 if (citiesList.size() > 0) {
                     Cities city = citiesList.get(i);
                     mCitiesSpinnerValueString = String.valueOf(city.getCityId());
                     System.out.println(city.getCityId());
+                    AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED,
+                            city.getCityId());
                 }
                 break;
             case R.id.speciality_spinner:
                 Specialities specialities = specialitiesList.get(i);
                 mSpecialitySpinnerValueString = String.valueOf(specialities.getSpecialitiesId());
                 System.out.println(specialities.getSpecialitiesId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
+                        specialities.getSpecialitiesId());
                 break;
             case R.id.clinics_spinner:
                 AffiliateClinic affiliateClinic = affiliateClinicsList.get(i);
                 mAffiliatedClinicsSpinnerValueString = String.valueOf(affiliateClinic.getId());
                 System.out.println(affiliateClinic.getId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED,
+                        affiliateClinic.getId());
                 break;
             case R.id.subscriptions_spinner:
                 SubscriptionType subscriptionType = subscriptionTypesList.get(i);
                 mSubscriptionSpinnerValueString = String.valueOf(subscriptionType.getId());
                 System.out.println(subscriptionType.getId() + "  " + subscriptionType.getPrice());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SUBSCRIPTION_SELECTED,
+                        subscriptionType.getId());
                 break;
         }
 
@@ -324,7 +342,11 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         mRequest.setTimeout(200000);
         mRequest.setOnReadyStateChangeListener(this);
         mRequest.setOnFileUploadProgressListener(this);
-        mRequest.open("POST", String.format("%suser/profile", AppGlobals.BASE_URL));
+        String method = "POST";
+        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+            method = "PUT";
+        }
+        mRequest.open(method, String.format("%suser/profile", AppGlobals.BASE_URL));
         mRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         mRequest.send(data);
@@ -347,12 +369,17 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         JSONObject jsonObject = spArray.getJSONObject(i);
                                         AffiliateClinic affiliateClinic = new AffiliateClinic();
                                         affiliateClinic.setId(jsonObject.getInt("id"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED)
+                                                == jsonObject.getInt("id")) {
+                                            affiliateClinicPosition = i;
+                                        }
                                         affiliateClinic.setName(jsonObject.getString("name"));
                                         affiliateClinicsList.add(affiliateClinic);
                                     }
                                     affiliateClinicAdapter = new AffiliateClinicAdapter(
                                             getActivity(), affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
+                                    mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -383,11 +410,16 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         JSONObject jsonObject = spArray.getJSONObject(i);
                                         Specialities specialities = new Specialities();
                                         specialities.setSpecialitiesId(jsonObject.getInt("id"));
+                                        if (jsonObject.getInt("id") ==
+                                                AppGlobals.getDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED)) {
+                                            specialistPosition = i;
+                                        }
                                         specialities.setSpeciality(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
                                     }
                                     specialitiesAdapter = new SpecialitiesAdapter(specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
+                                    mSpecialitySpinner.setSelection(specialistPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -419,11 +451,17 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         States states = new States();
                                         states.setCode(jsonObject.getString("code"));
                                         states.setId(jsonObject.getInt("id"));
+                                        if (jsonObject.getInt("id") ==
+                                                AppGlobals.getDoctorProfileIds(
+                                                        AppGlobals.KEY_STATE_SELECTED)) {
+                                            statePosition = i;
+                                        }
                                         states.setName(jsonObject.getString("name"));
                                         statesList.add(states);
                                     }
                                     statesAdapter = new StatesAdapter(getActivity(), statesList);
                                     mStateSpinner.setAdapter(statesAdapter);
+                                    mStateSpinner.setSelection(statePosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -455,6 +493,10 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         Cities cities = new Cities();
                                         cities.setCityId(jsonObject.getInt("id"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED) ==
+                                                jsonObject.getInt("id")) {
+                                            cityPosition = i;
+                                        }
                                         cities.setCityName(jsonObject.getString("name"));
                                         cities.setStateId(jsonObject.getInt("state"));
                                         cities.setStateName(jsonObject.getString("state_name"));
@@ -462,6 +504,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                     }
                                     citiesAdapter = new CitiesAdapter(getActivity(), citiesList);
                                     mCitySpinner.setAdapter(citiesAdapter);
+                                    mCitySpinner.setSelection(cityPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -495,11 +538,16 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         subscriptionType.setDescription(jsonObject.getString("description"));
                                         subscriptionType.setPrice(BigDecimal.valueOf(jsonObject.getDouble("price")).floatValue());
                                         subscriptionType.setId(jsonObject.getInt("id"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_SUBSCRIPTION_SELECTED)
+                                                == jsonObject.getInt("id")) {
+                                            subscriptionPosition = i;
+                                        }
                                         subscriptionTypesList.add(subscriptionType);
                                     }
                                     subscriptionTypeAdapter = new SubscriptionTypeAdapter(
                                             getActivity(), subscriptionTypesList);
                                     mSubscriptionSpinner.setAdapter(subscriptionTypeAdapter);
+                                    mSubscriptionSpinner.setSelection(subscriptionPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -528,15 +576,16 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                         AppGlobals.alertDialog(getActivity(), "Profile update Failed!", "provide a valid EmailAddress");
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
-                        AppGlobals.alertDialog(getActivity(), "Profile update Failed!", "Please enter correct password");
+                        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+                            AppGlobals.alertDialog(getActivity(), "Inactive Account", "Your account is inactive, " +
+                                    "please wait gor admin's approval. You will receive a activation Email");
+                        } else AppGlobals.alertDialog(getActivity(), "Profile update Failed", "Please enter correct password");
                         break;
 
                     case HttpURLConnection.HTTP_BAD_REQUEST:
                         Log.i("TAG", " " + request.getResponseText());
                         break;
                     case HttpURLConnection.HTTP_FORBIDDEN:
-                        AppGlobals.alertDialog(getActivity(), "Inactive Account", "Please activate your account");
-                        AccountManagerActivity.getInstance().loadFragment(new AccountActivationCode());
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Log.i("TAG", "res" + request.getResponseText());
@@ -604,10 +653,25 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
                             Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
                             AppGlobals.gotInfo(true);
+                            AccountManagerActivity.getInstance().finish();
                             startActivity(new Intent(getActivity(), MainActivity.class));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        break;
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", request.getResponseText());
+                        Helpers.showSnackBar(getView(), R.string.profile_updated);
+                        new android.os.Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (AppGlobals.isDoctor()) {
+                                    MainActivity.getInstance().loadFragment(new Dashboard());
+                                } else {
+                                    MainActivity.getInstance().loadFragment(new DoctorsList());
+                                }
+                            }
+                        }, 800);
                         break;
 
                 }
