@@ -311,10 +311,12 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
             case R.id.terms_check_box:
                 if (mTermsConditionCheckBox.isChecked()) {
                     mSaveButton.setEnabled(true);
+                    mSaveButton.setBackgroundColor(getResources().getColor(R.color.buttonColor));
                     mTermsConditionCheckBoxString = mTermsConditionCheckBox.getText().toString();
                     System.out.println(mTermsConditionCheckBoxString);
                 } else {
                     mSaveButton.setEnabled(false);
+                    mSaveButton.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                 }
                 break;
         }
