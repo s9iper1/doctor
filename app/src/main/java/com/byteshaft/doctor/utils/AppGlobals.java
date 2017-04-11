@@ -79,6 +79,12 @@ public class AppGlobals extends Application {
     public static final String KEY_USER = "user";
     public static final String KEY_GOT_INFO = "got_info";
     public static final String KEY_FAVOURITE_STATE = "favourite";
+    public static final String KEY_STATE_SELECTED = "selected_state";
+    public static final String KEY_CITY_SELECTED = "selected_city";
+    public static final String KEY_SUBSCRIPTION_SELECTED = "selected_subscription";
+    public static final String KEY_CLINIC_SELECTED = "selected_clinic";
+    public static final String KEY_SPECIALIST_SELECTED = "selected_specialist";
+
 
     public static final String KEY_TOKEN = "token";
     public static final String USER_ACTIVATION_KEY = "activation_key";
@@ -239,6 +245,16 @@ public class AppGlobals extends Application {
     public static boolean isInfoAvailable() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(KEY_GOT_INFO, false);
+    }
+
+    public static void saveDoctorProfileIds(String key, int value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putInt(key, value).apply();
+    }
+
+    public static int getDoctorProfileIds(String key) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getInt(key, -1);
     }
 }
 

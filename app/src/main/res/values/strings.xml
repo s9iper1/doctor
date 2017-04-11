@@ -119,6 +119,7 @@
     <string name="my_patient">My patient</string>
     <string name="my_schedule">My Schedule</string>
     <string name="update_profile">Update profile</string>
+    <string name="profile_updated">Profile Successfully updated</string>
 
 </resources>
 
