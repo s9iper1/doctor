@@ -229,6 +229,7 @@
                 <CheckBox
                     android:id="@+id/notifications_check_box"
                     android:layout_width="match_parent"
+                    android:checked="true"
                     android:layout_height="wrap_content"
                     android:text="@string/notifications" />
             </RelativeLayout>
@@ -242,6 +243,7 @@
 
                 <CheckBox
                     android:id="@+id/news_check_box"
+                    android:checked="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/news" />
@@ -253,6 +255,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
+            android:checked="true"
             android:text="@string/terms_and_conditions" />
 
 

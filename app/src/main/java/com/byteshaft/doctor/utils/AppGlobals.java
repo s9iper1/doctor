@@ -191,15 +191,34 @@ public class AppGlobals extends Application {
         return sharedPreferences.getBoolean(KEY_CHAT_STATUS, false);
     }
 
+    public static void saveNotificationState(boolean state) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean(KEY_SHOW_NOTIFICATION, state).apply();
+    }
+
+    public static boolean isShowNotification() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getBoolean(KEY_SHOW_NOTIFICATION, false);
+    }
+
+    public static void saveNewsState(boolean state) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean(KEY_SHOW_NEWS, state).apply();
+    }
+
+    public static boolean isShowNews() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getBoolean(KEY_SHOW_NEWS, false);
+    }
 
     public static void saveFavourite(String drId, boolean isFavourite) {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putBoolean(drId ,isFavourite).apply();
+        sharedPreferences.edit().putBoolean(drId, isFavourite).apply();
     }
 
     public static boolean isFavourite(String id) {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean(id , false);
+        return sharedPreferences.getBoolean(id, false);
     }
 
     public static SharedPreferences getPreferenceManager() {
