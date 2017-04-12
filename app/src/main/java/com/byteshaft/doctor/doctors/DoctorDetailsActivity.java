@@ -59,7 +59,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ReviewAdapter adapter;
     private String number;
     private CircleImageView circleImageView;
-    private boolean isFavourite;
     private HttpRequest request;
     private int id;
     private boolean isBlocked;
@@ -79,10 +78,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final float stars = getIntent().getFloatExtra("stars", 0);
-        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         number = getIntent().getStringExtra("number");
         isBlocked = getIntent().getBooleanExtra("block", false);
-        isFavourite = getIntent().getBooleanExtra("favourite", false);
         final String photo = getIntent().getStringExtra("photo");
         final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
@@ -108,7 +105,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         if (isBlocked) {
             chatButton.setEnabled(false);
         }
-        if (isFavourite) {
+        if ( AppGlobals.isDoctorFavourite) {
             heartButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
         heartButton.setOnClickListener(this);
@@ -124,12 +121,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 intent.putExtra("name", name);
                 intent.putExtra("specialist", specialist);
                 intent.putExtra("stars", stars);
-                intent.putExtra("favourite", favourite);
                 intent.putExtra("number", number);
                 intent.putExtra("available_to_chat", availableForChat);
                 intent.putExtra("user", id);
                 intent.putExtra("photo", photo);
-                intent.putExtra("favourite", isFavourite);
                 intent.putExtra("block", isBlocked);
                 intent.putExtra("start_time", startTime);
                 startActivity(intent);
@@ -187,12 +182,61 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                         ConversationActivity.class));
                 break;
             case R.id.heart_button:
-                if (isFavourite) {
-                    heartButton.setBackgroundResource(R.mipmap.heart);
-                    isFavourite = true;
+                if (!AppGlobals.isDoctorFavourite) {
+                    Helpers.favouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
+                        @Override
+                        public void onReadyStateChange(HttpRequest request, int readyState) {
+                            switch (readyState) {
+                                case HttpRequest.STATE_DONE:
+                                    switch (request.getStatus()) {
+                                        case HttpURLConnection.HTTP_CREATED:
+                                            Log.i("TAG", "favourite " + request.getResponseText());
+                                            JSONObject jsonObject = null;
+                                            try {
+                                                jsonObject = new JSONObject(request.getResponseText());
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            AppGlobals.favouriteHashMap.put(id, jsonObject);
+                                            Log.i("TAG", "adding to hashmap " + id + jsonObject);
+                                            AppGlobals.isDoctorFavourite = true;
+                                            heartButton.setBackgroundResource(R.mipmap.ic_heart_fill);
+                                    }
+                            }
+                        }
+                    }, new HttpRequest.OnErrorListener() {
+                        @Override
+                        public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+                        }
+                    });
                 } else {
-                    heartButton.setBackgroundResource(R.mipmap.ic_heart_fill);
-                    isFavourite = false;
+                    if (AppGlobals.favouriteHashMap.containsKey(id)) {
+                        try {
+                            Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
+                                @Override
+                                public void onReadyStateChange(HttpRequest request, int readyState) {
+                                    switch (readyState) {
+                                        case HttpRequest.STATE_DONE:
+                                            switch (request.getStatus()) {
+                                                case HttpURLConnection.HTTP_NO_CONTENT:
+                                                    AppGlobals.isDoctorFavourite = false;
+                                                    heartButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+
+                                            }
+                                    }
+
+                                }
+                            }, new HttpRequest.OnErrorListener() {
+                                @Override
+                                public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 break;
         }
