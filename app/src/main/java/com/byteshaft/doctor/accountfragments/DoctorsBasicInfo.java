@@ -148,6 +148,9 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         mNewsCheckBox = (CheckBox) mBaseView.findViewById(R.id.news_check_box);
         mTermsConditionCheckBox = (CheckBox) mBaseView.findViewById(R.id.terms_check_box);
 
+        mNotificationCheckBox.setChecked(AppGlobals.isShowNotification());
+        mNewsCheckBox.setChecked(AppGlobals.isShowNews());
+
         mSaveButton.setTypeface(AppGlobals.typefaceNormal);
         mPhoneOneEditText.setTypeface(AppGlobals.typefaceNormal);
         mPhoneTwoEditText.setTypeface(AppGlobals.typefaceNormal);
@@ -479,41 +482,41 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         HttpRequest getCitiesRequest = new HttpRequest(getActivity().getApplicationContext());
         getCitiesRequest.setOnReadyStateChangeListener(
                 new HttpRequest.OnReadyStateChangeListener() {
-            @Override
-            public void onReadyStateChange(HttpRequest request, int readyState) {
-                switch (readyState) {
-                    case HttpRequest.STATE_DONE:
-                        switch (request.getStatus()) {
-                            case HttpURLConnection.HTTP_OK:
-                                System.out.println(request.getResponseText());
-                                try {
-                                    JSONObject object = new JSONObject(request.getResponseText());
-                                    JSONArray jsonArray = object.getJSONArray("results");
-                                    citiesList = new ArrayList<>();
-                                    for (int i = 0; i < jsonArray.length(); i++) {
-                                        System.out.println("Test " + jsonArray.getJSONObject(i));
-                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                        Cities cities = new Cities();
-                                        cities.setCityId(jsonObject.getInt("id"));
-                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED) ==
-                                                jsonObject.getInt("id")) {
-                                            cityPosition = i;
+                    @Override
+                    public void onReadyStateChange(HttpRequest request, int readyState) {
+                        switch (readyState) {
+                            case HttpRequest.STATE_DONE:
+                                switch (request.getStatus()) {
+                                    case HttpURLConnection.HTTP_OK:
+                                        System.out.println(request.getResponseText());
+                                        try {
+                                            JSONObject object = new JSONObject(request.getResponseText());
+                                            JSONArray jsonArray = object.getJSONArray("results");
+                                            citiesList = new ArrayList<>();
+                                            for (int i = 0; i < jsonArray.length(); i++) {
+                                                System.out.println("Test " + jsonArray.getJSONObject(i));
+                                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                                Cities cities = new Cities();
+                                                cities.setCityId(jsonObject.getInt("id"));
+                                                if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED) ==
+                                                        jsonObject.getInt("id")) {
+                                                    cityPosition = i;
+                                                }
+                                                cities.setCityName(jsonObject.getString("name"));
+                                                cities.setStateId(jsonObject.getInt("state"));
+                                                cities.setStateName(jsonObject.getString("state_name"));
+                                                citiesList.add(cities);
+                                            }
+                                            citiesAdapter = new CitiesAdapter(getActivity(), citiesList);
+                                            mCitySpinner.setAdapter(citiesAdapter);
+                                            mCitySpinner.setSelection(cityPosition);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                         }
-                                        cities.setCityName(jsonObject.getString("name"));
-                                        cities.setStateId(jsonObject.getInt("state"));
-                                        cities.setStateName(jsonObject.getString("state_name"));
-                                        citiesList.add(cities);
-                                    }
-                                    citiesAdapter = new CitiesAdapter(getActivity(), citiesList);
-                                    mCitySpinner.setAdapter(citiesAdapter);
-                                    mCitySpinner.setSelection(cityPosition);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
                                 }
                         }
-                }
-            }
-        });
+                    }
+                });
         getCitiesRequest.open("GET", String.format("%spublic/states/%s/cities", AppGlobals.BASE_URL, id));
         getCitiesRequest.send();
     }
@@ -581,7 +584,8 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                         if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
                             AppGlobals.alertDialog(getActivity(), "Inactive Account", "Your account is inactive, " +
                                     "please wait gor admin's approval. You will receive a activation Email");
-                        } else AppGlobals.alertDialog(getActivity(), "Profile update Failed", "Please enter correct password");
+                        } else
+                            AppGlobals.alertDialog(getActivity(), "Profile update Failed", "Please enter correct password");
                         break;
 
                     case HttpURLConnection.HTTP_BAD_REQUEST:
@@ -591,79 +595,15 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Log.i("TAG", "res" + request.getResponseText());
-                        try {
-                            JSONObject jsonObject = new JSONObject(request.getResponseText());
-
-                            String userId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
-                            String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
-                            String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
-
-                            String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
-                            String dateOfBirth = jsonObject.getString(AppGlobals.KEY_DATE_OF_BIRTH);
-                            String phoneNumberPrimary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
-                            String phoneNumberSecondary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
-
-                            JSONObject affiliateClinicJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_AFFILIATE_CLINIC);
-                            String affiliateClinic = affiliateClinicJsonObject.getString("name");
-                            JSONObject subscriptionTypeJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_SUBSCRIPTION_TYPE);
-                            String subscriptionType = subscriptionTypeJsonObject.getString("plan_type");
-                            JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
-                            String speciality = specialityJsonObject.getString("name");
-                            String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
-                            String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
-                            boolean chatStatus = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
-
-                            String state = jsonObject.getString(AppGlobals.KEY_STATE);
-                            String city = jsonObject.getString(AppGlobals.KEY_CITY);
-                            String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
-                            String collegeId = jsonObject.getString(AppGlobals.KEY_COLLEGE_ID);
-                            String showNews = jsonObject.getString(AppGlobals.KEY_SHOW_NEWS);
-
-                            String showNotification = jsonObject.getString(AppGlobals.KEY_SHOW_NOTIFICATION);
-                            String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);
-                            String reviewStars = jsonObject.getString(AppGlobals.KEY_REVIEW_STARS);
-                            String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
-
-
-                            //saving values
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_USER_ID, userId);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, firstName);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, lastName);
-
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_GENDER, gender);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, dateOfBirth);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY, phoneNumberPrimary);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY, phoneNumberSecondary);
-
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE, subscriptionType);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY, speciality);
-
-//                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CHAT_STATUS, chatStatus);
-                            AppGlobals.saveChatStatus(chatStatus);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_STATE, state);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CITY, city);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, docId);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NEWS, showNews);
-
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NOTIFICATION, showNotification);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME, consultationTime);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_REVIEW_STARS, reviewStars);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_COLLEGE_ID, collegeId);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
-                            Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
-                            AppGlobals.gotInfo(true);
-                            AccountManagerActivity.getInstance().finish();
-                            startActivity(new Intent(getActivity(), MainActivity.class));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        parseServerResponse(request);
+                        AppGlobals.gotInfo(true);
+                        AccountManagerActivity.getInstance().finish();
+                        startActivity(new Intent(getActivity(), MainActivity.class));
                         break;
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", request.getResponseText());
                         Helpers.showSnackBar(getView(), R.string.profile_updated);
+                        parseServerResponse(request);
                         new android.os.Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -679,6 +619,76 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 }
         }
 
+    }
+
+    private void parseServerResponse(HttpRequest request) {
+        try {
+            JSONObject jsonObject = new JSONObject(request.getResponseText());
+
+            String userId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+            String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
+            String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
+
+            String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
+            String dateOfBirth = jsonObject.getString(AppGlobals.KEY_DATE_OF_BIRTH);
+            String phoneNumberPrimary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
+            String phoneNumberSecondary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
+
+            JSONObject affiliateClinicJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_AFFILIATE_CLINIC);
+            String affiliateClinic = affiliateClinicJsonObject.getString("name");
+            JSONObject subscriptionTypeJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_SUBSCRIPTION_TYPE);
+            String subscriptionType = subscriptionTypeJsonObject.getString("plan_type");
+            JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
+            String speciality = specialityJsonObject.getString("name");
+            String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
+            String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
+            boolean chatStatus = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
+
+            String state = jsonObject.getString(AppGlobals.KEY_STATE);
+            String city = jsonObject.getString(AppGlobals.KEY_CITY);
+            String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
+            String collegeId = jsonObject.getString(AppGlobals.KEY_COLLEGE_ID);
+            boolean showNews = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NEWS);
+
+            boolean showNotification = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NOTIFICATION);
+            String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);
+            String reviewStars = jsonObject.getString(AppGlobals.KEY_REVIEW_STARS);
+            String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
+
+
+            //saving values
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_USER_ID, userId);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, firstName);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, lastName);
+
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_GENDER, gender);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, dateOfBirth);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY, phoneNumberPrimary);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY, phoneNumberSecondary);
+
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE, subscriptionType);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY, speciality);
+
+//                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CHAT_STATUS, chatStatus);
+            AppGlobals.saveChatStatus(chatStatus);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_STATE, state);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CITY, city);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, docId);
+//                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NEWS, showNews);
+            AppGlobals.saveNewsState(showNews);
+            AppGlobals.saveNotificationState(showNotification);
+//                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NOTIFICATION, showNotification);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME, consultationTime);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_REVIEW_STARS, reviewStars);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_COLLEGE_ID, collegeId);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
+            Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

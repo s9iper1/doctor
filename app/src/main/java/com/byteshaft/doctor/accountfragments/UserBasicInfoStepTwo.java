@@ -122,6 +122,9 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mNewsCheckBox = (CheckBox) mBaseView.findViewById(R.id.news_check_box);
         mTermsConditionCheckBox = (CheckBox) mBaseView.findViewById(R.id.terms_check_box);
 
+        mNotificationCheckBox.setChecked(AppGlobals.isShowNotification());
+        mNewsCheckBox.setChecked(AppGlobals.isShowNews());
+
         mSaveButton = (Button) mBaseView.findViewById(R.id.save_button);
 
         mPhoneOneEditText.setTypeface(AppGlobals.typefaceNormal);
