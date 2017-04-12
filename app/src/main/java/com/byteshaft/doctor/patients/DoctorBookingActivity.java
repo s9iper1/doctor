@@ -46,7 +46,8 @@ import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener, AdapterView.OnItemClickListener {
+public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener,
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener, AdapterView.OnItemClickListener {
 
     private TextView mDoctorName;
     private TextView mDoctorSpeciality;
@@ -63,7 +64,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private ArrayList<AppointmentDetail> timeSlots;
     private TimeTableAdapter timeTableAdapter;
     private String currentDate;
-    private boolean favourite;
     private boolean isBlocked;
     private String startTime;
 
@@ -131,14 +131,14 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mFavButton.setOnClickListener(this);
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
-        favourite = getIntent().getBooleanExtra("favourite", false);
+        AppGlobals.isDoctorFavourite = getIntent().getBooleanExtra("favourite", false);
         final String startTime = getIntent().getStringExtra("start_time");
         drName = getIntent().getStringExtra("name");
         drSpecialist = getIntent().getStringExtra("specialist");
         drStars = getIntent().getFloatExtra("stars", 0);
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         phonenumber = getIntent().getStringExtra("number");
-         drPhoto = getIntent().getStringExtra("photo");
+        drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
         if (!availableForChat) {
@@ -212,6 +212,64 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 startActivity(new Intent(getApplicationContext(),
                         ConversationActivity.class));
                 break;
+            case R.id.favt_button:
+                if (!AppGlobals.isDoctorFavourite) {
+                    Helpers.favouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
+                        @Override
+                        public void onReadyStateChange(HttpRequest request, int readyState) {
+                            switch (readyState) {
+                                case HttpRequest.STATE_DONE:
+                                    switch (request.getStatus()) {
+                                        case HttpURLConnection.HTTP_CREATED:
+                                            Log.i("TAG", "favourite " + request.getResponseText());
+                                            JSONObject jsonObject = null;
+                                            try {
+                                                jsonObject = new JSONObject(request.getResponseText());
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            AppGlobals.favouriteHashMap.put(id, jsonObject);
+                                            Log.i("TAG", "adding to hashmap " + id + jsonObject);
+                                            AppGlobals.isDoctorFavourite = true;
+                                            mFavButton.setBackgroundResource(R.mipmap.ic_heart_fill);
+                                    }
+                            }
+                        }
+                    }, new HttpRequest.OnErrorListener() {
+                        @Override
+                        public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+                        }
+                    });
+                } else {
+                    if (AppGlobals.favouriteHashMap.containsKey(id)) {
+                        try {
+                            Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
+                                @Override
+                                public void onReadyStateChange(HttpRequest request, int readyState) {
+                                    switch (readyState) {
+                                        case HttpRequest.STATE_DONE:
+                                            switch (request.getStatus()) {
+                                                case HttpURLConnection.HTTP_NO_CONTENT:
+                                                    AppGlobals.isDoctorFavourite = false;
+                                                    mFavButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+
+                                            }
+                                    }
+
+                                }
+                            }, new HttpRequest.OnErrorListener() {
+                                @Override
+                                public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
         }
     }
 
@@ -272,10 +330,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
     }
 
+
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
 
     }
+
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -289,7 +349,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("start_time", appointmentDetail.getStartTime());
             intent.putExtra("available_to_chat", availableForChat);
             intent.putExtra("name", drName);
-            intent.putExtra("favourite", favourite);
+//            intent.putExtra("favourite", AppGlobals.isDoctorFavourite);
             intent.putExtra("block", isBlocked);
             intent.putExtra("photo", drPhoto);
             intent.putExtra("number", phonenumber);
