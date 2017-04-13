@@ -53,9 +53,10 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private int appointmentId;
     private ImageView status;
 
+    private int id;
+
     private HttpRequest request;
     private boolean availableForChat;
-    private boolean favourite;
     private boolean blocked;
     private ImageButton favouriteButton;
     private TextView dateText;
@@ -87,6 +88,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
         mSaveButton.setOnClickListener(this);
+        favouriteButton.setOnClickListener(this);
 
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
@@ -107,7 +109,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         final String name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final int stars = getIntent().getIntExtra("stars", 0);
-        favourite = getIntent().getBooleanExtra("favourite", false);
         mPhoneNumber = getIntent().getStringExtra("number");
         final String photo = getIntent().getStringExtra("photo");
         appointmentId = getIntent().getIntExtra("appointment_id", -1);
@@ -125,7 +126,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         if (blocked) {
             chatButton.setEnabled(false);
         }
-        if (favourite) {
+        if ( AppGlobals.isDoctorFavourite) {
             favouriteButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
         Helpers.getBitMap(photo, mDoctorImage);
@@ -161,6 +162,65 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 startActivity(new Intent(getApplicationContext(),
                         ConversationActivity.class));
                 break;
+            case R.id.btn_fav:
+                if (!AppGlobals.isDoctorFavourite) {
+                    Helpers.favouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
+                        @Override
+                        public void onReadyStateChange(HttpRequest request, int readyState) {
+                            switch (readyState) {
+                                case HttpRequest.STATE_DONE:
+                                    switch (request.getStatus()) {
+                                        case HttpURLConnection.HTTP_CREATED:
+                                            Log.i("TAG", "favourite " + request.getResponseText());
+                                            JSONObject jsonObject = null;
+                                            try {
+                                                jsonObject = new JSONObject(request.getResponseText());
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            AppGlobals.favouriteHashMap.put(id, jsonObject);
+                                            Log.i("TAG", "adding to hashmap " + id + jsonObject);
+                                            AppGlobals.isDoctorFavourite = true;
+                                            favouriteButton.setBackgroundResource(R.mipmap.ic_heart_fill);
+                                    }
+                            }
+                        }
+                    }, new HttpRequest.OnErrorListener() {
+                        @Override
+                        public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+                        }
+                    });
+                } else {
+                    if (AppGlobals.favouriteHashMap.containsKey(id)) {
+                        try {
+                            Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
+                                @Override
+                                public void onReadyStateChange(HttpRequest request, int readyState) {
+                                    switch (readyState) {
+                                        case HttpRequest.STATE_DONE:
+                                            switch (request.getStatus()) {
+                                                case HttpURLConnection.HTTP_NO_CONTENT:
+                                                    AppGlobals.isDoctorFavourite = false;
+                                                    favouriteButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+
+                                            }
+                                    }
+
+                                }
+                            }, new HttpRequest.OnErrorListener() {
+                                @Override
+                                public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+
             case R.id.button_save:
                 String appointmentReasonString = mAppointmentEditText.getText().toString();
                 System.out.println(appointmentReasonString  + "working");

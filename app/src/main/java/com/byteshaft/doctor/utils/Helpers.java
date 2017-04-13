@@ -18,12 +18,16 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.requests.HttpRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -283,6 +287,41 @@ public class Helpers {
         c.add(Calendar.MONTH, 1);
         SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
         return df.format(c.getTime());
+    }
+
+
+    public static void favouriteDoctorTask(int doctorId, HttpRequest.OnReadyStateChangeListener
+            readyStateChangeListener, HttpRequest.OnErrorListener onErrorListener) {
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(readyStateChangeListener);
+        request.setOnErrorListener(onErrorListener);
+        request.open("POST", String.format("%spatient/favorite-doctors ", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send(getDoctorsId(doctorId));
+    }
+
+
+    public static String getDoctorsId(int doctorId) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("doctor", doctorId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+
+    }
+
+    public static void unFavouriteDoctorTask(int favtId, HttpRequest.OnReadyStateChangeListener
+            readyStateChangeListener , HttpRequest.OnErrorListener onErrorListener) {
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(readyStateChangeListener);
+        request.setOnErrorListener(onErrorListener);
+        request.open("DELETE", String.format("%spatient/favorite-doctors/%s", AppGlobals.BASE_URL, favtId));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 
 }

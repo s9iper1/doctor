@@ -202,7 +202,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("name", stringBuilder.toString());
                 intent.putExtra("specialist", doctorDetails.getSpeciality());
                 intent.putExtra("stars", doctorDetails.getReviewStars());
-                intent.putExtra("favourite", doctorDetails.isFavouriteDoctor());
+                AppGlobals.isDoctorFavourite =  doctorDetails.isFavouriteDoctor();
                 intent.putExtra("block", doctorDetails.isBlocked());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
