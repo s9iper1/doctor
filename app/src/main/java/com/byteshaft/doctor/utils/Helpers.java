@@ -278,4 +278,11 @@ public class Helpers {
         return df.format(c.getTime());
     }
 
+    public static String getDateForComparison() {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONTH, 1);
+        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
+        return df.format(c.getTime());
+    }
+
 }
