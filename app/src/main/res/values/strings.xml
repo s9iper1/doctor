@@ -120,6 +120,7 @@
     <string name="my_schedule">My Schedule</string>
     <string name="update_profile">Update profile</string>
     <string name="profile_updated">Profile Successfully updated</string>
+    <string name="cannot_go_back_from_current_date">Cannot go back from current date</string>
 
 </resources>
 

@@ -21,6 +21,7 @@ import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,6 +59,7 @@ public class CalendarView extends LinearLayout {
     private GridView weekGrid;
     private Date selectedDate;
     private CalendarAdapter calendarAdapter;
+    private Context mContext;
 
     public CalendarView(Context context) {
         super(context);
@@ -65,6 +67,7 @@ public class CalendarView extends LinearLayout {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         initControl(context, attrs);
     }
 
@@ -122,8 +125,27 @@ public class CalendarView extends LinearLayout {
         btnPrev.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentDate.add(Calendar.MONTH, -1);
-                updateCalendar();
+                Calendar calendar = (Calendar) currentDate.clone();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                Date dateOne = null;
+                Date dateTwo = null;
+                try {
+                    dateOne = sdf.parse(sdf.format(calendar.getTime()));
+                    dateTwo = sdf.parse(Helpers.getDateForComparison());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Log.i("calendar", "" + sdf.format(calendar.getTime()));
+                Log.i("helpers", "" + Helpers.getDateForHeader());
+                Log.i("TAG", "less then " + String.valueOf(dateOne.compareTo(dateTwo) < 0));
+                Log.i("TAG", "greater then " + String.valueOf(dateOne.compareTo(dateTwo) > 0));
+                if (dateOne.compareTo(dateTwo) < 0) {
+                    Helpers.showSnackBar(getRootView().findViewById(android.R.id.content), R.string.cannot_go_back_from_current_date);
+
+                } else {
+                    currentDate.add(Calendar.MONTH, -1);
+                    updateCalendar();
+                }
             }
         });
 
@@ -170,8 +192,8 @@ public class CalendarView extends LinearLayout {
         calendarAdapter = new CalendarAdapter(getContext(), cells, events);
         grid.setAdapter(calendarAdapter);
         // update title
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
-        txtDate.setText(Helpers.getDateForHeader());
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+        txtDate.setText(sdf.format(currentDate.getTime()));
     }
 
 
