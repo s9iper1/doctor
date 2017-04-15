@@ -181,7 +181,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                 }
             }
         });
-        getStateRequest.open("GET", String.format("%spublic/insurance-carriers/", AppGlobals.BASE_URL));
+        getStateRequest.open("GET", String.format("%sinsurance-carriers/", AppGlobals.BASE_URL));
         getStateRequest.send();
     }
 
@@ -221,7 +221,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                 }
             }
         });
-        getStateRequest.open("GET", String.format("%spublic/states", AppGlobals.BASE_URL));
+        getStateRequest.open("GET", String.format("%sstates", AppGlobals.BASE_URL));
         getStateRequest.send();
     }
 
@@ -245,7 +245,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                         Cities cities = new Cities();
                                         cities.setCityId(jsonObject.getInt("id"));
                                         cities.setCityName(jsonObject.getString("name"));
-                                        cities.setStateId(jsonObject.getInt("state"));
+                                        cities.setStateId(jsonObject.getInt("id"));
                                         if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED) ==
                                                 jsonObject.getInt("id")) {
                                             cityPosition = i;
@@ -263,7 +263,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                 }
             }
         });
-        getCitiesRequest.open("GET", String.format("%spublic/states/%s/cities", AppGlobals.BASE_URL, id));
+        getCitiesRequest.open("GET", String.format("%sstates/%s/cities", AppGlobals.BASE_URL, id));
         getCitiesRequest.send();
     }
 
@@ -397,9 +397,9 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         } else {
             Helpers.showProgressDialog(getActivity(), "Updating your Profile...");
         }
-        data.append(FormData.TYPE_CONTENT_TEXT, "state_id", mStatesSpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "city_id", mCitiesSpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "insurance_carrier_id", mInsuranceCarrierSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "state", mStatesSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "city", mCitiesSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "insurance_carrier", mInsuranceCarrierSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_primary", mPhoneOneEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_secondary", mPhoneTwoEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "emergency_contact", mEmergencyContactString);
