@@ -351,7 +351,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
             method = "PUT";
         }
-        mRequest.open(method, String.format("%suser/profile", AppGlobals.BASE_URL));
+        mRequest.open(method, String.format("%profile", AppGlobals.BASE_URL));
         mRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         mRequest.send(data);

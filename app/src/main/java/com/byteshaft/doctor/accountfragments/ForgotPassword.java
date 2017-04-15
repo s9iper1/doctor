@@ -117,7 +117,7 @@ public class ForgotPassword extends Fragment implements View.OnClickListener, Ht
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%suser/forgot-password", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%sforgot-password", AppGlobals.BASE_URL));
         request.send(getUserPassword(email));
         Helpers.showProgressDialog(getActivity(), "Sending Recovery Mail");
     }
