@@ -114,7 +114,7 @@ public class ResetPassword extends Fragment implements View.OnClickListener, Htt
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%suser/change-password", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%schange-password", AppGlobals.BASE_URL));
         request.send(getUserChangePassword(email, emailotp, newpassword));
         Helpers.showProgressDialog(getActivity(), "Resetting your password");
     }

@@ -142,7 +142,7 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%suser/activate", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%sactivate", AppGlobals.BASE_URL));
         request.send(getUserActivationData(email, emailOtp));
     }
 

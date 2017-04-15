@@ -86,7 +86,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%suser/login", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%slogin", AppGlobals.BASE_URL));
         request.send(getUserLoginData(email, password));
         Helpers.showProgressDialog(getActivity(), "Logging In");
     }
@@ -289,7 +289,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
 
             }
         });
-        request.open("GET", String.format("%suser/profile", AppGlobals.BASE_URL));
+        request.open("GET", String.format("%sprofile", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
