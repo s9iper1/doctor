@@ -330,11 +330,11 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         } else {
             Helpers.showProgressDialog(getActivity(), "Updating your Profile...");
         }
-        data.append(FormData.TYPE_CONTENT_TEXT, "state_id", mStatesSpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "city_id", mCitiesSpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "speciality_id", mSpecialitySpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "affiliate_clinic_id", mAffiliatedClinicsSpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan_id", mSubscriptionSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "state", mStatesSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "city", mCitiesSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "speciality", mSpecialitySpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "affiliate_clinic", mAffiliatedClinicsSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan", mSubscriptionSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_primary", mPhoneOneEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_secondary", mPhoneTwoEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "consultation_time", mConsultationTimeEditTextString);
@@ -351,7 +351,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
             method = "PUT";
         }
-        mRequest.open(method, String.format("%profile", AppGlobals.BASE_URL));
+        mRequest.open(method, String.format("%sprofile", AppGlobals.BASE_URL));
         mRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         mRequest.send(data);
@@ -394,7 +394,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             }
         });
 
-        affiliateClinicRequest.open("GET", String.format("%spublic/clinics/", AppGlobals.BASE_URL));
+        affiliateClinicRequest.open("GET", String.format("%sclinics/", AppGlobals.BASE_URL));
         affiliateClinicRequest.send();
     }
 
@@ -434,7 +434,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             }
         });
 
-        specialitiesRequest.open("GET", String.format("%spublic/specialities", AppGlobals.BASE_URL));
+        specialitiesRequest.open("GET", String.format("%sspecialities", AppGlobals.BASE_URL));
         specialitiesRequest.send();
     }
 
@@ -474,7 +474,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
-        getStateRequest.open("GET", String.format("%spublic/states", AppGlobals.BASE_URL));
+        getStateRequest.open("GET", String.format("%sstates", AppGlobals.BASE_URL));
         getStateRequest.send();
     }
 
@@ -503,8 +503,8 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                                     cityPosition = i;
                                                 }
                                                 cities.setCityName(jsonObject.getString("name"));
-                                                cities.setStateId(jsonObject.getInt("state"));
-                                                cities.setStateName(jsonObject.getString("state_name"));
+                                                cities.setStateId(jsonObject.getInt("id"));
+//                                                cities.setStateName(jsonObject.getString("state_name"));
                                                 citiesList.add(cities);
                                             }
                                             citiesAdapter = new CitiesAdapter(getActivity(), citiesList);
@@ -517,7 +517,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                         }
                     }
                 });
-        getCitiesRequest.open("GET", String.format("%spublic/states/%s/cities", AppGlobals.BASE_URL, id));
+        getCitiesRequest.open("GET", String.format("%sstates/%s/cities", AppGlobals.BASE_URL, id));
         getCitiesRequest.send();
     }
 
@@ -560,7 +560,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
-        getsubTypeRequest.open("GET", String.format("%spublic/subscriptions/", AppGlobals.BASE_URL, id));
+        getsubTypeRequest.open("GET", String.format("%ssubscriptions/", AppGlobals.BASE_URL, id));
         getsubTypeRequest.send();
     }
 
