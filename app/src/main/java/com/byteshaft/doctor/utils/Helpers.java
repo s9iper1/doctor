@@ -295,7 +295,7 @@ public class Helpers {
         HttpRequest request = new HttpRequest(AppGlobals.getContext());
         request.setOnReadyStateChangeListener(readyStateChangeListener);
         request.setOnErrorListener(onErrorListener);
-        request.open("POST", String.format("%spatient/favorite-doctors ", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%spatient/doctors/%s/favorite", AppGlobals.BASE_URL, doctorId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send(getDoctorsId(doctorId));
@@ -313,12 +313,12 @@ public class Helpers {
 
     }
 
-    public static void unFavouriteDoctorTask(int favtId, HttpRequest.OnReadyStateChangeListener
+    public static void unFavouriteDoctorTask(int doctorId, HttpRequest.OnReadyStateChangeListener
             readyStateChangeListener , HttpRequest.OnErrorListener onErrorListener) {
         HttpRequest request = new HttpRequest(AppGlobals.getContext());
         request.setOnReadyStateChangeListener(readyStateChangeListener);
         request.setOnErrorListener(onErrorListener);
-        request.open("DELETE", String.format("%spatient/favorite-doctors/%s", AppGlobals.BASE_URL, favtId));
+        request.open("POST", String.format("%spatient/doctors/%s/unfavorite", AppGlobals.BASE_URL, doctorId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
