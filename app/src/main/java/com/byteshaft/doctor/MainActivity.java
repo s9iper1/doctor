@@ -240,14 +240,13 @@ public class MainActivity extends AppCompatActivity
                 getBitMap(url, profilePicture);
             }
         }
-
     }
 
     private void changeStatus(boolean status) {
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("PATCH", String.format("%suser/profile", AppGlobals.BASE_URL));
+        request.open("PATCH", String.format("%sprofile", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         JSONObject jsonObject = new JSONObject();
