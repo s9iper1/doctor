@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,11 +33,18 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.gettersetter.FavoriteDoctorsList;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.FilterDialog;
 import com.byteshaft.doctor.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -46,15 +54,18 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by s9iper1 on 3/1/17.
  */
 
-public class FavouriteDoctors extends Fragment {
+public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnErrorListener{
 
     private View mBaseView;
     private ListView mListView;
     private HashMap<Integer, String[]> doctorsList;
-    private ArrayList<String> addedDates;
+    private ArrayList<FavoriteDoctorsList> favoriteDoctorsList;
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
     private Toolbar toolbar;
+
+    private HttpRequest request;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -128,7 +139,7 @@ public class FavouriteDoctors extends Fragment {
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
         doctorsList = new HashMap<>();
-        addedDates = new ArrayList<>();
+        favoriteDoctorsList = new ArrayList<>();
         doctorsList.put(0, new String[]{"Bilal", "Dermatologist", "2", "2.5", "9:30", "12-February-2017", "0"});
         doctorsList.put(1, new String[]{"Husnain", "Dermatologist", "2", "3.5", "7:30", "12-February-2017", "1"});
         doctorsList.put(2, new String[]{"shahid", "Dermatologist", "3", "4.5", "5:30", "12-February-2017", "1"});
@@ -136,7 +147,7 @@ public class FavouriteDoctors extends Fragment {
         doctorsList.put(4, new String[]{"Mohsin", "Dermatologist", "6", "3.2", "7:30", "13-February-2017", "1"});
         doctorsList.put(5, new String[]{"Imran Hakeem", "Dermatologist", "8", "2.3", "5:30", "13-February-2017", "1"});
         customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                R.layout.favt_doc_delegate, doctorsList);
+                R.layout.favt_doc_delegate, favoriteDoctorsList);
         mListView.setAdapter(customAdapter);
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -177,21 +188,63 @@ public class FavouriteDoctors extends Fragment {
                 filterDialog.show();
                 return true;
             case R.id.action_location:
-
                 return true;
-            default:return false;
+            default:
+                return false;
         }
     }
 
-    class CustomAdapter extends ArrayAdapter<HashMap<Integer, String[]>> {
+    private void geFavoriteDoctorsList(String date) {
+        request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%spatient/doctors/?date=%s", AppGlobals.BASE_URL, date));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
 
-        private HashMap<Integer, String[]> doctorsList;
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        System.out.println(request.getResponseText());
+                        try {
+                            JSONObject jsonObject = null;
+                            jsonObject = new JSONObject(request.getResponseText());
+                            Log.i("Tag", "data" + jsonObject);
+                            com.byteshaft.doctor.gettersetter.FavoriteDoctorsList myFavoriteDoctorsList = new com.byteshaft.doctor.gettersetter.FavoriteDoctorsList();
+                            myFavoriteDoctorsList.setDoctorsName(jsonObject.getString("first_name") + " " + jsonObject.getString("last_name"));
+                            myFavoriteDoctorsList.setDoctorsLocation(jsonObject.getString("location"));
+                            myFavoriteDoctorsList.setSpeciality(jsonObject.getString("speciality"));
+                            myFavoriteDoctorsList.setDoctorImage(jsonObject.getString("photo"));
+                            myFavoriteDoctorsList.setStars(jsonObject.getInt("review_stars"));
+                            favoriteDoctorsList.add(myFavoriteDoctorsList);
+                            customAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                }
+        }
+    }
+
+
+    class CustomAdapter extends ArrayAdapter<FavoriteDoctorsList> {
+
+        private ArrayList<FavoriteDoctorsList> favoriteDoctorsList;
         private ViewHolder viewHolder;
 
-        public CustomAdapter(Context context, int resource, HashMap<Integer,
-                String[]> doctorsList) {
+        public CustomAdapter(Context context, int resource, ArrayList<FavoriteDoctorsList> favoriteDoctorsList) {
             super(context, resource);
-            this.doctorsList = doctorsList;
+            this.favoriteDoctorsList = favoriteDoctorsList;
         }
 
         @NonNull
@@ -211,7 +264,6 @@ public class FavouriteDoctors extends Fragment {
                 viewHolder.name.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.specialist.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.distance.setTypeface(AppGlobals.typefaceNormal);
-
                 LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
                 viewHolder.timingList.setLayoutManager(layoutManager);
                 convertView.setTag(viewHolder);
