@@ -1,49 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true">
-        <layer-list>
-            <item>
-                <shape android:shape="oval">
-                    <solid android:color="#4CAF50" />
-                    <size
-                        android:width="30dp"
-                        android:height="30dp" />
-                </shape>
-            </item>
-            <item android:left="8dp">
-                <rotate
-                    android:fromDegrees="30"
-                    android:pivotX="-35%"
-                    android:pivotY="-5%">
-                    <shape android:shape="line">
-                        <stroke
-                            android:width="5dip"
-                            android:color="@android:color/white" />
-                    </shape>
-                </rotate>
-            </item>
-            <item>
-                <rotate
-                    android:fromDegrees="-60"
-                    android:pivotX="57%"
-                    android:pivotY="43%">
-                    <shape android:shape="line">
-                        <stroke
-                            android:width="5dip"
-                            android:color="@android:color/white" />
-                    </shape>
-                </rotate>
-            </item>
-        </layer-list>
-    </item>
-    <item android:state_checked="false">
-        <shape android:shape="oval">
-            <solid android:color="@android:color/white" />
-            <size
-                android:width="30dp"
-                android:height="30dp" />
-            <stroke android:width="2px"
-                android:color="@color/greyed_out"/>
-        </shape>
-    </item>
+    <item android:drawable="@drawable/unchecked" android:state_checked="false" />
+    <item android:drawable="@drawable/checked" android:state_checked="true" />
+    <item android:drawable="@drawable/unchecked" />
 </selector>
