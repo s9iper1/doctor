@@ -360,7 +360,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("PATCH", String.format("%sdoctor/schedule", AppGlobals.BASE_URL));
+        request.open("PATCH", String.format("%sdoctor/schedule/", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         JSONObject jsonObject = new JSONObject();
@@ -389,7 +389,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%sdoctor/schedule", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%sdoctor/schedule/", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         JSONObject jsonObject = new JSONObject();
@@ -406,7 +406,8 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 }
             }
             if (jsonArray.length() > 0) {
-                jsonObject.put("items", jsonArray);
+                jsonObject.put("time_slots", jsonArray);
+                Log.i("TAG", jsonObject.toString());
                 request.send(jsonObject.toString());
             }
         } catch (JSONException e) {
