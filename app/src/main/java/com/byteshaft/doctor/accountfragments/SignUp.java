@@ -188,7 +188,7 @@ public class SignUp extends Fragment implements View.OnClickListener,
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%suser/register", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%sregister", AppGlobals.BASE_URL));
         request.send(getRegisterData(password, email, accountType));
         Helpers.showProgressDialog(getActivity(), "Registering User ");
     }
