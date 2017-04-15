@@ -317,7 +317,7 @@ public class MyPatients extends Fragment {
 
             }
         });
-        request.open("GET", String.format("%sdoctor/list-patients", AppGlobals.BASE_URL));
+        request.open("GET", String.format("%sdoctor/patients/", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();

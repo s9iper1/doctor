@@ -218,7 +218,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%spublic/filter-doctors?start_date=%s&end_date=%s",
+        request.open("GET", String.format("%sdoctors/?start_date=%s&end_date=%s",
                 AppGlobals.BASE_URL, Helpers.getDate(), Helpers.getDateNextSevenDays()));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
