@@ -250,7 +250,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                                 jsonObject.getInt("id")) {
                                             cityPosition = i;
                                         }
-                                        cities.setStateName(jsonObject.getString("state_name"));
+//                                        cities.setStateName(jsonObject.getString("state_name"));
                                         citiesList.add(cities);
                                     }
                                     citiesAdapter = new CitiesAdapter(getActivity(), citiesList);

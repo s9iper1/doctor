@@ -6,7 +6,7 @@ package com.byteshaft.doctor.gettersetter;
 
 public class Cities {
 
-    private String stateName;
+//    private String stateName;
     private String cityName;
     private int stateId;
     private int cityId;
@@ -19,13 +19,13 @@ public class Cities {
         this.cityName = cityName;
     }
 
-    public String getStateName() {
-        return stateName;
-    }
-
-    public void setStateName(String stateName) {
-        this.stateName = stateName;
-    }
+//    public String getStateName() {
+//        return stateName;
+//    }
+//
+//    public void setStateName(String stateName) {
+//        this.stateName = stateName;
+//    }
 
     public int getStateId() {
         return stateId;
