@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 
 public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChangeListener,
@@ -39,8 +40,8 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
     private View mBaseView;
     private ListView mListView;
-    private HashMap<String,ArrayList<JSONObject>> scheduleList;
-//    private LinearLayout searchContainer;
+    private HashMap<String, ArrayList<JSONObject>> scheduleList;
+    //    private LinearLayout searchContainer;
     private String currentDate;
     private ArrayList<String> initialTimeSLots;
     private HttpRequest request;
@@ -74,12 +75,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(getActivity(), dateFormat.format(formattedDate) , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
                 currentDate = dateFormat.format(formattedDate);
                 Log.i("TAG", "current date  " + currentDate);
-//                getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
-//                        .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
-//                        ))));
+                getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
+                        .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
+                        ))));
 
             }
         });
@@ -87,9 +88,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         idForDate = new HashMap<>();
         getSchedule(currentDate);
         setHasOptionsMenu(true);
-//        getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
-//                .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
-//        ))));
+        getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
+                .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
+                ))));
         save = (AppCompatButton) mBaseView.findViewById(R.id.save_button);
         save.setOnClickListener(this);
         return mBaseView;
@@ -146,8 +147,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 }
             }
         }
+        getSchedule(currentDate);
         scheduleList.put(currentDate, arrayList);
-        if (scheduleAdapter ==  null){
+        if (scheduleAdapter == null) {
             scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
             mListView.setAdapter(scheduleAdapter);
         } else {
@@ -160,11 +162,11 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_button:
-                if (jsonArray != null && jsonArray.length() > 0) {
-                    updateSchedule();
-                } else {
+//                if (jsonArray != null && jsonArray.length() > 0) {
+//                    updateSchedule();
+//                } else {
                     sendSchedule();
-                }
+//                }
                 break;
         }
     }
@@ -306,8 +308,8 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             for (JSONObject singleJson : jsonObjectJSONArray) {
                 if (singleJson.getInt("taken") == 1) {
                     JSONObject time = new JSONObject();
-                    time.put("start_time", singleJson.get("start_time"));
-                    time.put("end_time", singleJson.get("end_time"));
+                    time.put("start_time", singleJson.get("start_time").toString().trim());
+                    time.put("end_time", singleJson.get("end_time").toString().trim());
                     jsonArray.put(time);
                 }
             }
@@ -327,14 +329,14 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", "response  "+ request.getResponseText());
+                        Log.i("TAG", "response  " + request.getResponseText());
                         ArrayList<String> arrayList = new ArrayList<>();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject object = jsonArray.getJSONObject(i);
-                                Log.i("TAG", "Object "+ object);
+                                Log.i("TAG", "Object " + object);
                                 JSONArray timeSlots = object.getJSONArray("time_slots");
                                 for (int r = 0; r < timeSlots.length(); r++) {
                                     JSONObject timeSlot = timeSlots.getJSONObject(r);
@@ -345,17 +347,19 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             }
                             Log.i("Server", jsonArray.toString());
                             ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
-                            for (int j = 0; j < jsonObjects.size(); j++) {
-                                if (arrayList.contains(jsonObjects.get(j).getString("start_time").trim())) {
-                                    JSONObject slot = jsonObjects.get(j);
-                                    slot.put("taken", 1);
-                                    jsonObjects.remove(j);
-                                    jsonObjects.add(j, slot);
+                            if (jsonObjects.size() > 0) {
+                                for (int j = 0; j < jsonObjects.size(); j++) {
+                                    if (arrayList.contains(jsonObjects.get(j).getString("start_time").trim())) {
+                                        JSONObject slot = jsonObjects.get(j);
+                                        slot.put("taken", 1);
+                                        jsonObjects.remove(j);
+                                        jsonObjects.add(j, slot);
+                                    }
                                 }
+                                scheduleList.put(currentDate, jsonObjects);
+                                scheduleAdapter.notifyDataSetChanged();
+                                Log.i("Server", scheduleList.toString());
                             }
-                            scheduleList.put(currentDate, jsonObjects);
-                            scheduleAdapter.notifyDataSetChanged();
-                            Log.i("Server", scheduleList.toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
