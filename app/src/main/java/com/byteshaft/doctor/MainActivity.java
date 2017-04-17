@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Log.i("TAG", "token  "+ AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
 
         if (AppGlobals.isDoctor()) {
             View headerView;
