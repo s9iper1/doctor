@@ -68,6 +68,7 @@ public class Services extends Fragment implements View.OnClickListener {
         servicesArrayList = new ArrayList<>();
         searchContainer = new LinearLayout(getActivity());
         getServicesListFromAdmin();
+        getDoctorServices();
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -214,6 +215,28 @@ public class Services extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
         request.send(jsonObject.toString());
+    }
+
+    private void getDoctorServices() {
+        HttpRequest request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                request.getResponseText();
+                                Log.i("DOCTOR services", request.getResponseText());
+                        }
+                }
+            }
+        });
+        request.open("GET", String.format("%sdoctor/services/", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 
     private void showPriceDialog() {
