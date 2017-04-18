@@ -56,6 +56,7 @@ public class Services extends Fragment implements View.OnClickListener {
     private Button mSaveButton;
     private ServiceAdapter serviceAdapter;
     private ArrayList<com.byteshaft.doctor.gettersetter.Services> servicesArrayList;
+    private int currentAdapterPosition;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -184,7 +185,38 @@ public class Services extends Fragment implements View.OnClickListener {
         Helpers.showProgressDialog(getActivity(), "Getting Services List" + "\n" + "please wait..");
     }
 
-    private void shwoPriceDialog() {
+    private void setServicePrice(String price) {
+        HttpRequest request = new HttpRequest(getActivity());
+        Helpers.showProgressDialog(getActivity(), "Setting price..");
+        com.byteshaft.doctor.gettersetter.Services services = servicesArrayList.get(currentAdapterPosition);
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_CREATED:
+                                Helpers.showSnackBar(getView(), "Price successfully set");
+                        }
+                }
+            }
+        });
+        request.open("POST", String.format("%sdoctor/services/", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("price", price);
+            jsonObject.put("description", services.getServiceName());
+            jsonObject.put("service", services.getServiceId());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        request.send(jsonObject.toString());
+    }
+
+    private void showPriceDialog() {
         final EditText priceEditText = new EditText(getActivity());
         priceEditText.setHint("Enter Price");
         priceEditText.setFocusable(true);
@@ -196,6 +228,7 @@ public class Services extends Fragment implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String price = String.valueOf(priceEditText.getText());
+                        setServicePrice(price);
                         System.out.println(price);
                     }
                 })
@@ -267,7 +300,8 @@ public class Services extends Fragment implements View.OnClickListener {
             viewHolder.addService.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    shwoPriceDialog();
+                    currentAdapterPosition = position;
+                    showPriceDialog();
                     System.out.println("OKM " + position);
                 }
             });
@@ -297,6 +331,5 @@ public class Services extends Fragment implements View.OnClickListener {
         CheckBox serviceStatus;
         ImageButton removeService;
         ImageButton addService;
-
     }
 }
