@@ -310,14 +310,14 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                         timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
                         timeTableGrid.setAdapter(timeTableAdapter);
                         try {
-                            JSONArray jsonArray = new JSONArray(request.getResponseText());
+                            JSONObject mainObject = new JSONObject(request.getResponseText());
+                            JSONArray jsonArray = mainObject.getJSONArray("time_slots");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 AppointmentDetail appointmentDetail = new AppointmentDetail();
-                                appointmentDetail.setDoctorId(jsonObject.getInt("doctor"));
-                                appointmentDetail.setAppointmentId(jsonObject.getInt("id"));
+                                appointmentDetail.setSlotId(jsonObject.getInt("id"));
                                 appointmentDetail.setStartTime(Helpers.getFormattedTime(jsonObject.getString("start_time")));
-                                appointmentDetail.setState(jsonObject.getString("state"));
+                                appointmentDetail.setState(jsonObject.getBoolean("taken"));
                                 timeSlots.add(appointmentDetail);
                                 timeTableAdapter.notifyDataSetChanged();
                             }
@@ -342,10 +342,10 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         AppointmentDetail appointmentDetail = timeSlots.get(i);
         TextView textView = (TextView) view;
         Log.i("TAG", timeSlots.get(i).getStartTime());
-        if (appointmentDetail.getState().equals("pending")) {
+        if (!appointmentDetail.getState()) {
             textView.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             Intent intent = new Intent(this, CreateAppointmentActivity.class);
-            intent.putExtra("appointment_id", appointmentDetail.getAppointmentId());
+            intent.putExtra("appointment_id", appointmentDetail.getSlotId());
             intent.putExtra("start_time", appointmentDetail.getStartTime());
             intent.putExtra("available_to_chat", availableForChat);
             intent.putExtra("name", drName);
@@ -386,7 +386,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             final AppointmentDetail appointmentDetail = timeTable.get(position);
 
             viewHolder.time.setText(appointmentDetail.getStartTime());
-            if (appointmentDetail.getState().equals("pending")) {
+            if (!appointmentDetail.getState()) {
                 viewHolder.time.setBackground(getResources().getDrawable(R.drawable.normal_time_slot));
             } else {
                 viewHolder.time.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));

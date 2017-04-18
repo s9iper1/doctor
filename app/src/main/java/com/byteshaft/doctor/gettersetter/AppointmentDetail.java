@@ -6,24 +6,24 @@ package com.byteshaft.doctor.gettersetter;
 
 public class AppointmentDetail {
 
-    private int appointmentId;
-    private String state;
+    private int slotId;
+    private boolean state;
     private String startTime;
     private int doctorId;
 
-    public int getAppointmentId() {
-        return appointmentId;
+    public int getSlotId() {
+        return slotId;
     }
 
-    public void setAppointmentId(int appointmentId) {
-        this.appointmentId = appointmentId;
+    public void setSlotId(int slotId) {
+        this.slotId = slotId;
     }
 
-    public String getState() {
+    public boolean getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(boolean state) {
         this.state = state;
     }
 
