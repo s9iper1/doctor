@@ -185,7 +185,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        String url = String.format("%spublic/doctor/%s/schedule?date=%s",
+        String url = String.format("%sdoctors/%s/schedule?date=%s",
                 AppGlobals.BASE_URL, id, targetDate);
         Log.i("TAG", "url" + url);
         request.open("GET", url);

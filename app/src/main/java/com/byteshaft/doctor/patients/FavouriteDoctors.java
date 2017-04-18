@@ -1,5 +1,6 @@
 package com.byteshaft.doctor.patients;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -34,10 +35,12 @@ import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.gettersetter.FavoriteDoctorsList;
+import com.byteshaft.doctor.gettersetter.TimeSlots;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.FilterDialog;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +53,8 @@ import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
+
 /**
  * Created by s9iper1 on 3/1/17.
  */
@@ -59,18 +64,20 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
     private View mBaseView;
     private ListView mListView;
-    private HashMap<Integer, String[]> doctorsList;
+//    private HashMap<Integer, String[]> doctorsList;
     private ArrayList<FavoriteDoctorsList> favoriteDoctorsList;
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
     private Toolbar toolbar;
-
     private HttpRequest request;
+    private HashMap<Integer, ArrayList<TimeSlots>> slotsList;
 
+    @SuppressLint("UseSparseArrays")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.favourite_doctors, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.favt_doctors_list);
+        slotsList = new HashMap<>();
         searchContainer = new LinearLayout(getActivity());
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
@@ -123,9 +130,9 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             @Override
             public void onFocusChange(View view, boolean b) {
                 if (!b) {
-                    customAdapter.notifyDataSetChanged();
+
                 } else {
-                    customAdapter.notifyDataSetChanged();
+
                 }
             }
         });
@@ -138,17 +145,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
-        doctorsList = new HashMap<>();
+        geFavoriteDoctorsList(Helpers.getDate());
         favoriteDoctorsList = new ArrayList<>();
-        doctorsList.put(0, new String[]{"Bilal", "Dermatologist", "2", "2.5", "9:30", "12-February-2017", "0"});
-        doctorsList.put(1, new String[]{"Husnain", "Dermatologist", "2", "3.5", "7:30", "12-February-2017", "1"});
-        doctorsList.put(2, new String[]{"shahid", "Dermatologist", "3", "4.5", "5:30", "12-February-2017", "1"});
-        doctorsList.put(3, new String[]{"Omer", "Dermatologist", "4", "1.5", "6:30", "13-February-2017", "0"});
-        doctorsList.put(4, new String[]{"Mohsin", "Dermatologist", "6", "3.2", "7:30", "13-February-2017", "1"});
-        doctorsList.put(5, new String[]{"Imran Hakeem", "Dermatologist", "8", "2.3", "5:30", "13-February-2017", "1"});
-        customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                R.layout.favt_doc_delegate, favoriteDoctorsList);
-        mListView.setAdapter(customAdapter);
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -181,7 +179,6 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-
                 return true;
             case R.id.action_filter:
                 FilterDialog filterDialog = new FilterDialog(getActivity());
@@ -194,7 +191,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         }
     }
 
-    private void geFavoriteDoctorsList(String date) {
+    public void geFavoriteDoctorsList(String date) {
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -217,18 +214,49 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         System.out.println(request.getResponseText());
+                        System.out.println(request.getResponseURL());
                         try {
-                            JSONObject jsonObject = null;
-                            jsonObject = new JSONObject(request.getResponseText());
-                            Log.i("Tag", "data" + jsonObject);
-                            com.byteshaft.doctor.gettersetter.FavoriteDoctorsList myFavoriteDoctorsList = new com.byteshaft.doctor.gettersetter.FavoriteDoctorsList();
-                            myFavoriteDoctorsList.setDoctorsName(jsonObject.getString("first_name") + " " + jsonObject.getString("last_name"));
-                            myFavoriteDoctorsList.setDoctorsLocation(jsonObject.getString("location"));
-                            myFavoriteDoctorsList.setSpeciality(jsonObject.getString("speciality"));
-                            myFavoriteDoctorsList.setDoctorImage(jsonObject.getString("photo"));
-                            myFavoriteDoctorsList.setStars(jsonObject.getInt("review_stars"));
-                            favoriteDoctorsList.add(myFavoriteDoctorsList);
-                            customAdapter.notifyDataSetChanged();
+                            JSONArray jsonArray = new JSONArray(request.getResponseText());
+                            for (int i= 0; i < jsonArray.length(); i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                com.byteshaft.doctor.gettersetter.FavoriteDoctorsList myFavoriteDoctorsList
+                                        = new com.byteshaft.doctor.gettersetter.FavoriteDoctorsList();
+                                myFavoriteDoctorsList.setDoctorsName(jsonObject.getString("first_name") + " " +
+                                        jsonObject.getString("last_name"));
+                                myFavoriteDoctorsList.setDoctorsLocation(jsonObject.getString("location"));
+                                myFavoriteDoctorsList.setId(jsonObject.getInt("id"));
+                                JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
+                                myFavoriteDoctorsList.setSpeciality(specialityJsonObject.getString("name"));
+                                myFavoriteDoctorsList.setDoctorImage(jsonObject.getString("photo").replace("http://localhost", AppGlobals.SERVER_IP));
+                                myFavoriteDoctorsList.setStars(jsonObject.getInt("review_stars"));
+                                JSONArray dateJSONArray = jsonObject.getJSONArray("schedule");
+                                for (int j= 0; j < dateJSONArray.length(); j++) {
+                                    JSONObject dateJObject = dateJSONArray.getJSONObject(j);
+                                    myFavoriteDoctorsList.setSchduleDate(dateJObject.getString("date"));
+                                    myFavoriteDoctorsList.setTimeId(dateJObject.getInt("id"));
+                                    JSONArray timeJSONArray = dateJObject.getJSONArray("time_slots");
+                                    ArrayList<TimeSlots> arrayList = new ArrayList<>();
+                                    Log.e("TAG", timeJSONArray.toString());
+                                    for (int k= 0; k < timeJSONArray.length(); k++) {
+                                        Log.e("TAG", "slots ");
+                                        JSONObject timeJobject = timeJSONArray.getJSONObject(k);
+                                        TimeSlots timeSlots = new TimeSlots();
+                                        timeSlots.setEndTime(timeJobject.getString("end_time"));
+                                        timeSlots.setStartTime(timeJobject.getString("start_time"));
+                                        timeSlots.setTaken(timeJobject.getBoolean("taken"));
+                                        timeSlots.setSlotId(timeJobject.getInt("id"));
+                                        arrayList.add(timeSlots);
+                                    }
+                                    Log.i("TAG", "arraylist" + arrayList);
+                                    favoriteDoctorsList.add(myFavoriteDoctorsList);
+                                    slotsList.put(jsonObject.getInt("id"), arrayList);
+                                    Log.e("TAG", slotsList.toString());
+                                }
+
+                            }
+                            customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                                    R.layout.favt_doc_delegate, favoriteDoctorsList);
+                            mListView.setAdapter(customAdapter);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -270,37 +298,20 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            viewHolder.name.setText(doctorsList.get(position)[0]);
-            viewHolder.specialist.setText(doctorsList.get(position)[1]);
-            viewHolder.distance.setText(" " + doctorsList.get(position)[2] + " km");
-            viewHolder.review.setRating(Float.parseFloat(doctorsList.get(position)[3]));
-            ArrayList<String> arrayList = new ArrayList();
-            arrayList.add("01:00");
-            arrayList.add("01:30");
-            arrayList.add("02:00");
-            arrayList.add("02:30");
-            arrayList.add("03:00");
-            arrayList.add("03:30");
-            arrayList.add("04:00");
-            arrayList.add("04:30");
-            arrayList.add("05:00");
-            arrayList.add("05:30");
-            arrayList.add("06:00");
-            arrayList.add("06:30");
-            arrayList.add("07:00");
-            arrayList.add("07:30");
-            arrayList.add("08:00");
-            arrayList.add("08:30");
-            arrayList.add("09:00");
-            arrayList.add("09:30");
-            arrayList.add("10:00");
-            arrayList.add("10:30");
-            arrayList.add("11:00");
-            arrayList.add("11:30");
-            arrayList.add("12:00");
-            arrayList.add("12:30");
-
-            TimingAdapter timingAdapter = new TimingAdapter(arrayList);
+            FavoriteDoctorsList favorite = favoriteDoctorsList.get(position);
+            viewHolder.name.setText(favorite.getDoctorsName());
+            String[] startLocation = favorite.getDoctorsLocation().split(",");
+            String[] endLocation = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION).split(",");
+            viewHolder.distance.setText(" " + String.valueOf(calculationByDistance(new LatLng(Double.parseDouble(startLocation[0]),
+                    Double.parseDouble(startLocation[1])), new LatLng(Double.parseDouble(endLocation[0]),
+                    Double.parseDouble(endLocation[1])))) + " " + "km");
+            viewHolder.specialist.setText(favorite.getSpeciality());
+            viewHolder.review.setRating(favorite.getStars());
+            Helpers.getBitMap(favorite.getDoctorImage(), viewHolder.circleImageView);
+            System.out.println(favorite.getDoctorImage() + "image url");
+            TimeSlots timeSlots = slotsList.get(favorite.getId()).get(0);
+            Log.i("TAG", timeSlots.getStartTime());
+            TimingAdapter timingAdapter = new TimingAdapter(slotsList.get(favorite.getId()));
             viewHolder.timingList.canScrollVertically(LinearLayoutManager.VERTICAL);
             viewHolder.timingList.setHasFixedSize(true);
             viewHolder.timingList.setAdapter(timingAdapter);
@@ -309,7 +320,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
         @Override
         public int getCount() {
-            return doctorsList.size();
+            return favoriteDoctorsList.size();
         }
     }
 
@@ -325,10 +336,10 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
     class TimingAdapter extends RecyclerView.Adapter<TimingAdapter.Holder> {
 
-        private ArrayList<String> timingList;
+        private ArrayList<TimeSlots> timingList;
         private Holder holder;
 
-        public TimingAdapter( ArrayList<String> timingList) {
+        public TimingAdapter(ArrayList<TimeSlots> timingList) {
             super();
             this.timingList = timingList;
         }
@@ -344,8 +355,9 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         @Override
         public void onBindViewHolder(final Holder holder, final int position) {
             holder.setIsRecyclable(false);
-            holder.timeButton.setText(timingList.get(position));
-            if (position % 2 == 0) {
+            final TimeSlots timeSlots = timingList.get(position);
+            holder.timeButton.setText(timeSlots.getStartTime());
+            if (timeSlots.isTaken()) {
                 holder.timeButton.setPressed(true);
             } else {
                 holder.timeButton.setPressed(false);
@@ -353,7 +365,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             holder.timeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (position % 2 == 0) {
+                    if (!timeSlots.isTaken()) {
                         holder.timeButton.setPressed(true);
                         startActivity(new Intent(getActivity(), CreateAppointmentActivity.class));
                     } else {
