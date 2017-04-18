@@ -6,7 +6,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp">
+        android:layout_margin="8dp"
+        android:descendantFocusability="afterDescendants">
 
         <TextView
             android:id="@+id/service_name"
@@ -26,11 +27,11 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginRight="18dp"
-            android:visibility="gone"
-            android:layout_toLeftOf="@+id/test_layout"
+            android:layout_toLeftOf="@+id/service_checkbox"
             android:text="100.00"
             android:textSize="16sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:visibility="invisible" />
 
 
         <ImageButton
@@ -40,35 +41,30 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="12dp"
-            android:visibility="invisible"
-            android:background="@mipmap/minus_button" />
+            android:background="@mipmap/minus_button"
+            android:visibility="invisible" />
 
-        <RelativeLayout
-            android:id="@+id/test_layout"
+
+        <CheckBox
+            android:id="@+id/service_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/remove_service">
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/remove_service"
+            android:button="@drawable/circular_checkbox"
+            android:checked="true"
+            android:visibility="invisible" />
 
-            <CheckBox
-                android:id="@+id/service_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:button="@drawable/circular_checkbox"
-                android:checked="true"
-                android:visibility="gone" />
-
-            <ImageButton
-                android:id="@+id/add_service"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:background="@mipmap/action_button"
-                android:button="@drawable/circular_checkbox"
-                android:checked="true"
-                android:gravity="center" />
-        </RelativeLayout>
-
+        <ImageButton
+            android:id="@+id/add_service"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_toLeftOf="@+id/remove_service"
+            android:background="@mipmap/action_button"
+            android:button="@drawable/circular_checkbox"
+            android:clickable="true"
+            android:gravity="center" />
     </RelativeLayout>
 
 </RelativeLayout>
