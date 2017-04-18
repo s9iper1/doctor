@@ -305,7 +305,7 @@ public class Helpers {
     public static String getDoctorsId(int doctorId) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("doctor", doctorId);
+            jsonObject.put("id", doctorId);
         } catch (JSONException e) {
             e.printStackTrace();
         }

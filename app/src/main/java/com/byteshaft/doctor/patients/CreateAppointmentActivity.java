@@ -180,6 +180,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                             }
                                             AppGlobals.favouriteHashMap.put(id, jsonObject);
                                             Log.i("TAG", "adding to hashmap " + id + jsonObject);
+                                            Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + "boolean");
                                             AppGlobals.isDoctorFavourite = true;
                                             favouriteButton.setBackgroundResource(R.mipmap.ic_heart_fill);
                                     }
@@ -192,7 +193,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                         }
                     });
                 } else {
+                    Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + "boolean");
                     if (AppGlobals.favouriteHashMap.containsKey(id)) {
+                        Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + id +"doctor id");
                         try {
                             Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
                                 @Override
@@ -258,7 +261,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%spublic/appointment/%s/request",
+        request.open("POST", String.format("%sappointment/%s/request",
                 AppGlobals.BASE_URL, appointmentId));
         Log.i("TAG", "id " + appointmentId);
         request.setRequestHeader("Authorization", "Token " +

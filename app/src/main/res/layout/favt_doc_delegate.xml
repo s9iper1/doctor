@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     android:orientation="vertical"
     android:padding="5dp">
@@ -11,14 +12,18 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="horizontal"
-        android:padding="5dp"
+        android:padding="2dp"
         android:weightSum="12">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_image"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:layout_weight="2"
+            android:padding="2dp"
+            app:civ_border_color="#FFF"
+            app:civ_border_width="2dp"
+            app:civ_fill_color="@android:color/white"
             android:src="@mipmap/image_placeholder" />
 
         <LinearLayout
@@ -64,17 +69,19 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
+                android:padding="2dp"
+                android:maxLines="1"
+                android:text="Distance"
                 android:drawableLeft="@mipmap/ic_location_dark" />
 
         </LinearLayout>

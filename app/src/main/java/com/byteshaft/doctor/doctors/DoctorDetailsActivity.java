@@ -143,10 +143,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        String url =  String.format("%spublic/doctor/%s/review",
+        String url =  String.format("%sdoctor/%s/review",
                 AppGlobals.BASE_URL, id);
         Log.i("TAG", "url" + url);
-        request.open("GET", String.format("%spublic/doctor/%s/review",
+        request.open("GET", String.format("%sdoctor/%s/review",
                 AppGlobals.BASE_URL, id));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));

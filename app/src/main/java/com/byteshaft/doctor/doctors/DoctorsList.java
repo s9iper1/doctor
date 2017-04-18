@@ -203,6 +203,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("specialist", doctorDetails.getSpeciality());
                 intent.putExtra("stars", doctorDetails.getReviewStars());
                 AppGlobals.isDoctorFavourite =  doctorDetails.isFavouriteDoctor();
+                Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + "boolean");
                 intent.putExtra("block", doctorDetails.isBlocked());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
@@ -283,7 +284,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                     doctorDetails.setGender(doctorDetail.getString("gender"));
                                     doctorDetails.setLocation(doctorDetail.getString("location"));
                                     doctorDetails.setFavouriteDoctor(doctorDetail.getBoolean("is_favorite"));
-                                    doctorDetails.setStartTime(getFormattedTime(doctorDetail.getString("start_time")));
+                                    if (!doctorDetail.isNull("start_time")) {
+                                        doctorDetails.setStartTime(getFormattedTime(doctorDetail.getString("start_time")));
+                                    }
                                     doctorDetails.setBlocked(doctorDetail.getBoolean("am_i_blocked"));
                                     doctorDetails.setPrimaryPhoneNumber(doctorDetail.getString("phone_number_primary"));
                                     if (doctorDetail.has("phone_number_secondary") && !doctorDetail.isNull("phone_number_secondary")) {
