@@ -51,7 +51,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
     private TextView mDoctorName;
     private TextView mDoctorSpeciality;
-    private TextView mtime;
+    private TextView mTime;
     private CircleImageView mDoctorImage;
     private RatingBar mDoctorRating;
     private ImageButton mCallButton;
@@ -67,13 +67,17 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private boolean isBlocked;
     private String startTime;
 
-    private String phonenumber;
+    private String phoneNumber;
     private String drName;
     private String drSpecialist;
     private float drStars;
     private String drPhoto;
     private boolean availableForChat;
+    private static DoctorBookingActivity sInstance;
 
+    public static DoctorBookingActivity getInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_booking);
+        sInstance = this;
         timeTableGrid = (GridView) findViewById(R.id.time_table);
         timeTableGrid.setOnItemClickListener(this);
         timeSlots = new ArrayList<>();
@@ -115,11 +120,11 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mDoctorName = (TextView) findViewById(R.id.doctor_name);
         mDoctorSpeciality = (TextView) findViewById(R.id.doctor_sp);
         mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
-        mtime = (TextView) findViewById(R.id.clock);
+        mTime = (TextView) findViewById(R.id.clock);
 
         mDoctorName.setTypeface(AppGlobals.typefaceNormal);
         mDoctorSpeciality.setTypeface(AppGlobals.typefaceNormal);
-        mtime.setTypeface(AppGlobals.typefaceNormal);
+        mTime.setTypeface(AppGlobals.typefaceNormal);
 
         mDoctorImage = (CircleImageView) findViewById(R.id.profile_image_view_search);
         mCallButton = (ImageButton) findViewById(R.id.call_button);
@@ -137,7 +142,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         drSpecialist = getIntent().getStringExtra("specialist");
         drStars = getIntent().getFloatExtra("stars", 0);
         final boolean favourite = getIntent().getBooleanExtra("favourite", false);
-        phonenumber = getIntent().getStringExtra("number");
+        phoneNumber = getIntent().getStringExtra("number");
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
@@ -156,7 +161,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mDoctorName.setText(drName);
         mDoctorSpeciality.setText(drSpecialist);
         mDoctorRating.setRating(drStars);
-        mtime.setText(startTime);
+        mTime.setText(startTime);
         Helpers.getBitMap(drPhoto, mDoctorImage);
         getSchedule(currentDate);
     }
@@ -204,7 +209,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE},
                             AppGlobals.CALL_PERMISSION);
                 } else {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phonenumber));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber));
                     startActivity(intent);
                 }
                 break;
@@ -349,10 +354,13 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("start_time", appointmentDetail.getStartTime());
             intent.putExtra("available_to_chat", availableForChat);
             intent.putExtra("name", drName);
+            intent.putExtra("user", id);
+            intent.putExtra("time_slot", appointmentDetail.getStartTime());
+            intent.putExtra("appointment_date", currentDate);
 //            intent.putExtra("favourite", AppGlobals.isDoctorFavourite);
             intent.putExtra("block", isBlocked);
             intent.putExtra("photo", drPhoto);
-            intent.putExtra("number", phonenumber);
+            intent.putExtra("number", phoneNumber);
             intent.putExtra("stars", drStars);
             intent.putExtra("specialist", drSpecialist);
             startActivity(intent);
@@ -391,8 +399,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             } else {
                 viewHolder.time.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             }
-
-
             return convertView;
         }
 

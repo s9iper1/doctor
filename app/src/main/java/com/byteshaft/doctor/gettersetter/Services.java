@@ -9,6 +9,16 @@ public class Services {
     private int serviceId;
     private String serviceName;
 
+    public String getServicePrice() {
+        return servicePrice;
+    }
+
+    public void setServicePrice(String servicePrice) {
+        this.servicePrice = servicePrice;
+    }
+
+    private String servicePrice;
+
     public int getServiceId() {
         return serviceId;
     }
