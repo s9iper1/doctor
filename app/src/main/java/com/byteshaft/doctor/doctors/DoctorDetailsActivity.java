@@ -38,7 +38,6 @@ import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -301,9 +300,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 String currentTime = jsonObject.getString("created_at");
                                 Log.i("TAG", currentTime);
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                                dateFormat.setTimeZone(TimeZone.getTimeZone(Calendar.getInstance().getTimeZone().getDisplayName()));
+                                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                Date date = dateFormat.parse(currentTime);
+                                dateFormat.setTimeZone(TimeZone.getDefault());
+                                String formattedDate = dateFormat.format(date);
                                 try {
-                                    review.setReviewTime(getDateDiff(dateFormat.parse(currentTime), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
+                                    review.setReviewTime(getDateDiff(dateFormat.parse(formattedDate), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
                                             TimeUnit.MILLISECONDS));
                                 } catch (ParseException e) {
                                     e.printStackTrace();
@@ -312,6 +314,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 reviewAdapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                 }
