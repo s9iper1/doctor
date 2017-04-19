@@ -164,6 +164,9 @@ public class Appointments extends Fragment implements
                                 Agenda agenda = agendaArrayList.get(position);
                                 agenda.setAgendaState(state);
                                 arrayAdapter.notifyDataSetChanged();
+                                break;
+                            case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
+                                // TODO: 19/04/2017 add dialog for the error 
                         }
                 }
             }
