@@ -195,6 +195,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                         ConversationActivity.class));
                 break;
             case R.id.btn_fav:
+                favouriteButton.setEnabled(false);
                 if (!AppGlobals.isDoctorFavourite) {
                     Helpers.favouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
                         @Override
@@ -202,17 +203,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                             switch (readyState) {
                                 case HttpRequest.STATE_DONE:
                                     switch (request.getStatus()) {
-                                        case HttpURLConnection.HTTP_CREATED:
-                                            Log.i("TAG", "favourite " + request.getResponseText());
-                                            JSONObject jsonObject = null;
-                                            try {
-                                                jsonObject = new JSONObject(request.getResponseText());
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                            AppGlobals.favouriteHashMap.put(id, jsonObject);
-                                            Log.i("TAG", "adding to hashmap " + id + jsonObject);
-                                            Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + "boolean");
+                                        case HttpURLConnection.HTTP_OK:
+                                            favouriteButton.setEnabled(true);
                                             AppGlobals.isDoctorFavourite = true;
                                             favouriteButton.setBackgroundResource(R.mipmap.ic_heart_fill);
                                     }
@@ -221,21 +213,18 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                     }, new HttpRequest.OnErrorListener() {
                         @Override
                         public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
+                            favouriteButton.setEnabled(true);
                         }
                     });
                 } else {
-                    Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + "boolean");
-                    if (AppGlobals.favouriteHashMap.containsKey(id)) {
-                        Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + id +"doctor id");
-                        try {
-                            Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
+                    Helpers.unFavouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
                                 @Override
                                 public void onReadyStateChange(HttpRequest request, int readyState) {
                                     switch (readyState) {
                                         case HttpRequest.STATE_DONE:
                                             switch (request.getStatus()) {
                                                 case HttpURLConnection.HTTP_NO_CONTENT:
+                                                    favouriteButton.setEnabled(true);
                                                     AppGlobals.isDoctorFavourite = false;
                                                     favouriteButton.setBackgroundResource(R.mipmap.ic_empty_heart);
 
@@ -246,13 +235,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                             }, new HttpRequest.OnErrorListener() {
                                 @Override
                                 public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
+                                    favouriteButton.setEnabled(true);
                                 }
                             });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
                 }
                 break;
 
@@ -351,7 +336,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-        Helpers.dismissProgressDialog();
+
 
     }
 

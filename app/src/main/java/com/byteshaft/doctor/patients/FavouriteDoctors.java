@@ -359,16 +359,15 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             holder.setIsRecyclable(false);
             final TimeSlots timeSlots = timingList.get(position);
             holder.timeButton.setText(timeSlots.getStartTime());
-            if (timeSlots.isTaken()) {
-                holder.timeButton.setPressed(true);
+            if (!timeSlots.isTaken()) {
+                holder.timeButton.setBackground(getResources().getDrawable(R.drawable.normal_time_slot));
             } else {
-                holder.timeButton.setPressed(false);
+                holder.timeButton.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             }
             holder.timeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (!timeSlots.isTaken()) {
-                        holder.timeButton.setPressed(true);
                         startActivity(new Intent(getActivity(), CreateAppointmentActivity.class));
                     } else {
                         Helpers.showSnackBar(getView(), R.string.time_slot_booked);
