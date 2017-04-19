@@ -149,19 +149,55 @@ public class Appointments extends Fragment implements
         request.send();
     }
 
+    private void updateAppointmentStatus(final String state, int id, final int position) {
+        HttpRequest request = new HttpRequest(getActivity());
+        Helpers.showProgressDialog(getActivity(), "Please wait..");
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                Helpers.showSnackBar(getView(), "Appointment " + state);
+                                Agenda agenda = agendaArrayList.get(position);
+                                agenda.setAgendaState(state);
+                                arrayAdapter.notifyDataSetChanged();
+                        }
+                }
+            }
+        });
+        request.open("PATCH", String.format("%sdoctor/appointments/%d", AppGlobals.BASE_URL, id));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("state", state);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        request.send(jsonObject.toString());
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                Agenda agenda = agendaArrayList.get(position);
                 switch (index) {
                     // close
                     case 0:
+                        String rejected = "rejected";
+                        updateAppointmentStatus(rejected, agenda.getAgendaId(), position);
                         Log.i("TAG", "Rejected");
                         return true;
                     // tick
                     case 1:
+                        String accepted = "accepted";
+                        updateAppointmentStatus(accepted, agenda.getAgendaId(), position);
                         Log.i("TAG", "Accepted");
                         return true;
                     default:
@@ -276,7 +312,7 @@ public class Appointments extends Fragment implements
             // setting values
             Agenda agenda = agendaArrayList.get(position);
             System.out.println("Photo Url: " + agenda.getPhotoUrl());
-            Helpers.getBitMap(agenda.getPhotoUrl(), viewHolder.patientImage);
+            Helpers.getBitMap(String.format(AppGlobals.SERVER_IP + "%s", agenda.getPhotoUrl()), viewHolder.patientImage);
 
             if (agenda.isAvailAbleForChat()) {
                 viewHolder.chatStatus.setImageDrawable(
@@ -298,13 +334,13 @@ public class Appointments extends Fragment implements
                 e.printStackTrace();
             }
             String state = agenda.getAgendaState();
-            if (state.contains("pending")) {
+            if (state.contains(AppGlobals.PENDING)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.pending_background_color));
-            } else if (state.contains("attended")) {
+            } else if (state.contains(AppGlobals.ACCEPTED)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.attended_background_color));
-            } else if (state.contains("rejected")) {
+            } else if (state.contains(AppGlobals.REJCTED)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.reject_background));
             }
