@@ -26,7 +26,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -68,7 +67,6 @@ public class Services extends Fragment implements View.OnClickListener {
         servicesArrayList = new ArrayList<>();
         searchContainer = new LinearLayout(getActivity());
         getServicesListFromAdmin();
-        getDoctorServices();
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
                 (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -168,12 +166,14 @@ public class Services extends Fragment implements View.OnClickListener {
                                         JSONObject jsonObject = array.getJSONObject(i);
                                         com.byteshaft.doctor.gettersetter.Services services =
                                                 new com.byteshaft.doctor.gettersetter.Services();
-                                        services.setServiceId(jsonObject.getInt("id"));
+                                        services.setId(jsonObject.getInt("id"));
                                         services.setServiceName(jsonObject.getString("name"));
+                                        services.setStatus(false);
                                         servicesArrayList.add(services);
                                     }
                                     serviceAdapter = new ServiceAdapter(servicesArrayList);
                                     serviceList.setAdapter(serviceAdapter);
+                                    getDoctorServices();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -183,7 +183,7 @@ public class Services extends Fragment implements View.OnClickListener {
         });
         mRequestServiceList.open("GET", String.format("%sservices", AppGlobals.BASE_URL));
         mRequestServiceList.send();
-        Helpers.showProgressDialog(getActivity(), "Getting Services List" + "\n" + "please wait..");
+        Helpers.showProgressDialog(getActivity(), "Getting services list" + "\n" + "please wait..");
     }
 
     private void setServicePrice(String price) {
@@ -198,6 +198,7 @@ public class Services extends Fragment implements View.OnClickListener {
                         Helpers.dismissProgressDialog();
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_CREATED:
+                                getDoctorServices();
                                 Helpers.showSnackBar(getView(), "Price successfully set");
                         }
                 }
@@ -210,7 +211,7 @@ public class Services extends Fragment implements View.OnClickListener {
         try {
             jsonObject.put("price", price);
             jsonObject.put("description", services.getServiceName());
-            jsonObject.put("service", services.getServiceId());
+            jsonObject.put("service", services.getId());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -229,6 +230,27 @@ public class Services extends Fragment implements View.OnClickListener {
                             case HttpURLConnection.HTTP_OK:
                                 request.getResponseText();
                                 Log.i("DOCTOR services", request.getResponseText());
+                                try {
+                                    JSONObject object = new JSONObject(request.getResponseText());
+                                    JSONArray jsonArray = object.getJSONArray("results");
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        JSONObject serviceObject = jsonObject.getJSONObject("service");
+                                        int serviceId = serviceObject.getInt("id");
+                                        for (com.byteshaft.doctor.gettersetter.Services service :
+                                                servicesArrayList) {
+                                            if (serviceId == service.getId()) {
+                                                service.setServiceId(jsonObject.getInt("id"));
+                                                service.setDescription(jsonObject.getString("description"));
+                                                service.setPrice(jsonObject.getString("price"));
+                                                service.setStatus(true);
+                                                serviceAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                         }
                 }
             }
@@ -305,9 +327,11 @@ public class Services extends Fragment implements View.OnClickListener {
                 viewHolder = new ViewHolder();
                 viewHolder.serviceName = (TextView) convertView.findViewById(R.id.service_name);
                 viewHolder.servicePrice = (TextView) convertView.findViewById(R.id.service_price);
-                viewHolder.serviceStatus = (CheckBox) convertView.findViewById(R.id.service_checkbox);
+                viewHolder.serviceCheckBox = (ImageButton) convertView.findViewById(R.id.service_checkbox);
                 viewHolder.removeService = (ImageButton) convertView.findViewById(R.id.remove_service);
                 viewHolder.addService = (ImageButton) convertView.findViewById(R.id.add_service);
+                viewHolder.servicePrice.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.serviceName.setTypeface(AppGlobals.typefaceNormal);
                 AppGlobals.buttonEffect(viewHolder.addService);
                 convertView.setTag(viewHolder);
             } else {
@@ -329,6 +353,18 @@ public class Services extends Fragment implements View.OnClickListener {
                 }
             });
             viewHolder.serviceName.setText(services.getServiceName());
+            AppGlobals.buttonEffect(viewHolder.removeService);
+            viewHolder.servicePrice.setText(services.getPrice());
+            if (services.getStatus()) {
+                viewHolder.servicePrice.setVisibility(View.VISIBLE);
+                viewHolder.serviceCheckBox.setVisibility(View.VISIBLE);
+                viewHolder.removeService.setVisibility(View.VISIBLE);
+                viewHolder.addService.setVisibility(View.GONE);
+            } else {
+                viewHolder.serviceCheckBox.setVisibility(View.GONE);
+                viewHolder.removeService.setVisibility(View.INVISIBLE);
+                viewHolder.addService.setVisibility(View.VISIBLE);
+            }
             return convertView;
         }
 
@@ -351,7 +387,7 @@ public class Services extends Fragment implements View.OnClickListener {
     class ViewHolder {
         TextView serviceName;
         TextView servicePrice;
-        CheckBox serviceStatus;
+        ImageButton serviceCheckBox;
         ImageButton removeService;
         ImageButton addService;
     }

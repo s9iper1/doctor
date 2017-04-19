@@ -1,12 +1,9 @@
 package com.byteshaft.doctor.gettersetter;
 
-/**
- * Created by s9iper1 on 4/10/17.
- */
 
 public class Services {
 
-    private int serviceId;
+    private int id;
     private String serviceName;
 
     public int getServiceId() {
@@ -15,6 +12,48 @@ public class Services {
 
     public void setServiceId(int serviceId) {
         this.serviceId = serviceId;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    private int serviceId;
+    private String price;
+    private String description;
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    boolean status;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getServiceName() {
