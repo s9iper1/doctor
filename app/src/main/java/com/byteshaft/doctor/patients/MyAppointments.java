@@ -30,10 +30,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.gettersetter.PatientAppointment;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -41,11 +48,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static com.byteshaft.doctor.utils.Helpers.getBitMap;
 
 
-public class MyAppointments extends Fragment {
+public class MyAppointments extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private ListView appointmentList;
-    private ArrayList<String[]> appointments;
+    private ArrayList<PatientAppointment> appointments;
     private LinearLayout searchContainer;
     private EditText toolbarSearchView;
 
@@ -54,12 +61,15 @@ public class MyAppointments extends Fragment {
     private TextView patientAge;
     private CircleImageView profilePicture;
     private Toolbar toolbar;
+    private HttpRequest request;
+    private Adapter patientAppointmentAdapter;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.patient_my_appointment, container, false);
         setHasOptionsMenu(true);
+        getPatientAppointments();
         searchContainer = new LinearLayout(getActivity());
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
@@ -140,14 +150,8 @@ public class MyAppointments extends Fragment {
         toolbar.addView(searchContainer);
         appointments = new ArrayList<>();
         appointmentList = (ListView) mBaseView.findViewById(R.id.patient_appointment);
-        appointments.add(new String[]{"10-2-2017", "10:00", "Dr Shahid", "Dermatology", "Service details", "A"});
-        appointments.add(new String[]{"11-2-2017", "12:00", "Dr Bilal", "ENT", "Service details", "C"});
-        appointments.add(new String[]{"12-2-2017", "14:00", "Dr Mohsin", "Child specialist", "Service details", "P"});
-        appointments.add(new String[]{"12-2-2017", "16:00", "Dr Zeshan", "Chest Specialist", "Service details", "C"});
-        appointments.add(new String[]{"14-2-2017", "11:00", "Dr Hussnain", "FCPS", "Service details", "P"});
-        appointments.add(new String[]{"16-2-2017", "13:00", "Dr Karobar", "Dermatologist", "Service details", "A"});
-        appointmentList.setAdapter(new Adapter(getContext(), appointments));
-
+        patientAppointmentAdapter = new Adapter(getContext(), appointments);
+        appointmentList.setAdapter(patientAppointmentAdapter);
         patientName = (TextView) mBaseView.findViewById(R.id.patient_name_dashboard);
         patientEmail = (TextView) mBaseView.findViewById(R.id.patient_email);
         patientAge = (TextView) mBaseView.findViewById(R.id.patient_age);
@@ -200,12 +204,64 @@ public class MyAppointments extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    class Adapter extends ArrayAdapter<String> {
+    private void getPatientAppointments() {
+        request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%spatient/appointments/", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
 
-        private ArrayList<String[]> appointmentsList;
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "patient appointments " + request.getResponseText());
+                        try {
+                            JSONObject jsonObject = new JSONObject(request.getResponseText());
+                            JSONArray jsonArray = jsonObject.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject appointmentObject = jsonArray.getJSONObject(i);
+                                PatientAppointment appointment = new PatientAppointment();
+                                appointment.setDate(appointmentObject.getString("created_at"));
+                                JSONObject doctorObject = appointmentObject.getJSONObject("doctor");
+                                appointment.setDrFirstName(doctorObject.getString("first_name"));
+                                JSONObject specialityJsonObject = doctorObject.getJSONObject("speciality");
+                                appointment.setDrSpeciality(specialityJsonObject.getString("name"));
+                                JSONArray serviceArray = appointmentObject.getJSONArray("services");
+                                for (int j = 0; j < serviceArray.length(); j++) {
+                                    JSONObject service =  serviceArray.getJSONObject(j);
+                                    JSONObject serviceDetail = service.getJSONObject("service");
+                                    appointment.setServiceName(serviceDetail.getString("name"));
+                                }
+                                appointment.setAppointmentTime(appointmentObject.getString("start_time"));
+                                appointment.setState(appointmentObject.getString("state"));
+                                patientAppointmentAdapter.notifyDataSetChanged();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                }
+        }
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+    }
+
+    private class Adapter extends ArrayAdapter<PatientAppointment> {
+
+        private ArrayList<PatientAppointment> appointmentsList;
         private ViewHolder viewHolder;
 
-        public Adapter(Context context, ArrayList<String[]> appointmentsList) {
+        public Adapter(Context context, ArrayList<PatientAppointment> appointmentsList) {
             super(context, R.layout.delegate_p_appointment_history);
             this.appointmentsList = appointmentsList;
         }
@@ -226,11 +282,10 @@ public class MyAppointments extends Fragment {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-
-            viewHolder.appointmentDate.setText(appointmentsList.get(position)[0]);
-            viewHolder.appointmentTime.setText(appointmentsList.get(position)[1]);
-            viewHolder.doctorName.setText(appointmentsList.get(position)[2] + " - " + appointmentsList.get(position)[3]);
-
+            PatientAppointment appointment = appointmentsList.get(position);
+            viewHolder.appointmentDate.setText(appointment.getDate());
+            viewHolder.appointmentTime.setText(appointment.getAppointmentTime());
+            viewHolder.doctorName.setText(appointment.getDrFirstName() + " " + appointment.getDrSpeciality());
 
             TextPaint paint = viewHolder.doctorName.getPaint();
             Rect rect = new Rect();
@@ -240,30 +295,30 @@ public class MyAppointments extends Fragment {
                     viewHolder.doctorName.getWidth()) {
                 Log.i("My Appointments", "Your text is too large");
                 String specialist;
-                if (appointmentsList.get(position)[3].length() > 7) {
-                    specialist = appointmentsList.get(position)[3].substring(0, 7
+                if (appointment.getDrSpeciality().length() > 7) {
+                    specialist = appointment.getDrSpeciality().substring(0, 7
                     ).trim() + "…";
                 } else {
-                    specialist = appointmentsList.get(position)[3];
+                    specialist = appointment.getDrSpeciality();
                 }
-                viewHolder.doctorName.setText(appointmentsList.get(position)[2] + " - " + specialist);
+                viewHolder.doctorName.setText(appointment.getDrFirstName() + " - " + specialist);
 
             }
 
 
-            viewHolder.serviceDescription.setText(appointmentsList.get(position)[4]);
-            switch (appointmentsList.get(position)[5]) {
-                case "A":
+            viewHolder.serviceDescription.setText(appointment.getServiceName());
+            switch (appointment.getState()) {
+                case "accepted":
                     viewHolder.appointmentStatus.setText("A");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.attended_background_color));
                     break;
-                case "C":
+                case "C]rejected":
                     viewHolder.appointmentStatus.setText("C");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.cancel_background_color));
                     break;
-                case "P":
+                case "pending":
                     viewHolder.appointmentStatus.setText("P");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.pending_background_color));
