@@ -14,15 +14,12 @@
 
         <RelativeLayout
             android:id="@+id/board"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:layout_marginTop="8dp"
             android:background="#3F3F3F"
-            android:padding="15dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:padding="15dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/doctor_image"
@@ -35,8 +32,8 @@
                 android:id="@+id/status"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
-                android:layout_marginRight="100dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_toRightOf="@+id/doctor_image"
                 android:src="@mipmap/ic_offline_indicator" />
 
@@ -101,7 +98,7 @@
                     android:id="@+id/starts_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:singleLine="true"
+                    android:maxLines="1"
                     android:layout_centerHorizontal="true"
                     android:layout_centerInParent="true"
                     android:layout_toRightOf="@+id/image_time"
@@ -262,7 +259,8 @@
                 android:id="@+id/tv_total"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:editable="true"
+                android:enabled="false"
+                android:focusable="false"
                 android:gravity="center"
                 android:text=""
                 android:textSize="18sp" />
