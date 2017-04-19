@@ -17,7 +17,7 @@
             android:layout_marginRight="8dp"
             android:singleLine="true"
             android:text="Service Name"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
@@ -28,15 +28,15 @@
             android:layout_toLeftOf="@+id/service_checkbox"
             android:layout_marginRight="12dp"
             android:text="100.00"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="invisible" />
 
 
         <ImageButton
             android:id="@+id/remove_service"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="4dp"
@@ -46,8 +46,8 @@
 
         <ImageButton
             android:id="@+id/service_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/remove_service"
             android:background="@mipmap/ic_tick"
@@ -56,8 +56,8 @@
 
         <ImageButton
             android:id="@+id/add_service"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_gravity="center"
             android:visibility="invisible"
             android:layout_toLeftOf="@+id/remove_service"

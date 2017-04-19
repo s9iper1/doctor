@@ -218,6 +218,33 @@ public class Services extends Fragment implements View.OnClickListener {
         request.send(jsonObject.toString());
     }
 
+    private void removeService(int id, final int itemPosition) {
+        HttpRequest request = new HttpRequest(getActivity());
+        Helpers.showProgressDialog(getActivity(), "Removing Service...");
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_NO_CONTENT:
+                                com.byteshaft.doctor.gettersetter.Services services = servicesArrayList.get(itemPosition);
+                                services.setStatus(false);
+                                services.setPrice("");
+                                services.setServiceId(-1);
+                                serviceAdapter.notifyDataSetChanged();
+                                Helpers.showSnackBar(getView(), "Service removed");
+                        }
+                }
+            }
+        });
+        request.open("DELETE", String.format("%sdoctor/services/%d", AppGlobals.BASE_URL, id));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
     private void getDoctorServices() {
         HttpRequest request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
@@ -268,6 +295,7 @@ public class Services extends Fragment implements View.OnClickListener {
         priceEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setTitle("Add your price to this service")
+                .setCancelable(false)
                 .setView(priceEditText)
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
@@ -280,6 +308,20 @@ public class Services extends Fragment implements View.OnClickListener {
                 .setNegativeButton("Cancel", null)
                 .create();
         dialog.show();
+    }
+
+    private void confirmationDialog(final int serviceId, final int itemPosition) {
+        new AlertDialog.Builder(getActivity())
+                .setCancelable(false)
+                .setTitle("Delete Service")
+                .setMessage("Do you really want to delete?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        removeService(serviceId, itemPosition);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     @Override
@@ -337,11 +379,11 @@ public class Services extends Fragment implements View.OnClickListener {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            com.byteshaft.doctor.gettersetter.Services services = servicesArrayList.get(position);
+            final com.byteshaft.doctor.gettersetter.Services services = servicesArrayList.get(position);
             viewHolder.removeService.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    System.out.println("Remove position  " + position);
+                    confirmationDialog(services.getServiceId(), position);
                 }
             });
             viewHolder.addService.setOnClickListener(new View.OnClickListener() {
@@ -349,7 +391,6 @@ public class Services extends Fragment implements View.OnClickListener {
                 public void onClick(View view) {
                     currentAdapterPosition = position;
                     showPriceDialog();
-                    System.out.println("OKM " + position);
                 }
             });
             viewHolder.serviceName.setText(services.getServiceName());
