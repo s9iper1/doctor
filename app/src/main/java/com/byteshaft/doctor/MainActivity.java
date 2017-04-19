@@ -391,7 +391,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         isError = true;
-        Helpers.showSnackBar(findViewById(android.R.id.content), R.string.check_internet);
+        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
         if (!AppGlobals.isDoctor()) {
             new android.os.Handler().postDelayed(new Runnable() {
                 @Override

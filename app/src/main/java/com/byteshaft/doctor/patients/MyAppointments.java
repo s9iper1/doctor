@@ -258,7 +258,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
-        Helpers.showSnackBar(getView(), exception.getMessage());
+        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
     }
 
     private class Adapter extends ArrayAdapter<PatientAppointment> {

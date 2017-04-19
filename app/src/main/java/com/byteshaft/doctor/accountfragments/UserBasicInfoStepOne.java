@@ -482,9 +482,6 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
-//                else if (items[item].equals("Remove photo")) {
-//                    mProfilePicture.setImageDrawable(null);
-//                }
 
             }
         });
