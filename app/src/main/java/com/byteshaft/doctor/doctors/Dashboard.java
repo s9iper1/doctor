@@ -47,6 +47,8 @@ public class Dashboard extends Fragment {
         doctorImage = (CircleImageView) mBaseView.findViewById(R.id.doctor_image);
         list = (RecyclerView) mBaseView.findViewById(R.id.dashboard_list);
         mChart = (BarChart) mBaseView.findViewById(R.id.chart);
+        mChart.setPinchZoom(false);
+        mChart.animateXY(2000, 2000);
 
         ArrayList<BarEntry> list = new ArrayList<>();
         list.add(new BarEntry(1, 2));
