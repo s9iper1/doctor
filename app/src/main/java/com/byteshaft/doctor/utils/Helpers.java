@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -70,18 +71,15 @@ public class Helpers {
 
     }
 
-    public static void alertDialog(Activity activity, String title, String msg, final Runnable runnable) {
+    public static void alertDialog(Activity activity, String title, String msg, final SwitchCompat compat) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setTitle(title);
         alertDialogBuilder.setMessage(msg).setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                if (compat != null) {
+                    compat.setChecked(false);
+                }
                 dialog.dismiss();
-            }
-        });
-        alertDialogBuilder.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                runnable.run();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();

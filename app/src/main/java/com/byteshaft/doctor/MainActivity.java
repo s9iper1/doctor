@@ -376,6 +376,14 @@ public class MainActivity extends AppCompatActivity
                             doctorOnlineSwitch.setEnabled(true);
                             AppGlobals.saveChatStatus(doctorOnlineSwitch.isChecked());
                         }
+                        break;
+                    case HttpURLConnection.HTTP_UNAUTHORIZED:
+                        if (AppGlobals.isDoctor()) {
+                            Helpers.alertDialog(this, getResources().getString(R.string.account),
+                                    getResources().getString(R.string.account_not_activated),
+                                    doctorOnlineSwitch);
+
+                        }
                 }
         }
     }

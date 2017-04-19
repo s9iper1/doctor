@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -74,6 +75,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private String drPhoto;
     private boolean availableForChat;
     private static DoctorBookingActivity sInstance;
+    private ProgressBar progressBar;
 
     public static DoctorBookingActivity getInstance() {
         return sInstance;
@@ -85,6 +87,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_booking);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         sInstance = this;
         timeTableGrid = (GridView) findViewById(R.id.time_table);
         timeTableGrid.setOnItemClickListener(this);
@@ -187,6 +190,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     }
 
     private void getSchedule(String targetDate) {
+        progressBar.setVisibility(View.VISIBLE);
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -308,6 +312,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                progressBar.setVisibility(View.GONE);
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
@@ -338,7 +343,8 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
+        progressBar.setVisibility(View.GONE);
+        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getMessage());
     }
 
 
@@ -357,7 +363,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("user", id);
             intent.putExtra("time_slot", appointmentDetail.getStartTime());
             intent.putExtra("appointment_date", currentDate);
-//            intent.putExtra("favourite", AppGlobals.isDoctorFavourite);
             intent.putExtra("block", isBlocked);
             intent.putExtra("photo", drPhoto);
             intent.putExtra("number", phoneNumber);
