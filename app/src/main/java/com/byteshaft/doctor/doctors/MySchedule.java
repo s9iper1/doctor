@@ -294,6 +294,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     }
 
     private void sendSchedule() {
+        Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_schedule));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -327,6 +328,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response  " + request.getResponseText());
@@ -367,6 +369,10 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     case HttpURLConnection.HTTP_CREATED:
                         Helpers.showSnackBar(getView(), R.string.success);
                         break;
+                    case HttpURLConnection.HTTP_UNAUTHORIZED:
+                        Helpers.alertDialog(getActivity(), getResources().getString(R.string.account),
+                                getResources().getString(R.string.account_not_activated), null);
+                        break;
                 }
         }
 
@@ -374,6 +380,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        Helpers.dismissProgressDialog();
 
     }
 }

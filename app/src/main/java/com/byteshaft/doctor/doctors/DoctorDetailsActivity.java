@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -68,6 +69,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ListView reviewList;
     private ReviewAdapter reviewAdapter;
     private static DoctorDetailsActivity sInstance;
+    private ProgressBar progressBar;
 
     public static DoctorDetailsActivity getInstance() {
         return sInstance;
@@ -102,6 +104,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         chatButton = (ImageButton) findViewById(R.id.message_button);
         heartButton = (ImageButton) findViewById(R.id.heart_button);
         status = (ImageView) findViewById(R.id.status);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.GONE);
 
         // setting typeface
         doctorName.setTypeface(AppGlobals.typefaceNormal);
@@ -147,6 +151,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     }
 
     private void getReviews() {
+        progressBar.setVisibility(View.VISIBLE);
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -283,6 +288,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                progressBar.setVisibility(View.GONE);
+                reviewList.setVisibility(View.VISIBLE);
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "review "+ request.getResponseText());
@@ -324,6 +331,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        progressBar.setVisibility(View.GONE);
+        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getMessage());
 
     }
 

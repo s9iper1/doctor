@@ -225,6 +225,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     }
 
     private void getDoctorList() {
+        Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_doctor_list));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -270,6 +271,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
@@ -338,6 +340,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        Helpers.dismissProgressDialog();
+        Helpers.showSnackBar(getView(), exception.getMessage());
     }
 
     private class CustomAdapter extends ArrayAdapter<ArrayList<DoctorDetails>> {
