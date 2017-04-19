@@ -39,7 +39,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
-import com.byteshaft.doctor.gettersetter.DoctorDetails;
+import com.byteshaft.doctor.gettersetter.*;
+import com.byteshaft.doctor.gettersetter.Services;
 import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.patients.DoctorsLocator;
 import com.byteshaft.doctor.utils.AppGlobals;
@@ -81,10 +82,19 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private TextView noDoctor;
     private Toolbar toolbar;
 
+    public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
+    private static DoctorsList sInstnace;
+
+    public static DoctorsList getInstance() {
+        return sInstnace;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         doctors = new ArrayList<>();
+        sDoctorServices = new HashMap<>();
         getDoctorList();
+        sInstnace = this;
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
         noDoctor = (TextView) mBaseView.findViewById(R.id.no_doctor);
@@ -203,7 +213,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("specialist", doctorDetails.getSpeciality());
                 intent.putExtra("stars", doctorDetails.getReviewStars());
                 AppGlobals.isDoctorFavourite =  doctorDetails.isFavouriteDoctor();
-                Log.i("Tag", String.valueOf(AppGlobals.isDoctorFavourite) + "boolean");
                 intent.putExtra("block", doctorDetails.isBlocked());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
@@ -263,7 +272,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", "data " + request.getResponseText());
+                        Log.i("TAG", "response " + request.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
@@ -297,6 +306,20 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                     doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
                                     doctors.add(doctorDetails);
                                     customAdapter.notifyDataSetChanged();
+                                    JSONArray services = doctorDetail.getJSONArray("services");
+                                    if (services.length() > 0) {
+                                        ArrayList<Services> servicesArrayList = new ArrayList<>();
+                                        for (int s = 0; s < services.length(); s++) {
+                                            JSONObject singleService = services.getJSONObject(s);
+                                            Services service = new Services();
+                                            service.setServiceId(singleService.getInt("id"));
+                                            JSONObject internalObject = singleService.getJSONObject("service");
+                                            service.setServiceName(internalObject.getString("name"));
+                                            service.setServicePrice(singleService.getString("price"));
+                                            servicesArrayList.add(service);
+                                        }
+                                        sDoctorServices.put(doctorDetail.getInt("id"), servicesArrayList);
+                                    }
                                 }
                                 if (doctors.size() < 1) {
                                     mListView.setVisibility(GONE);
@@ -310,11 +333,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                         break;
                 }
         }
+        Log.i("TAG", sDoctorServices.toString());
     }
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
     }
 
     private class CustomAdapter extends ArrayAdapter<ArrayList<DoctorDetails>> {

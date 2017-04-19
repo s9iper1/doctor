@@ -121,6 +121,8 @@
     <string name="update_profile">Update profile</string>
     <string name="profile_updated">Profile Successfully updated</string>
     <string name="cannot_go_back_from_current_date">Cannot go back from current date</string>
+    <string name="please_enter_appointment_reason">please enter appointment reason</string>
+    <string name="appointment_created">Appointment Created</string>
 
 </resources>
 

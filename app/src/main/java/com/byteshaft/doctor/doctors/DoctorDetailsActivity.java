@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -66,6 +67,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ArrayList<Review> arrayList;
     private ListView reviewList;
     private ReviewAdapter reviewAdapter;
+    private static DoctorDetailsActivity sInstance;
+
+    public static DoctorDetailsActivity getInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +79,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_doctor_details);
+        sInstance = this;
         reviewList = (ListView) findViewById(R.id.review_list);
         startTime = getIntent().getStringExtra("start_time");
         final String name = getIntent().getStringExtra("name");
@@ -143,10 +150,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        String url =  String.format("%sdoctor/%s/review",
+        String url =  String.format("%sdoctors/%s/review",
                 AppGlobals.BASE_URL, id);
         Log.i("TAG", "url" + url);
-        request.open("GET", String.format("%sdoctor/%s/review",
+        request.open("GET", String.format("%sdoctors/%s/review",
                 AppGlobals.BASE_URL, id));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -291,9 +298,14 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 review.setReviewText(jsonObject.getString("message"));
                                 review.setReviewStars(jsonObject.getInt("stars"));
                                 String currentTime = jsonObject.getString("created_at");
+                                Log.i("TAG", currentTime);
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                Date date = dateFormat.parse(currentTime);
+                                dateFormat.setTimeZone(TimeZone.getDefault());
+                                String formattedDate = dateFormat.format(date);
                                 try {
-                                    review.setReviewTime(getDateDiff(dateFormat.parse(currentTime), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
+                                    review.setReviewTime(getDateDiff(dateFormat.parse(formattedDate), dateFormat.parse(Helpers.getCurrentTimeAndDate()),
                                             TimeUnit.MILLISECONDS));
                                 } catch (ParseException e) {
                                     e.printStackTrace();
@@ -302,6 +314,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 reviewAdapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
                 }
@@ -344,15 +358,18 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             }
             Review review = arrayList.get(position);
             viewHolder.userRating.setRating(review.getReviewStars());
-            String output = review.getReviewText().substring(0, 1).toUpperCase() +
-                    review.getReviewText().substring(1);
-            viewHolder.userComment.setText(output);
+            if (review.getReviewText().length() > 1) {
+                String output = review.getReviewText().substring(0, 1).toUpperCase() +
+                        review.getReviewText().substring(1);
+                viewHolder.userComment.setText(output);
+            }
+            Log.i("TAG", "time " + review.getReviewTime());
             viewHolder.time.setText(timeConvert(review.getReviewTime()));
 
             return convertView;
         }
 
-        public String timeConvert(long time) {
+        private String timeConvert(long time) {
             long x = time / 1000;
             long seconds  = x % 60;
             x /= 60;

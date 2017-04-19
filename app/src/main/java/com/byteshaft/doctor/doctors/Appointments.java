@@ -143,7 +143,7 @@ public class Appointments extends Fragment implements
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%sdoctor/agenda?date=%s", AppGlobals.BASE_URL, date));
+        request.open("GET", String.format("%sdoctor/appointments/?date=%s", AppGlobals.BASE_URL, date));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
@@ -307,7 +307,6 @@ public class Appointments extends Fragment implements
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.reject_background));
             }
-
             return convertView;
         }
     }

@@ -12,7 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,17 +24,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.byteshaft.doctor.R;
+import com.byteshaft.doctor.doctors.DoctorDetailsActivity;
+import com.byteshaft.doctor.doctors.DoctorsList;
+import com.byteshaft.doctor.gettersetter.Services;
 import com.byteshaft.doctor.messages.ConversationActivity;
 import com.byteshaft.doctor.utils.AppGlobals;
 import com.byteshaft.doctor.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -50,17 +55,30 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private TextView mSpecialityTextView;
     private TextView mDoctorStartTime;
     private RatingBar mDoctorRating;
-    private int appointmentId;
     private ImageView status;
 
     private int id;
 
     private HttpRequest request;
-    private boolean availableForChat;
     private boolean blocked;
     private ImageButton favouriteButton;
     private TextView dateText;
     private TextView timeText;
+    private boolean isBlocked;
+    private String startTime;
+    private String phonenumber;
+    private String drName;
+    private String drSpecialist;
+    private float drStars;
+    private String drPhoto;
+    private boolean availableForChat;
+    private int appointmentId;
+    private ServiceAdapter serviceAdapter;
+    private EditText priceTotalEditText;
+    private String slotTime;
+    private String appointmentDate;
+    private int selectedServiceId;
+    private String reason;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +86,23 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_create_appoint);
+        id = getIntent().getIntExtra("user", -1);
+        startTime = getIntent().getStringExtra("start_time");
+        isBlocked = getIntent().getBooleanExtra("block", false);
+        drName = getIntent().getStringExtra("name");
+        drSpecialist = getIntent().getStringExtra("specialist");
+        drStars = getIntent().getFloatExtra("stars", 0);
+        appointmentId = getIntent().getIntExtra("appointment_id", -1);
+        Log.i("TAG", "appointmentId " + appointmentId);
+        phonenumber = getIntent().getStringExtra("number");
+        drPhoto = getIntent().getStringExtra("photo");
+        availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        slotTime = getIntent().getStringExtra("time_slot");
+        appointmentDate = getIntent().getStringExtra("appointment_date");
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
+        dateText.setText(appointmentDate);
+        timeText.setText(slotTime);
         callButton = (ImageButton) findViewById(R.id.btn_call);
         chatButton = (ImageButton) findViewById(R.id.btn_chat);
         mDoctorImage = (CircleImageView) findViewById(R.id.doctor_image);
@@ -84,6 +117,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mNameTextView.setTypeface(AppGlobals.typefaceNormal);
         mSpecialityTextView.setTypeface(AppGlobals.typefaceNormal);
         mDoctorStartTime.setTypeface(AppGlobals.typefaceNormal);
+        priceTotalEditText = (EditText) findViewById(R.id.tv_total);
+        priceTotalEditText.setTypeface(AppGlobals.robotoBlackItalic);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
@@ -92,27 +127,24 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
+        final ArrayList<Services> arrayList = DoctorsList.sDoctorServices.get(id);
+        if (arrayList.size() > 0) {
+            serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
+            serviceAdapter = new ServiceAdapter(arrayList);
+            serviceListSpinner.setAdapter(serviceAdapter);
+            serviceListSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    Services service = arrayList.get(i);
+                    selectedServiceId = service.getServiceId();
+                    priceTotalEditText.setText(service.getServicePrice());
+                }
 
-        serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
-        List<String> serviceList = new ArrayList<>();
-        serviceList.add("Service 1");
-        serviceList.add("Service 2");
-        serviceList.add("Service 3");
-        serviceList.add("Service 4");
-        serviceList.add("Service 5");
-        ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, serviceList);
-        serviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        serviceListSpinner.setAdapter(serviceAdapter);
-
-        final String startTime = getIntent().getStringExtra("start_time");
-        final String name = getIntent().getStringExtra("name");
-        final String specialist = getIntent().getStringExtra("specialist");
-        final int stars = getIntent().getIntExtra("stars", 0);
-        mPhoneNumber = getIntent().getStringExtra("number");
-        final String photo = getIntent().getStringExtra("photo");
-        appointmentId = getIntent().getIntExtra("appointment_id", -1);
-        availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
+        }
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
@@ -120,16 +152,16 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         }
         blocked = getIntent().getBooleanExtra("block", false);
         mDoctorStartTime.setText(startTime);
-        mNameTextView.setText(name);
-        mSpecialityTextView.setText(specialist);
-        mDoctorRating.setRating(stars);
+        mNameTextView.setText(drName);
+        mSpecialityTextView.setText(drSpecialist);
+        mDoctorRating.setRating(drStars);
         if (blocked) {
             chatButton.setEnabled(false);
         }
         if ( AppGlobals.isDoctorFavourite) {
             favouriteButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
-        Helpers.getBitMap(photo, mDoctorImage);
+        Helpers.getBitMap(drPhoto, mDoctorImage);
 
     }
 
@@ -225,9 +257,14 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 break;
 
             case R.id.button_save:
-                String appointmentReasonString = mAppointmentEditText.getText().toString();
-                System.out.println(appointmentReasonString  + "working");
-                patientsAppointment(appointmentReasonString, new int[4]);
+                String appointmentReason = mAppointmentEditText.getText().toString();
+                System.out.println(appointmentReason  + "working");
+                if (appointmentReason != null && !appointmentReason.trim().isEmpty()) {
+                    patientsAppointment(appointmentReason, selectedServiceId);
+                } else {
+                    Helpers.showSnackBar(findViewById(android.R.id.content),
+                            getResources().getString(R.string.please_enter_appointment_reason));
+                }
         }
     }
 
@@ -257,24 +294,27 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         }
     }
 
-    private void patientsAppointment(String appointmentReason, int[] services_id) {
+    private void patientsAppointment(String appointmentReason, int serviceId) {
+        Helpers.showProgressDialog(this, "Getting appointment");
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%sappointment/%s/request",
-                AppGlobals.BASE_URL, appointmentId));
+        request.open("POST", String.format("%sdoctors/%s/schedule/%s/get-appointment",
+                AppGlobals.BASE_URL,id,  appointmentId));
         Log.i("TAG", "id " + appointmentId);
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        request.send(getAppointmentData(appointmentReason, services_id));
+        request.send(getAppointmentData(appointmentReason, serviceId));
+        Log.i("TAG", getAppointmentData(appointmentReason, serviceId));
     }
 
-
-    private String getAppointmentData(String appointmentReason, int[] services_id) {
+    private String getAppointmentData(String appointmentReason, int serviceId) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("reason", appointmentReason);
-            jsonObject.put("services_id", services_id);
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.put(serviceId);
+            jsonObject.put("services", jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -286,13 +326,22 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
                         break;
                     case HttpRequest.STATE_DONE:
                             case HttpURLConnection.HTTP_CREATED:
-                                Log.i("TAG", "HTTP_CREATED " + request.getResponseText());
+                                Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.appointment_created));
+                                new android.os.Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        DoctorBookingActivity.getInstance().finish();
+                                        DoctorDetailsActivity.getInstance().finish();
+                                        finish();
+                                    }
+                                }, 500);
                                 break;
                 }
 
@@ -303,5 +352,50 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
 
+    }
+
+    private class ServiceAdapter extends BaseAdapter {
+
+        private ArrayList<Services> arrayList;
+        private ViewHolder viewHolder;
+
+        public ServiceAdapter(ArrayList<Services> arrayList) {
+            super();
+            this.arrayList = arrayList;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getLayoutInflater().inflate(R.layout.service_delegate, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.serviceName = (TextView) convertView.findViewById(R.id.service_name);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            Services services = arrayList.get(position);
+            Log.i("TAG", "service id " + services.getServiceId());
+            viewHolder.serviceName.setText(services.getServiceName());
+            return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return arrayList.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+    }
+    private class ViewHolder {
+        TextView serviceName;
     }
 }
