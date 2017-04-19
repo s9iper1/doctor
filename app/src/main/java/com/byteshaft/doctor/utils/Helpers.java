@@ -111,7 +111,7 @@ public class Helpers {
     }
 
     public static void showSnackBar(View view, String text) {
-        Snackbar.make(view, text, Snackbar.LENGTH_SHORT)
+        Snackbar.make(view, text, Snackbar.LENGTH_LONG)
                 .setActionTextColor(AppGlobals.getContext().getResources().getColor(android.R.color.holo_red_light))
                 .show();
     }
