@@ -81,6 +81,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
                         ))));
+                mListView.setSelectionAfterHeaderView();
 
             }
         });

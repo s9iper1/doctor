@@ -78,6 +78,7 @@ public class Helpers {
             public void onClick(DialogInterface dialog, int id) {
                 if (compat != null) {
                     compat.setChecked(false);
+                    compat.setEnabled(true);
                 }
                 dialog.dismiss();
             }
