@@ -60,11 +60,10 @@ import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
  */
 
 public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadyStateChangeListener,
-        HttpRequest.OnErrorListener{
+        HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private ListView mListView;
-//    private HashMap<Integer, String[]> doctorsList;
     private ArrayList<FavoriteDoctorsList> favoriteDoctorsList;
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
@@ -192,6 +191,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     }
 
     public void geFavoriteDoctorsList(String date) {
+        Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_favourite_doctors));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -203,6 +203,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        Helpers.dismissProgressDialog();
+        Helpers.showSnackBar(getView(), exception.getMessage());
 
     }
 

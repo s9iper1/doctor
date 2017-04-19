@@ -3,7 +3,6 @@ package com.byteshaft.doctor.patients;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -35,7 +34,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private EditText mDateEditText;
     private EditText mTimeEditText;
     private EditText mReturnDateEditText;
-    private EditText mEexplanationEditText;
+    private EditText mExplanationEditText;
     private EditText mConclusionsEditText;
 
     private DatePickerDialog datePickerDialog;
@@ -45,7 +44,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private ImageButton backPress;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setTitle(R.string.my_patient_details);
         setContentView(R.layout.activity_doctors_appointment);
@@ -59,7 +58,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mDateEditText = (EditText) findViewById(R.id.date_edit_text);
         mTimeEditText = (EditText) findViewById(R.id.time_edit_text);
         mReturnDateEditText = (EditText) findViewById(R.id.return_date_edit_text);
-        mEexplanationEditText = (EditText) findViewById(R.id.explanation_edit_text);
+        mExplanationEditText = (EditText) findViewById(R.id.explanation_edit_text);
         mConclusionsEditText = (EditText) findViewById(R.id.conclusions_edit_text);
         backPress = (ImageButton) findViewById(R.id.back_press);
         backPress.setOnClickListener(this);
@@ -67,7 +66,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mDateEditText.setTypeface(AppGlobals.typefaceNormal);
         mTimeEditText.setTypeface(AppGlobals.typefaceNormal);
         mReturnDateEditText.setTypeface(AppGlobals.typefaceNormal);
-        mEexplanationEditText.setTypeface(AppGlobals.typefaceNormal);
+        mExplanationEditText.setTypeface(AppGlobals.typefaceNormal);
         mConclusionsEditText.setTypeface(AppGlobals.typefaceNormal);
 
         mDateEditText.setOnClickListener(this);

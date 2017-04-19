@@ -123,6 +123,13 @@
     <string name="cannot_go_back_from_current_date">Cannot go back from current date</string>
     <string name="please_enter_appointment_reason">please enter appointment reason</string>
     <string name="appointment_created">Appointment Created</string>
+    <string name="account_not_activated">Account not activated. we will mail you when your account gets activated</string>
+    <string name="account">Account</string>
+    <string name="getting_doctor_list">fetching doctors list…</string>
+    <string name="getting_schedule">fetching schedule…</string>
+    <string name="getting_patients">fetching patients…</string>
+    <string name="getting_favourite_doctors">fetching favourite doctor</string>
+    <string name="fetching_my_appointments">fetching…</string>
 
 </resources>
 
