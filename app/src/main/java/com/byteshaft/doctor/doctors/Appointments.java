@@ -151,6 +151,13 @@ public class Appointments extends Fragment implements
 
     private void updateAppointmentStatus(final String state, int id, final int position) {
         HttpRequest request = new HttpRequest(getActivity());
+        request.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                Helpers.dismissProgressDialog();
+                Helpers.alertDialog(getActivity(), "", exception.getMessage(), null);
+            }
+        });
         Helpers.showProgressDialog(getActivity(), "Please wait..");
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -164,6 +171,9 @@ public class Appointments extends Fragment implements
                                 Agenda agenda = agendaArrayList.get(position);
                                 agenda.setAgendaState(state);
                                 arrayAdapter.notifyDataSetChanged();
+                                break;
+                            case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
+                                Helpers.alertDialog(getActivity(), "Warning", "check your internet connection", null);
                         }
                 }
             }
