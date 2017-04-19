@@ -24,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.gettersetter.AppointmentDetail;
@@ -113,7 +112,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(DoctorBookingActivity.this, dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(DoctorBookingActivity.this, dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
                 currentDate = dateFormat.format(formattedDate);
                 Log.i("TAG", "current date  " + currentDate);
                 getSchedule(currentDate);
