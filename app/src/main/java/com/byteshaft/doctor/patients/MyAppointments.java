@@ -48,7 +48,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static com.byteshaft.doctor.utils.Helpers.getBitMap;
 
 
-public class MyAppointments extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class MyAppointments extends Fragment implements HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private ListView appointmentList;

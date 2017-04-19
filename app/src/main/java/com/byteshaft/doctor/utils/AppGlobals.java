@@ -92,6 +92,10 @@ public class AppGlobals extends Application {
     public static final String KEY_SPECIALIST_SELECTED = "selected_specialist";
     public static final String KEY_INSURANCE_SELECTED = "selected_insurance";
 
+    public static final String PENDING = "pending";
+    public static final String ACCEPTED = "accepted";
+    public static final String REJCTED = "rejected";
+
 
     public static final String KEY_TOKEN = "token";
     public static final String USER_ACTIVATION_KEY = "activation_key";
