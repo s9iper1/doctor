@@ -41,7 +41,10 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -64,7 +67,6 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     private Toolbar toolbar;
     private HttpRequest request;
     private Adapter patientAppointmentAdapter;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -238,7 +240,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                                 appointment.setDrSpeciality(specialityJsonObject.getString("name"));
                                 JSONArray serviceArray = appointmentObject.getJSONArray("services");
                                 for (int j = 0; j < serviceArray.length(); j++) {
-                                    JSONObject service =  serviceArray.getJSONObject(j);
+                                    JSONObject service = serviceArray.getJSONObject(j);
                                     JSONObject serviceDetail = service.getJSONObject("service");
                                     appointment.setServiceName(serviceDetail.getString("name"));
                                 }
@@ -283,12 +285,27 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                 viewHolder.doctorName = (TextView) convertView.findViewById(R.id.doctor_name);
                 viewHolder.serviceDescription = (TextView) convertView.findViewById(R.id.service_description);
                 viewHolder.appointmentStatus = (TextView) convertView.findViewById(R.id.appointment_status);
+
+                // setting typeface
+                viewHolder.appointmentDate.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.appointmentTime.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.doctorName.setTypeface(AppGlobals.robotoBold);
+                viewHolder.serviceDescription.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.appointmentStatus.setTypeface(AppGlobals.typefaceNormal);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             PatientAppointment appointment = appointmentsList.get(position);
-            viewHolder.appointmentDate.setText(appointment.getDate());
+            SimpleDateFormat formatterFrom = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date formattedDate = null;
+            try {
+                formattedDate = formatterFrom.parse(appointment.getDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            viewHolder.appointmentDate.setText(dateFormat.format(formattedDate));
             viewHolder.appointmentTime.setText(appointment.getAppointmentTime());
             viewHolder.doctorName.setText(appointment.getDrFirstName() + " " + appointment.getDrSpeciality());
 
