@@ -59,7 +59,7 @@ import static com.byteshaft.doctor.utils.Helpers.calculationByDistance;
  * Created by s9iper1 on 3/9/17.
  */
 
-public class MyPatients extends Fragment {
+public class MyPatients extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private ListView mListView;
@@ -170,7 +170,6 @@ public class MyPatients extends Fragment {
         return mBaseView;
     }
 
-
     @Override
     public void onPause() {
         super.onPause();
@@ -193,6 +192,16 @@ public class MyPatients extends Fragment {
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
     }
 
     private class CustomAdapter extends ArrayAdapter<ArrayList<com.byteshaft.doctor.gettersetter.MyPatients>> {
@@ -244,7 +253,6 @@ public class MyPatients extends Fragment {
             } else {
                 viewHolder.status.setImageResource(R.mipmap.ic_online_indicator);
             }
-
             viewHolder.chat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

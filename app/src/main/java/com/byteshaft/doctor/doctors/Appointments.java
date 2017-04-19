@@ -208,7 +208,8 @@ public class Appointments extends Fragment implements
                                 agenda.setDate(agendaObject.getString("date"));
                                 agenda.setAgendaState(agendaObject.getString("state"));
                                 agenda.setReaseon(agendaObject.getString("reason"));
-                                agenda.setDoctorId(agendaObject.getInt("doctor"));
+                                JSONObject doctorJsonObject = agendaObject.getJSONObject("doctor");
+                                agenda.setDoctorId(doctorJsonObject.getInt("id"));
                                 agenda.setAgendaId(agendaObject.getInt("id"));
                                 agenda.setStartTIme(agendaObject.getString("start_time"));
                                 agendaArrayList.add(agenda);
