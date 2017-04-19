@@ -241,6 +241,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                                 }
                                 appointment.setAppointmentTime(appointmentObject.getString("start_time"));
                                 appointment.setState(appointmentObject.getString("state"));
+                                appointments.add(appointment);
                                 patientAppointmentAdapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
@@ -253,7 +254,6 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
     }
 
     private class Adapter extends ArrayAdapter<PatientAppointment> {
@@ -307,13 +307,14 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
 
 
             viewHolder.serviceDescription.setText(appointment.getServiceName());
+            Log.i("TAG", appointment.getState());
             switch (appointment.getState()) {
                 case "accepted":
                     viewHolder.appointmentStatus.setText("A");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.attended_background_color));
                     break;
-                case "C]rejected":
+                case "rejected":
                     viewHolder.appointmentStatus.setText("C");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.cancel_background_color));
