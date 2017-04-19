@@ -24,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.gettersetter.AppointmentDetail;
@@ -113,7 +112,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(DoctorBookingActivity.this, dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(DoctorBookingActivity.this, dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
                 currentDate = dateFormat.format(formattedDate);
                 Log.i("TAG", "current date  " + currentDate);
                 getSchedule(currentDate);
@@ -222,6 +221,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                         ConversationActivity.class));
                 break;
             case R.id.favt_button:
+                mFavButton.setEnabled(false);
                 if (!AppGlobals.isDoctorFavourite) {
                     Helpers.favouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
                         @Override
@@ -229,16 +229,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                             switch (readyState) {
                                 case HttpRequest.STATE_DONE:
                                     switch (request.getStatus()) {
-                                        case HttpURLConnection.HTTP_CREATED:
+                                        case HttpURLConnection.HTTP_OK:
+                                            mFavButton.setEnabled(true);
                                             Log.i("TAG", "favourite " + request.getResponseText());
-                                            JSONObject jsonObject = null;
-                                            try {
-                                                jsonObject = new JSONObject(request.getResponseText());
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                            AppGlobals.favouriteHashMap.put(id, jsonObject);
-                                            Log.i("TAG", "adding to hashmap " + id + jsonObject);
                                             AppGlobals.isDoctorFavourite = true;
                                             mFavButton.setBackgroundResource(R.mipmap.ic_heart_fill);
                                     }
@@ -247,36 +240,30 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                     }, new HttpRequest.OnErrorListener() {
                         @Override
                         public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
+                            mFavButton.setEnabled(true);
                         }
                     });
                 } else {
-                    if (AppGlobals.favouriteHashMap.containsKey(id)) {
-                        try {
-                            Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
-                                @Override
-                                public void onReadyStateChange(HttpRequest request, int readyState) {
-                                    switch (readyState) {
-                                        case HttpRequest.STATE_DONE:
-                                            switch (request.getStatus()) {
-                                                case HttpURLConnection.HTTP_NO_CONTENT:
-                                                    AppGlobals.isDoctorFavourite = false;
-                                                    mFavButton.setBackgroundResource(R.mipmap.ic_empty_heart);
-
-                                            }
+                    Helpers.unFavouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
+                        @Override
+                        public void onReadyStateChange(HttpRequest request, int readyState) {
+                            switch (readyState) {
+                                case HttpRequest.STATE_DONE:
+                                    switch (request.getStatus()) {
+                                        case HttpURLConnection.HTTP_NO_CONTENT:
+                                            AppGlobals.isDoctorFavourite = false;
+                                            mFavButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+                                            mFavButton.setEnabled(true);
                                     }
+                            }
 
-                                }
-                            }, new HttpRequest.OnErrorListener() {
-                                @Override
-                                public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
-                                }
-                            });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
+                    }, new HttpRequest.OnErrorListener() {
+                        @Override
+                        public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                            mFavButton.setEnabled(true);
+                        }
+                    });
                 }
                 break;
         }
@@ -344,7 +331,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         progressBar.setVisibility(View.GONE);
-        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getMessage());
+        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
     }
 
 
@@ -354,7 +341,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         TextView textView = (TextView) view;
         Log.i("TAG", timeSlots.get(i).getStartTime());
         if (!appointmentDetail.getState()) {
-            textView.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
             Intent intent = new Intent(this, CreateAppointmentActivity.class);
             intent.putExtra("appointment_id", appointmentDetail.getSlotId());
             intent.putExtra("start_time", appointmentDetail.getStartTime());

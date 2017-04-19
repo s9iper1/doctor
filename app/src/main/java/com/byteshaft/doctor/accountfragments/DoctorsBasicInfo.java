@@ -52,7 +52,7 @@ import java.util.ArrayList;
 import static android.R.attr.id;
 
 public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSelectedListener,
-        CompoundButton.OnCheckedChangeListener, View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnFileUploadProgressListener {
+        CompoundButton.OnCheckedChangeListener, View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnFileUploadProgressListener, HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private Button mSaveButton;
@@ -346,6 +346,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         mRequest = new HttpRequest(getActivity().getApplicationContext());
         mRequest.setTimeout(200000);
         mRequest.setOnReadyStateChangeListener(this);
+        mRequest.setOnErrorListener(this);
         mRequest.setOnFileUploadProgressListener(this);
         String method = "POST";
         if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
@@ -713,6 +714,16 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             alertDialog.show();
         }
 
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        } else {
+            Helpers.dismissProgressDialog();
+        }
+        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
     }
 
     private class ViewHolder {

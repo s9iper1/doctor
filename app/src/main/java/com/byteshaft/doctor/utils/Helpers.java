@@ -78,6 +78,7 @@ public class Helpers {
             public void onClick(DialogInterface dialog, int id) {
                 if (compat != null) {
                     compat.setChecked(false);
+                    compat.setEnabled(true);
                 }
                 dialog.dismiss();
             }
@@ -110,7 +111,7 @@ public class Helpers {
     }
 
     public static void showSnackBar(View view, String text) {
-        Snackbar.make(view, text, Snackbar.LENGTH_SHORT)
+        Snackbar.make(view, text, Snackbar.LENGTH_LONG)
                 .setActionTextColor(AppGlobals.getContext().getResources().getColor(android.R.color.holo_red_light))
                 .show();
     }

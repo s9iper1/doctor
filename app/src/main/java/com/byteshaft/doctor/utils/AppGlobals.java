@@ -15,13 +15,10 @@ import com.byteshaft.doctor.R;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import org.json.JSONObject;
-
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -105,8 +102,6 @@ public class AppGlobals extends Application {
 
     public static boolean isDoctorFavourite = false;
 
-    public static HashMap<Integer, JSONObject> favouriteHashMap;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -128,9 +123,6 @@ public class AppGlobals extends Application {
         robotoRegular = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Roboto_Regular.ttf");
         robotoThin = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Roboto_Thin.ttf");
         robotoThinItalic = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/Roboto_ThinItalic.ttf");
-
-        favouriteHashMap = new HashMap<>();
-
     }
 
     private static void disableSSLCertificateChecking() {

@@ -14,7 +14,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.doctor.R;
 import com.byteshaft.doctor.utils.AppGlobals;
@@ -75,12 +74,13 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
                 currentDate = dateFormat.format(formattedDate);
                 Log.i("TAG", "current date  " + currentDate);
                 getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
                         ))));
+                mListView.setSelectionAfterHeaderView();
 
             }
         });
@@ -381,6 +381,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
+        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
 
     }
 }

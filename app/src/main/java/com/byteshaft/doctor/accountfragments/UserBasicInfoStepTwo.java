@@ -45,7 +45,7 @@ import java.util.ArrayList;
 
 public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItemSelectedListener,
         View.OnClickListener, CompoundButton.OnCheckedChangeListener, HttpRequest.OnReadyStateChangeListener,
-        HttpRequest.OnFileUploadProgressListener {
+        HttpRequest.OnFileUploadProgressListener, HttpRequest.OnErrorListener {
     private View mBaseView;
     private Spinner mStateSpinner;
     private Spinner mCitySpinner;
@@ -410,6 +410,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mRequest.setTimeout(200000);
         mRequest.setOnReadyStateChangeListener(this);
         mRequest.setOnFileUploadProgressListener(this);
+        mRequest.setOnErrorListener(this);
         String method = "POST";
         if (AppGlobals.isInfoAvailable()) {
             method = "PATCH";
@@ -593,5 +594,15 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
             alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        } else {
+            Helpers.dismissProgressDialog();
+        }
+        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
     }
 }

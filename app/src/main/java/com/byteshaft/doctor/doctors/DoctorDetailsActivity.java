@@ -116,7 +116,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         if (isBlocked) {
             chatButton.setEnabled(false);
         }
-        if ( AppGlobals.isDoctorFavourite) {
+        if (AppGlobals.isDoctorFavourite) {
             heartButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
         heartButton.setOnClickListener(this);
@@ -155,7 +155,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        String url =  String.format("%sdoctors/%s/review",
+        String url = String.format("%sdoctors/%s/review",
                 AppGlobals.BASE_URL, id);
         Log.i("TAG", "url" + url);
         request.open("GET", String.format("%sdoctors/%s/review",
@@ -171,7 +171,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
 
@@ -194,6 +195,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                         ConversationActivity.class));
                 break;
             case R.id.heart_button:
+                heartButton.setEnabled(false);
                 if (!AppGlobals.isDoctorFavourite) {
                     Helpers.favouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
                         @Override
@@ -201,16 +203,9 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                             switch (readyState) {
                                 case HttpRequest.STATE_DONE:
                                     switch (request.getStatus()) {
-                                        case HttpURLConnection.HTTP_CREATED:
+                                        case HttpURLConnection.HTTP_OK:
+                                            heartButton.setEnabled(true);
                                             Log.i("TAG", "favourite " + request.getResponseText());
-                                            JSONObject jsonObject = null;
-                                            try {
-                                                jsonObject = new JSONObject(request.getResponseText());
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-                                            AppGlobals.favouriteHashMap.put(id, jsonObject);
-                                            Log.i("TAG", "adding to hashmap " + id + jsonObject);
                                             AppGlobals.isDoctorFavourite = true;
                                             heartButton.setBackgroundResource(R.mipmap.ic_heart_fill);
                                     }
@@ -219,36 +214,31 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                     }, new HttpRequest.OnErrorListener() {
                         @Override
                         public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
+                            heartButton.setEnabled(true);
                         }
                     });
                 } else {
-                    if (AppGlobals.favouriteHashMap.containsKey(id)) {
-                        try {
-                            Helpers.unFavouriteDoctorTask(AppGlobals.favouriteHashMap.get(id).getInt("id"), new HttpRequest.OnReadyStateChangeListener() {
-                                @Override
-                                public void onReadyStateChange(HttpRequest request, int readyState) {
-                                    switch (readyState) {
-                                        case HttpRequest.STATE_DONE:
-                                            switch (request.getStatus()) {
-                                                case HttpURLConnection.HTTP_NO_CONTENT:
-                                                    AppGlobals.isDoctorFavourite = false;
-                                                    heartButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+                    Helpers.unFavouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
+                        @Override
+                        public void onReadyStateChange(HttpRequest request, int readyState) {
+                            switch (readyState) {
+                                case HttpRequest.STATE_DONE:
+                                    switch (request.getStatus()) {
+                                        case HttpURLConnection.HTTP_NO_CONTENT:
+                                            heartButton.setEnabled(true);
+                                            AppGlobals.isDoctorFavourite = false;
+                                            heartButton.setBackgroundResource(R.mipmap.ic_empty_heart);
 
-                                            }
                                     }
+                            }
 
-                                }
-                            }, new HttpRequest.OnErrorListener() {
-                                @Override
-                                public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-
-                                }
-                            });
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
+                    }, new HttpRequest.OnErrorListener() {
+                        @Override
+                        public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                            heartButton.setEnabled(true);
+                        }
+                    });
                 }
                 break;
         }
@@ -292,7 +282,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 reviewList.setVisibility(View.VISIBLE);
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", "review "+ request.getResponseText());
+                        Log.i("TAG", "review " + request.getResponseText());
                         arrayList = new ArrayList<>();
                         reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
                         reviewList.setAdapter(reviewAdapter);
@@ -332,7 +322,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         progressBar.setVisibility(View.GONE);
-        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getMessage());
+        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
 
     }
 
@@ -380,18 +370,18 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
         private String timeConvert(long time) {
             long x = time / 1000;
-            long seconds  = x % 60;
+            long seconds = x % 60;
             x /= 60;
             long minutes = x % 60;
             x /= 60;
-           long hours = x % 24;
+            long hours = x % 24;
             x /= 24;
-            long days  = x;
+            long days = x;
             if (days > 0)
-            return days +" days ago";
-            else if (days == 0 && hours > 0) return hours +" hours ago";
-            else if (days == 0 && hours == 0 && minutes > 0) return hours +" minutes ago";
-            else  return seconds +" seconds ago";
+                return days + " days ago";
+            else if (days == 0 && hours > 0) return hours + " hours ago";
+            else if (days == 0 && hours == 0 && minutes > 0) return hours + " minutes ago";
+            else return seconds + " seconds ago";
         }
 
         @Override
