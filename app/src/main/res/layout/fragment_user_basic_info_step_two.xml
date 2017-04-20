@@ -134,7 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/emergency_contact"
-                android:inputType="phone"
+                android:inputType="text"
                 android:maxLength="250"/>
         </android.support.design.widget.TextInputLayout>
 
