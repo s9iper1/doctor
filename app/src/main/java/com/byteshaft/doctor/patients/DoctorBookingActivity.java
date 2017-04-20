@@ -136,14 +136,13 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mCallButton.setOnClickListener(this);
         mChatButton.setOnClickListener(this);
         mFavButton.setOnClickListener(this);
+        Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
-        AppGlobals.isDoctorFavourite = getIntent().getBooleanExtra("favourite", false);
         final String startTime = getIntent().getStringExtra("start_time");
         drName = getIntent().getStringExtra("name");
         drSpecialist = getIntent().getStringExtra("specialist");
         drStars = getIntent().getFloatExtra("stars", 0);
-        final boolean favourite = getIntent().getBooleanExtra("favourite", false);
         phoneNumber = getIntent().getStringExtra("number");
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
@@ -156,15 +155,22 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         if (isBlocked) {
             mChatButton.setEnabled(false);
         }
-        if (favourite) {
-            mFavButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
-        }
         mDoctorName.setText(drName);
         mDoctorSpeciality.setText(drSpecialist);
         mDoctorRating.setRating(drStars);
         mTime.setText(startTime);
         Helpers.getBitMap(drPhoto, mDoctorImage);
         getSchedule(currentDate);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (AppGlobals.isDoctorFavourite) {
+            mFavButton.setBackgroundResource(R.mipmap.ic_heart_fill);
+        } else {
+            mFavButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+        }
     }
 
     @Override

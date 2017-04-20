@@ -124,6 +124,12 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         chatButton.setOnClickListener(this);
         mSaveButton.setOnClickListener(this);
         favouriteButton.setOnClickListener(this);
+        Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
+        if (AppGlobals.isDoctorFavourite) {
+            favouriteButton.setBackgroundResource(R.mipmap.ic_heart_fill);
+        } else {
+            favouriteButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+        }
 
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
@@ -160,9 +166,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         mDoctorRating.setRating(drStars);
         if (blocked) {
             chatButton.setEnabled(false);
-        }
-        if ( AppGlobals.isDoctorFavourite) {
-            favouriteButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
         Helpers.getBitMap(drPhoto, mDoctorImage);
 

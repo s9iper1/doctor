@@ -116,9 +116,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         if (isBlocked) {
             chatButton.setEnabled(false);
         }
-        if (AppGlobals.isDoctorFavourite) {
-            heartButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
-        }
         heartButton.setOnClickListener(this);
         bookingButton = (Button) findViewById(R.id.button_book);
         showallReviewButton = (Button) findViewById(R.id.review_all_button);
@@ -148,6 +145,17 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         }
         Helpers.getBitMap(photo, circleImageView);
         getReviews();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (AppGlobals.isDoctorFavourite) {
+            heartButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
+        } else {
+            heartButton.setBackground(getResources().getDrawable(R.mipmap.ic_empty_heart));
+
+        }
     }
 
     private void getReviews() {
