@@ -128,7 +128,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
         final ArrayList<Services> arrayList = DoctorsList.sDoctorServices.get(id);
-        if (arrayList.size() > 0) {
+        if (arrayList != null && arrayList.size() > 0) {
             serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
             serviceAdapter = new ServiceAdapter(arrayList);
             serviceListSpinner.setAdapter(serviceAdapter);
@@ -144,6 +144,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
+        } else {
+            Helpers.alertDialog(this, getResources().getString(R.string.no_services),
+                    getResources().getString(R.string.no_services_message), null);
         }
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);

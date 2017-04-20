@@ -159,7 +159,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         if (favourite) {
             mFavButton.setBackground(getResources().getDrawable(R.mipmap.ic_heart_fill));
         }
-
         mDoctorName.setText(drName);
         mDoctorSpeciality.setText(drSpecialist);
         mDoctorRating.setRating(drStars);
@@ -306,6 +305,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                         timeSlots = new ArrayList<>();
                         timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
                         timeTableGrid.setAdapter(timeTableAdapter);
+                        timeTableGrid.setVisibility(View.VISIBLE);
                         try {
                             JSONObject mainObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = mainObject.getJSONArray("time_slots");

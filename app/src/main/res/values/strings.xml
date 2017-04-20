@@ -130,6 +130,8 @@
     <string name="getting_patients">fetching patients…</string>
     <string name="getting_favourite_doctors">fetching favourite doctor</string>
     <string name="fetching_my_appointments">fetching…</string>
+    <string name="no_services">No Service</string>
+    <string name="no_services_message">No Service set by this doctor</string>
 
 </resources>
 
