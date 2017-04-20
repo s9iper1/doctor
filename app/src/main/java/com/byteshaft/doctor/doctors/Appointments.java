@@ -237,7 +237,7 @@ public class Appointments extends Fragment implements
                                 JSONObject patientDetailsObject = agendaObject.getJSONObject("patient");
 
                                 /// getting patient details
-                                Log.i("PatientDetaisl", patientDetailsObject.toString());
+                                Log.i("PatientDetails", patientDetailsObject.toString());
 
                                 Agenda agenda = new Agenda();
                                 agenda.setFirstName(patientDetailsObject.getString("first_name"));

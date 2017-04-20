@@ -221,8 +221,16 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 com.byteshaft.doctor.gettersetter.FavoriteDoctorsList myFavoriteDoctorsList
                                         = new com.byteshaft.doctor.gettersetter.FavoriteDoctorsList();
-                                myFavoriteDoctorsList.setDoctorsName(jsonObject.getString("first_name") + " " +
-                                        jsonObject.getString("last_name"));
+                                StringBuilder stringBuilder = new StringBuilder();
+                                if (jsonObject.getString("gender").equals("M")) {
+                                    stringBuilder.append("Dr.");
+                                } else {
+                                    stringBuilder.append("Dra.");
+                                }
+                                stringBuilder.append(jsonObject.getString("first_name"));
+                                stringBuilder.append(" ");
+                                stringBuilder.append(jsonObject.getString("last_name"));
+                                myFavoriteDoctorsList.setDoctorsName(stringBuilder.toString());
                                 myFavoriteDoctorsList.setDoctorsLocation(jsonObject.getString("location"));
                                 myFavoriteDoctorsList.setId(jsonObject.getInt("id"));
                                 JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
