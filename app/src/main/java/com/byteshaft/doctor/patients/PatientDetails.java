@@ -28,8 +28,6 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private ImageButton callButton;
     private ImageButton chatButton;
     private Button appointmentButton;
-
-
     private EditText docId;
     private EditText birthDate;
     private EditText patientAddress;

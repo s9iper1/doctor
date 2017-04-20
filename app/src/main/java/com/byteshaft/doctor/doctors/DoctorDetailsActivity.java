@@ -322,8 +322,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         progressBar.setVisibility(View.GONE);
-        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
-
     }
 
     private class ReviewAdapter extends ArrayAdapter {

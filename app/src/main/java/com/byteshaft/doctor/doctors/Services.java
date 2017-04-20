@@ -215,6 +215,7 @@ public class Services extends Fragment implements View.OnClickListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.i("TAG", jsonObject.toString());
         request.send(jsonObject.toString());
     }
 

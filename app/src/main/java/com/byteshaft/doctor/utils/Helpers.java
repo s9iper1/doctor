@@ -49,6 +49,7 @@ import static com.byteshaft.doctor.utils.AppGlobals.sImageLoader;
 public class Helpers {
 
     private static ProgressDialog progressDialog;
+    private static AlertDialog alertDialog;
 
     // get default sharedPreferences.
     private static SharedPreferences getPreferenceManager() {
@@ -71,6 +72,10 @@ public class Helpers {
 
     }
 
+    public static AlertDialog getAlertDialog() {
+        return alertDialog;
+    }
+
     public static void alertDialog(Activity activity, String title, String msg, final SwitchCompat compat) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setTitle(title);
@@ -83,7 +88,7 @@ public class Helpers {
                 dialog.dismiss();
             }
         });
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 

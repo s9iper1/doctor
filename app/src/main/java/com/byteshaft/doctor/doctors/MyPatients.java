@@ -275,7 +275,6 @@ public class MyPatients extends Fragment {
     }
 
     private void getPatientsDetails() {
-        Helpers.showProgressDialog(getActivity(), "fetching patients...");
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -305,16 +304,24 @@ public class MyPatients extends Fragment {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                                break;
+                            case HttpURLConnection.HTTP_UNAUTHORIZED:
+                            Helpers.dismissProgressDialog();
+                                try {
+                                    Helpers.showSnackBar(getView(), new JSONObject(request.getResponseText()).getString("detail"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
                         }
                 }
-
             }
         });
         request.setOnErrorListener(new HttpRequest.OnErrorListener() {
             @Override
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
                 Helpers.dismissProgressDialog();
-                Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+                Helpers.showSnackBar(getView(), getResources().getString(R.string.check_internet));
             }
         });
         request.open("GET", String.format("%sdoctor/patients/", AppGlobals.BASE_URL));

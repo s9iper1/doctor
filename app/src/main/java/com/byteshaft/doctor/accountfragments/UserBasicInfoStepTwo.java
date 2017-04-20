@@ -79,7 +79,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
     private ArrayList<Cities> citiesList;
     private CitiesAdapter citiesAdapter;
 
-    private ArrayList<InsuranceCarriers> insuranceCarriersesList;
+    private ArrayList<InsuranceCarriers> insuranceCarriersList;
     private InsuranceCarriersAdapter insuranceCarriersAdapter;
 
     private int cityPosition;
@@ -103,7 +103,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         /// data list work
         statesList = new ArrayList<>();
         citiesList = new ArrayList<>();
-        insuranceCarriersesList = new ArrayList<>();
+        insuranceCarriersList = new ArrayList<>();
 
         mStateSpinner = (Spinner) mBaseView.findViewById(R.id.states_spinner);
         mCitySpinner = (Spinner) mBaseView.findViewById(R.id.cities_spinner);
@@ -169,9 +169,9 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                             insuranceCarrierPosition = i;
                                         }
                                         insuranceCarriers.setName(jsonObject.getString("name"));
-                                        insuranceCarriersesList.add(insuranceCarriers);
+                                        insuranceCarriersList.add(insuranceCarriers);
                                     }
-                                    insuranceCarriersAdapter = new InsuranceCarriersAdapter(getActivity(), insuranceCarriersesList);
+                                    insuranceCarriersAdapter = new InsuranceCarriersAdapter(getActivity(), insuranceCarriersList);
                                     mInsuranceCarrierSpinner.setAdapter(insuranceCarriersAdapter);
                                     mInsuranceCarrierSpinner.setSelection(insuranceCarrierPosition);
                                 } catch (JSONException e) {
@@ -296,7 +296,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                         city.getCityId());
                 break;
             case R.id.insurance_spinner:
-                InsuranceCarriers insuranceCarriers = insuranceCarriersesList.get(i);
+                InsuranceCarriers insuranceCarriers = insuranceCarriersList.get(i);
                 mInsuranceCarrierSpinnerValueString = String.valueOf(insuranceCarriers.getId());
                 AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
                         insuranceCarriers.getId());
@@ -407,7 +407,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         data.append(FormData.TYPE_CONTENT_TEXT, "show_news", mNewsCheckBoxString);
 
         mRequest = new HttpRequest(getActivity().getApplicationContext());
-        mRequest.setTimeout(200000);
         mRequest.setOnReadyStateChangeListener(this);
         mRequest.setOnFileUploadProgressListener(this);
         mRequest.setOnErrorListener(this);
@@ -603,6 +602,5 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         } else {
             Helpers.dismissProgressDialog();
         }
-        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
     }
 }

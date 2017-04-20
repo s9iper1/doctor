@@ -337,8 +337,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
-        Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
-
 
     }
 

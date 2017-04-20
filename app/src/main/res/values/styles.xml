@@ -122,6 +122,8 @@
 
     <style name="MyDialogTheme" parent="android:Theme.DeviceDefault.Light.Dialog"/>
 
+    <style name="AccentButton" parent="ThemeOverlay.AppCompat.Dark"/>
+
     <style name="MyButton" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/buttonColor</item>
         <item name="android:textColor">@android:color/white</item>

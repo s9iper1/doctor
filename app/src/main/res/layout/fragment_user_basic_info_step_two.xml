@@ -134,7 +134,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/emergency_contact"
-                android:inputType="phone" />
+                android:inputType="phone"
+                android:maxLength="250"/>
         </android.support.design.widget.TextInputLayout>
 
         <Spinner
@@ -203,7 +204,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:checked="true"
             android:text="@string/i_accept_the_terms_and_conditions" />
 
 
@@ -215,6 +215,7 @@
             android:layout_marginTop="15dp"
             android:enabled="false"
             android:text="@string/save"
+            style="@style/AccentButton"
             android:theme="@style/MyButton" />
 
         <TextView

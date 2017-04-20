@@ -341,10 +341,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         data.append(FormData.TYPE_CONTENT_TEXT, "college_id", mCollegeIdEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "show_notification", mNotificationCheckBoxString);
         data.append(FormData.TYPE_CONTENT_TEXT, "show_news", mNewsCheckBoxString);
-        Log.i("send test data", data.toString());
-
         mRequest = new HttpRequest(getActivity().getApplicationContext());
-        mRequest.setTimeout(200000);
         mRequest.setOnReadyStateChangeListener(this);
         mRequest.setOnErrorListener(this);
         mRequest.setOnFileUploadProgressListener(this);
@@ -723,7 +720,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         } else {
             Helpers.dismissProgressDialog();
         }
-        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
     }
 
     private class ViewHolder {

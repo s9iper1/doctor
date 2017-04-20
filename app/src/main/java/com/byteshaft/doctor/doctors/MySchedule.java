@@ -370,8 +370,10 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         Helpers.showSnackBar(getView(), R.string.success);
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
-                        Helpers.alertDialog(getActivity(), getResources().getString(R.string.account),
-                                getResources().getString(R.string.account_not_activated), null);
+                        if (Helpers.getAlertDialog() == null) {
+                            Helpers.alertDialog(getActivity(), getResources().getString(R.string.account),
+                                    getResources().getString(R.string.account_not_activated), null);
+                        }
                         break;
                 }
         }
@@ -381,7 +383,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
-        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
 
     }
 }

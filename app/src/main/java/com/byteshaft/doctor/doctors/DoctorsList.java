@@ -341,7 +341,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
-        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
     }
 
     private class CustomAdapter extends ArrayAdapter<ArrayList<DoctorDetails>> {

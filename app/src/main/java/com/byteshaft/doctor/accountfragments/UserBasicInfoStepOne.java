@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -156,6 +157,10 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
             String url = String.format("%s" + AppGlobals
                     .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
             getBitMap(url, mProfilePicture);
+        }
+        if (AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL) != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
+            mProfilePicture.setImageBitmap(bitmap);
         }
         mNextButton.setOnClickListener(this);
         mAddressTextView.setOnClickListener(this);

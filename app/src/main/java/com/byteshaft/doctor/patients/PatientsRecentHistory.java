@@ -11,7 +11,6 @@ import com.byteshaft.doctor.utils.AppGlobals;
 
 public class PatientsRecentHistory extends AppCompatActivity {
 
-
     private TextView patientName;
     private TextView patientEmail;
     private TextView patientAge;

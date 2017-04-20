@@ -111,7 +111,6 @@ public class ForgotPassword extends Fragment implements View.OnClickListener, Ht
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
-        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
 
     }
 

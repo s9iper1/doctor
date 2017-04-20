@@ -167,7 +167,6 @@ public class Appointments extends Fragment implements
                         Helpers.dismissProgressDialog();
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                Helpers.showSnackBar(getView(), "Appointment " + state);
                                 Agenda agenda = agendaArrayList.get(position);
                                 agenda.setAgendaState(state);
                                 arrayAdapter.notifyDataSetChanged();
@@ -277,9 +276,6 @@ public class Appointments extends Fragment implements
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
-        Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
-
-
     }
 
     private class Adapter extends ArrayAdapter {

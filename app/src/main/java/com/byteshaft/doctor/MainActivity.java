@@ -68,14 +68,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sInstance = this;
+        setContentView(R.layout.activity_main);
         if (AccountManagerActivity.getInstance() != null) {
             AccountManagerActivity.getInstance().finish();
         }
         if (IntroScreen.getInstance() != null) {
             IntroScreen.getInstance().finish();
         }
-        sInstance = this;
-        setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Log.i("TAG", "token  "+ AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
